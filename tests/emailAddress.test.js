@@ -1,5 +1,5 @@
 const assert = require('assert');
-const EmailAddress = require('../emailAddress');
+const { EmailAddress } = require('../emailAddress');
 
 test('Test valid email address.', () => {
     let email;

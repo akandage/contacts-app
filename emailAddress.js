@@ -40,4 +40,7 @@ class EmailAddress
     }
 }
 
-module.exports = EmailAddress;
+module.exports = {
+    EmailAddress,
+    INVALID_EMAIL_ADDRESS
+};

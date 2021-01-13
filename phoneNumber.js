@@ -1,6 +1,7 @@
 const USA_CANADA_PHONE_NUMBER_PATTERN = '^\\+?(\\d{0,3})[ ]?(\\d\\d\\d)[ -]?(\\d\\d\\d)[ -]?(\\d\\d\\d\\d)$';
 const USA_CANADA_COUNTRY_CODE = '1';
 const INVALID_PHONE_NUMBER = 'Not a valid phone number.';
+const INVALID_USA_CANADA_PHONE_NUMBER = 'Not a valid USA or Canada phone number.';
 
 //
 // PhoneNumber class only supports USA and Canada phone numbers for now.
@@ -63,6 +64,15 @@ class PhoneNumber
 
         return false;
     }
+
+    toString()
+    {
+        return this._phoneNumber;
+    }
 }
 
-module.exports = PhoneNumber;
+module.exports = {
+    PhoneNumber,
+    INVALID_PHONE_NUMBER,
+    INVALID_USA_CANADA_PHONE_NUMBER
+};

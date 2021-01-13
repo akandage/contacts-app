@@ -1,5 +1,5 @@
 const assert = require('assert');
-const PhoneNumber = require('../phoneNumber');
+const { PhoneNumber } = require('../phoneNumber');
 
 test('Test valid US/Canada phone number.', () => {
     let phoneNum;
