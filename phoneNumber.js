@@ -1,5 +1,6 @@
+const USA_CANADA_PHONE_NUMBER_PATTERN = '^\\+?(\\d{0,3})[ ]?(\\d\\d\\d)[ -]?(\\d\\d\\d)[ -]?(\\d\\d\\d\\d)$';
 const USA_CANADA_COUNTRY_CODE = '1';
-const INVALID_USA_CANADA_PHONE_NUMBER = 'Not a valid US or Canadian phone number.';
+const INVALID_PHONE_NUMBER = 'Not a valid phone number.';
 
 //
 // PhoneNumber class only supports USA and Canada phone numbers for now.
@@ -11,34 +12,19 @@ class PhoneNumber
     {
         if (phoneNum === undefined || phoneNum === null || typeof phoneNum !== 'string')
         {
-            throw new Error(INVALID_USA_CANADA_PHONE_NUMBER);
+            throw new Error(INVALID_PHONE_NUMBER);
         }
 
-        let matches = /^\+?(\d{0,3})(\d\d\d)[ -]?(\d\d\d)[ -]?(\d\d\d\d)$/.exec(phoneNum);
+        let matches = new RegExp(USA_CANADA_PHONE_NUMBER_PATTERN).exec(phoneNum);
 
         if (matches === null)
         {
-            throw new Error(INVALID_USA_CANADA_PHONE_NUMBER);
+            throw new Error(INVALID_PHONE_NUMBER);
         }
 
-        if (matches.length > 4)
-        {
-            // Check the country code.
-            if(matches[1] !== USA_CANADA_COUNTRY_CODE)
-            {
-                throw new Error(INVALID_USA_CANADA_PHONE_NUMBER);
-            }
-
-            this._countryCode = matches[1];
-            this._areaCode = matches[2];
-            this._phoneNumber = matches[2] + matches[3] + matches[4];
-        }
-        else
-        {
-            this._countryCode = USA_CANADA_COUNTRY_CODE;
-            this._areaCode = matches[1];
-            this._phoneNumber = matches[1] + matches[2] + matches[3];
-        }
+        this._countryCode = matches[1].length > 0 ? matches[1] : USA_CANADA_COUNTRY_CODE;
+        this._areaCode = matches[2];
+        this._phoneNumber = matches[2] + matches[3] + matches[4];
     }
 
     get countryCode()
@@ -56,18 +42,18 @@ class PhoneNumber
         return this._phoneNumber;
     }
 
-    static isValidUSAOrCanada()
+    static isValidUSAOrCanada(phoneNum)
     {
         if (phoneNum === undefined || phoneNum === null || typeof phoneNum !== 'string')
         {
-            throw new Error(INVALID_USA_CANADA_PHONE_NUMBER);
+            return false;
         }
 
-        let matches = /^\+?(\d{0,3})(\d\d\d)[ -]?(\d\d\d)[ -]?(\d\d\d\d)$/.exec(phoneNum);
+        let matches = new RegExp(USA_CANADA_PHONE_NUMBER_PATTERN).exec(phoneNum);
 
         if (matches !== null)
         {
-            if (matches.length > 4)
+            if (matches[1].length > 0)
             {
                 return matches[1] === USA_CANADA_COUNTRY_CODE;
             }
