@@ -19,11 +19,13 @@ const UserSchema = mongoose.Schema({
     },
     password: {
         hash: {
-            type: String
+            type: String,
+            required: true
         }
     },
     emailAddress: {
         type: String,
+        required: true,
         unique: [ true, 'User already exists with this email address.' ],
         validate: {
             validator: EmailAddress.isValid,
@@ -32,6 +34,7 @@ const UserSchema = mongoose.Schema({
     },
     phoneNumber: {
         type: String,
+        required: true,
         unique: [ true, 'User already exists with this phone number.' ],
         validate: {
             validator: PhoneNumber.isValidUSAOrCanada,
