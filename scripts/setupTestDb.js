@@ -2,19 +2,12 @@ const dotenv = require('dotenv');
 const mongoose = require('mongoose');
 const path = require('path');
 
-const { connectToDb, disconnectDb, teardownDb } = require('../db');
-const { SessionSchema, SESSION_COLLECTION } = require('../sessionDb');
-const { UserSchema, USER_COLLECTION } = require('../userSchema');
-const testUsers = require('./testUsers');
-
 dotenv.config({
     path: path.resolve(__dirname, 'testdb.env')
 });
 
 const MONGODB_URL = process.env.MONGODB_URL;
 const MONGODB_DBNAME = process.env.MONGODB_DBNAME;
-const MONGODB_USER = process.env.MONGODB_USER;
-const MONGODB_PASS = process.env.MONGODB_PASS;
 
 if (!MONGODB_URL)
 {
@@ -24,6 +17,11 @@ if (!MONGODB_DBNAME)
 {
     throw new Error('MONGODB_DBNAME is not configured!');
 }
+
+const { connectToDb, disconnectDb, teardownDb } = require('../db');
+const { SessionSchema, SESSION_COLLECTION } = require('../sessionDb');
+const { UserSchema, USER_COLLECTION } = require('../userDb');
+const testUsers = require('./testUsers');
 
 console.log('MONGODB_URL: ' + MONGODB_URL);
 console.log('MONGODB_DBNAME: ' + MONGODB_DBNAME);

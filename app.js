@@ -17,7 +17,11 @@ const httpError = require('http-errors');
 const mongoose = require('mongoose');
 const path = require('path');
 const { SessionDb } = require('./sessionDb');
+const { UserDb } = require('./userDb');
+
 const app = express();
+const sessionDb = new SessionDb();
+const userDb = new UserDb();
 
 /**
  * Set up request logger.
@@ -52,15 +56,45 @@ app.set('mongodb-url', process.env.MONGODB_URL || 'mongodb://localhost:27017');
 app.set('mongodb-name', process.env.MONGODB_DBNAME || 'contacts-db');
 
 /**
+ * Set up middleware to attach Session-Id cookie to the request object
+ * if present in the request.
+ */
+app.use(function(req, res, next) {
+    let sessionId = req.cookies["Session-Id"];
+
+    if (sessionId)
+    {
+        let session = sessionDb.heartbeatSession(sessionId);
+
+        if (session)
+        {
+            req.session = session;
+        }
+        else
+        {
+            req.session = null;
+            res.clearCookie("Session-Id");
+        }
+    }
+
+    next();
+});
+
+/**
  * Server startup function.
  */
 
-const sessionDb = new SessionDb();
-
 app.startup = async function()
 {
-    sessionDb.connection = await connectToDb();
+    let db = await connectToDb();
+
+    sessionDb.connection = db;
     await sessionDb.start();
+    app.set('session-db', sessionDb);
+
+    userDb.connection = db;
+    await userDb.start();
+    app.set('user-db', userDb);
 }
 
 /**
@@ -68,6 +102,7 @@ app.startup = async function()
  */
 app.shutdown = async function()
 {
+    await userDb.stop();
     await sessionDb.stop();
     await disconnectDb();
 }
@@ -91,10 +126,10 @@ app.use(function(err, req, res, next) {
     switch (err.status)
     {
         case 404:
-            res.sendFile(NOT_FOUND_PAGE);
+            res.status(404).sendFile(NOT_FOUND_PAGE);
             break;
         case 500:
-            res.sendFile(ERROR_PAGE);
+            res.status(500).sendFile(ERROR_PAGE);
             break;
         default:
             break;

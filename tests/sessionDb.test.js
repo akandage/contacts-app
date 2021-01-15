@@ -1,4 +1,11 @@
 const assert = require('assert');
+const dotenv = require('dotenv');
+const path = require('path');
+
+dotenv.config({
+    path: path.resolve(__dirname, 'testdb.env')
+});
+
 const { connectToDb, disconnectDb, teardownDb } = require('../db');
 const { SessionDb } = require('../sessionDb');
 
@@ -11,10 +18,16 @@ const sessionDb = new SessionDb();
 beforeEach(async () => {
     await teardownDb();
     sessionDb.connection = await connectToDb();
+    await sessionDb.start();
 });
 
 afterEach(async () => {
-    disconnectDb();
+    await sessionDb.stop();
+    await disconnectDb();
+});
+
+afterAll(async () => {
+    await teardownDb(); 
 });
 
 test('Test register a user session.', async () => {
@@ -42,5 +55,3 @@ test('Test register a user session.', async () => {
 // TODO: Add more positive tests.
 
 // TODO: Add more negative tests.
-
-// TODO: Fix MongoDB environment warning.

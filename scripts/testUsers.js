@@ -1,4 +1,4 @@
-const Password = require('../password');
+const { Password } = require('../password');
 
 const testUsers = [
     {
@@ -12,7 +12,7 @@ const testUsers = [
     {
         username: 'testuser_bob',
         password: {
-            hash: Password.hash('Test!Password1')
+            hash: Password.hash('Test!Password2')
         },
         emailAddress: 'bob@coolmail.com',
         phoneNumber: '19051234568'
