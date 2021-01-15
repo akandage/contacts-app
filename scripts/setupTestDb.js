@@ -2,7 +2,9 @@ const dotenv = require('dotenv');
 const mongoose = require('mongoose');
 const path = require('path');
 
-const { UserSchema } = require('../userSchema');
+const { connectToDb, disconnectDb, teardownDb } = require('../db');
+const { SessionSchema, SESSION_COLLECTION } = require('../sessionDb');
+const { UserSchema, USER_COLLECTION } = require('../userSchema');
 const testUsers = require('./testUsers');
 
 dotenv.config({
@@ -23,52 +25,12 @@ if (!MONGODB_DBNAME)
     throw new Error('MONGODB_DBNAME is not configured!');
 }
 
-const MONGODB_CONNECT_URL = `${MONGODB_URL}/${MONGODB_DBNAME}`;
-
 console.log('MONGODB_URL: ' + MONGODB_URL);
 console.log('MONGODB_DBNAME: ' + MONGODB_DBNAME);
 
-async function connectToDb()
-{
-    let connectOptions = {
-        useUnifiedTopology: true
-    };
-
-    if (MONGODB_USER)
-    {
-        connectOptions.user = MONGODB_USER;
-    }
-    if (MONGODB_PASS)
-    {
-        connectOptions.pass = MONGODB_PASS;
-    }
-
-    console.log(`Connecting to ${MONGODB_CONNECT_URL}`);
-    await mongoose.connect(MONGODB_CONNECT_URL, connectOptions);
-    console.log(`Successfully connected to ${MONGODB_CONNECT_URL}`);
-
-    mongoose.connection.on('error', error => {
-        console.error(`MongoDB (${MONGODB_CONNECT_URL}) connection error: ${error}`);
-    });
-}
-
-async function disconnectDb()
-{
-    try
-    {
-        console.log(`Closing connection (${MONGODB_CONNECT_URL}).`);
-        await mongoose.connection.close();
-        console.log(`Successfully closed connection (${MONGODB_CONNECT_URL}).`);
-    }
-    catch (error)
-    {
-        console.warn(`Error closing connection (${MONGODB_CONNECT_URL}): ${error}`);
-    } 
-}
-
 async function createUserModel()
 {
-    const UserModel = mongoose.connection.model('UserModel', UserSchema, 'users');
+    const UserModel = mongoose.connection.model('UserModel', UserSchema, USER_COLLECTION);
 
     // Ensure UserModel indexes are built.
     console.log('Initializing user model.');
@@ -82,6 +44,18 @@ async function createUserModel()
     return UserModel;
 }
 
+async function createSessionModel()
+{
+    const SessionModel = mongoose.connection.model('SessionModel', SessionSchema, SESSION_COLLECTION);
+
+    // Ensure SessionModel indexes are built.
+    console.log('Initializing session model.');
+    await SessionModel.init();
+    console.log('Initialized session model.');
+
+    return SessionModel;
+}
+
 async function setupTestDb()
 {
     await connectToDb();
@@ -89,6 +63,7 @@ async function setupTestDb()
     try
     {
         const userModel = await createUserModel();
+        const sessionModel = await createSessionModel();
     }
     catch (error)
     {
@@ -99,27 +74,6 @@ async function setupTestDb()
     await disconnectDb();
 }
 
-async function teardownTestDb()
-{
-    await connectToDb();
-
-    try
-    {
-        console.log(`Dropping database (${MONGODB_DBNAME}).`);
-        await mongoose.connection.dropDatabase();
-        console.log(`Dropped database (${MONGODB_DBNAME}).`);
-    }
-    catch (error)
-    {
-        console.warn(`Error dropping database (${MONGODB_DBNAME}): ${error}`);
-    }
-
-    await disconnectDb();
-}
-
-teardownTestDb().then(
+teardownDb().then(
     () => setupTestDb()
 );
-// setupTestDb().then(
-//     () => teardownTestDb()
-// )

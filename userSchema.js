@@ -2,6 +2,7 @@ const mongoose = require('mongoose');
 const { EmailAddress, INVALID_EMAIL_ADDRESS } = require('./emailAddress');
 const { PhoneNumber, INVALID_USA_CANADA_PHONE_NUMBER } = require('./phoneNumber');
 
+const USER_COLLECTION = 'users';
 const USERNAME_REGEX = /[a-zA-Z][a-zA-Z0-9_]*/;
 const MIN_USERNAME_LENGTH = 8;
 const INVALID_USERNAME = `Invalid username. Must start with a letter, can only contain alphanumeric characters and underscores and must be at least ${MIN_USERNAME_LENGTH} characters in length.`;
@@ -56,5 +57,6 @@ function validateUsername(username)
 
 module.exports = {
     UserSchema,
+    USER_COLLECTION,
     validateUsername
 };

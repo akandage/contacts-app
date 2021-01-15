@@ -4,7 +4,8 @@
   "description": "Contacts app using MERN stack.",
   "main": "index.js",
   "scripts": {
-    "blah": "echo \"Hello\"; echo \"World!\"",
+    "start": "node index.js",
+    "start-dev": "nodemon index.js",
     "test": "jest"
   },
   "repository": {
@@ -27,9 +28,12 @@
   },
   "homepage": "https://github.com/akandage/contacts-app#readme",
   "dependencies": {
+    "cookie-parser": "^1.4.5",
+    "debug": "^4.3.1",
     "dotenv": "^8.2.0",
     "email-validator": "^2.0.4",
     "express": "^4.17.1",
+    "http-errors": "^1.8.0",
     "mongoose": "^5.11.11",
     "morgan": "^1.10.0",
     "webpack": "^5.13.0",
