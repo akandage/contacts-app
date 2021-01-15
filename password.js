@@ -8,8 +8,6 @@ class Password
 {
     constructor(password)
     {
-
-
         this._passwordRaw = password;
         this._passwordHash = null;
     }
