@@ -121,7 +121,7 @@ class SessionDb
         }
 
         let now = Date.now();
-        let sessionId = generateSessionId(username);
+        let sessionId = SessionDb.generateSessionId(username);
 
         debug(`Registering session for user ${username}.`);
         session = await this._model.create({
@@ -186,11 +186,11 @@ class SessionDb
 
         //debug('Removing expired user sessions.');
 
-        let cursor = await this._model.find({ expires: { $gte: now } }).cursor();
+        let cursor = await this._model.find({ expires: { $lte: now } }).cursor();
 
         for (let session = await cursor.next(); session !== null; session = await cursor.next())
         {
-            let session = await this._model.findOneAndDelete({ sessionId: session.sessionId, expires: session.expires });
+            session = await this._model.findOneAndDelete({ sessionId: session.sessionId, expires: session.expires });
 
             if (session)
             {
