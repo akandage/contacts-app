@@ -65,6 +65,7 @@ afterAll(async () => {
 
 test('Test successful user login.', async () => {
     assert.ok(await userDb.login(testUsers[0].username, testUsers[0].password.value));
+    assert.ok(await userDb.login(testUsers[1].username, testUsers[1].password.value));
 });
 
 test('Test unsuccessful user login.', async () => {

@@ -113,8 +113,11 @@ class UserDb
                 hash: Password.hash(password)
             }
         }).countDocuments().exec();
+        let loginOk = count === 1;
 
-        return count === 1;
+        debug(loginOk ? `User ${username} login successful.` : `User ${username} login failed.`);
+
+        return loginOk;
     }
 }
 

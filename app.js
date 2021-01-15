@@ -17,7 +17,14 @@ const httpError = require('http-errors');
 const mongoose = require('mongoose');
 const path = require('path');
 const { SessionDb } = require('./sessionDb');
+const sessionRouter = require('./sessionRouter');
 const { UserDb } = require('./userDb');
+
+const HTML_ROOT = path.resolve(__dirname, 'html');
+const CONTACTS_DEFAULT_PAGE = 'index.html';
+const CONTACTS_APP_PAGE = 'contacts.html';
+const NOT_FOUND_PAGE = 'not_found.html';
+const ERROR_PAGE = 'error.html';
 
 const app = express();
 const sessionDb = new SessionDb();
@@ -59,12 +66,12 @@ app.set('mongodb-name', process.env.MONGODB_DBNAME || 'contacts-db');
  * Set up middleware to attach Session-Id cookie to the request object
  * if present in the request.
  */
-app.use(function(req, res, next) {
-    let sessionId = req.cookies["Session-Id"];
+app.use(async (req, res, next) => {
+    let sessionId = req.cookies['Session-Id'];
 
     if (sessionId)
     {
-        let session = sessionDb.heartbeatSession(sessionId);
+        let session = await sessionDb.heartbeatSession(sessionId);
 
         if (session)
         {
@@ -73,12 +80,32 @@ app.use(function(req, res, next) {
         else
         {
             req.session = null;
-            res.clearCookie("Session-Id");
+            res.clearCookie('Session-Id');
         }
     }
 
     next();
 });
+
+/**
+ * Set up route handlers.
+ */
+
+app.use('/', (req, res, next) => {
+    let session = req.session;
+
+    if (session)
+    {
+        res.status(200)
+            .sendFile(CONTACTS_APP_PAGE);
+    }
+    else
+    {
+        res.status(200)
+            .sendFile(CONTACTS_DEFAULT_PAGE);
+    }
+});
+app.use(sessionRouter);
 
 /**
  * Server startup function.
@@ -107,6 +134,11 @@ app.shutdown = async function()
     await disconnectDb();
 }
 
+app.pathToHtml = function(html)
+{
+    return path.resolve(HTML_ROOT, html);
+}
+
 /**
  * Default middleware will be executed for any request that doesn't match
  * another request handler. Therefore if we get here send a 404 Not Found
@@ -116,9 +148,6 @@ app.use(function(req, res, next) {
     next(httpError.NotFound());
 });
 
-const NOT_FOUND_PAGE = path.resolve(__dirname, 'html', 'not_found.html');
-const ERROR_PAGE = path.resolve(__dirname, 'html', 'error.html');
-
 /**
  * Error handler middleware.
  */
@@ -126,12 +155,10 @@ app.use(function(err, req, res, next) {
     switch (err.status)
     {
         case 404:
-            res.status(404).sendFile(NOT_FOUND_PAGE);
-            break;
-        case 500:
-            res.status(500).sendFile(ERROR_PAGE);
+            res.status(err.status).sendFile(app.pathToHtml(NOT_FOUND_PAGE));
             break;
         default:
+            res.status(err.status).sendFile(app.pathToHtml(ERROR_PAGE));
             break;
     }
 });
