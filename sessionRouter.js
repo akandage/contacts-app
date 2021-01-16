@@ -38,6 +38,8 @@ sessionRouter.post('/login', async (req, res, next) => {
     }
     catch (error)
     {
+        console.error(`Error while trying to login user ${username}: ${error}`);
+
         if (error.message.startsWith('Invalid argument') ||
                 error.message.startsWith('Invalid username') ||
                 error.message.startsWith('Invalid password'))
@@ -63,6 +65,7 @@ sessionRouter.get('/logout', async (req, res, next) => {
         }
         catch (error)
         {
+            console.error(`Error while trying to logout user ${username}: ${error}`);
             next(httpError(500));
         }
 

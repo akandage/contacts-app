@@ -71,7 +71,16 @@ app.use(async (req, res, next) => {
 
     if (sessionId)
     {
-        let session = await sessionDb.heartbeatSession(sessionId);
+        let session = null;
+        
+        try
+        {
+            session = await sessionDb.heartbeatSession(sessionId);
+        }
+        catch (error)
+        {
+            console.error(`Error while trying to heartbeat session ${sessionId}: ${error}`);
+        }
 
         if (session)
         {

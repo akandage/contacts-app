@@ -52,6 +52,39 @@ test('Test register a user session.', async () => {
     assert.ok(!(await sessionDb.isSessionValid(sessionId)));
 });
 
+test('Test unregister a user session.', async () => {
+    let session1 = await sessionDb.registerSession(USER1);
+
+    assert.strictEqual(session1.username, USER1);
+    assert.notEqual(session1.sessionId, null);
+    assert.equal(session1.sessionId.length, SESSION_ID_LENGTH);
+    assert.ok(session1.expires > Date.now());
+    assert.ok(sessionDb.isSessionValid(session1.sessionId));
+    
+    let session2 = await sessionDb.registerSession(USER2);
+
+    assert.strictEqual(session2.username, USER2);
+    assert.notEqual(session2.sessionId, null);
+    assert.equal(session2.sessionId.length, SESSION_ID_LENGTH);
+    assert.notStrictEqual(session2.sessionId, session1.sessionId);
+    assert.ok(session2.expires > Date.now());
+    assert.ok((await sessionDb.isSessionValid(session1.sessionId)));
+    assert.ok((await sessionDb.isSessionValid(session2.sessionId)));
+
+    let sessionId1 = session1.sessionId;
+    let sessionId2 = session2.sessionId;
+
+    await sessionDb.unregisterSession(sessionId1);
+
+    assert.ok(!(await sessionDb.isSessionValid(sessionId1)));
+    assert.ok((await sessionDb.isSessionValid(sessionId2)));
+
+    await sessionDb.unregisterSession(sessionId2);
+
+    assert.ok(!(await sessionDb.isSessionValid(sessionId1)));
+    assert.ok(!(await sessionDb.isSessionValid(sessionId2)));
+});
+
 // TODO: Add more positive tests.
 
 // TODO: Add more negative tests.
