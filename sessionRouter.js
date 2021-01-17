@@ -28,7 +28,9 @@ sessionRouter.post('/login', async (req, res, next) => {
             let session = await sessionDb.registerSession(username);
 
             res.cookie('Session-Id', session.sessionId, {
-                httpOnly: true
+                expires: new Date(session.expires),
+                httpOnly: true,
+                sameSite: 'Strict'
             });
             res.redirect('/');
         }
@@ -74,7 +76,11 @@ sessionRouter.get('/logout', async (req, res, next) => {
             return;
         }
 
-        res.clearCookie('Session-Id');
+        res.clearCookie('Session-Id', {
+            expires: new Date(session.expires),
+            httpOnly: true,
+            sameSite: 'Strict'
+        });
         res.status(200)
             .sendFile(req.app.pathToHtml(LOGGED_OUT_PAGE));
     }

@@ -155,15 +155,20 @@ class SessionDb
         return session;
     }
 
-    async heartbeatSession(sessionId)
+    async getSession(sessionId)
     {
         if (sessionId === undefined || sessionId === null || typeof sessionId !== 'string' || sessionId.length === 0)
         {
             throw new Error('Invalid argument: sessionId');
         }
 
+        return (await this._model.findOne({ sessionId }).exec());
+    }
+
+    async heartbeatSession(sessionId)
+    {
         let now = Date.now();
-        let session = await this._model.findOne({ sessionId }).exec();
+        let session = await this.getSession(sessionId);
 
         if (session)
         {

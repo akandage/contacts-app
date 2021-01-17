@@ -75,7 +75,7 @@ app.use(async (req, res, next) => {
         
         try
         {
-            session = await sessionDb.heartbeatSession(sessionId);
+            session = await sessionDb.getSession(sessionId);
         }
         catch (error)
         {
@@ -89,7 +89,7 @@ app.use(async (req, res, next) => {
         else
         {
             req.session = null;
-            res.clearCookie('Session-Id');
+            // res.clearCookie('Session-Id');
         }
     }
 
