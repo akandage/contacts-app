@@ -3,13 +3,23 @@
     <head>
         <meta charset="utf-8">
         <meta http-equiv="X-UA-Compatible" content="IE=edge">
-        <title>Contacts - Logged Out</title>
+        <title>Contacts - Login</title>
         <meta name="description" content="">
-        <link rel="stylesheet" href="">
+        <!-- Bootstrap 4.4.1 stylesheet -->
+        <link
+            rel="stylesheet"
+            href="https://maxcdn.bootstrapcdn.com/bootstrap/4.4.1/css/bootstrap.min.css"
+            integrity="sha384-Vkoo8x4CGsO3+Hhxv8T/Q5PaXtkKtu6ug5TOeNV6gBiFeWPGFN9MuhOf23Q9Ifjh"
+            crossorigin="anonymous"
+        />
+        <!-- <link rel="stylesheet" href="/stylesheets/contacts.css"> -->
     </head>
     <body>
-        <main>
-            <h2>Logged Out</h2>
-        </main>
+        <form>
+            <input id="login-form-alert" name="login-form-alert" type="hidden" value="LOGGED_OUT" />
+        </form>
+        <main id="root" />
+        <script type="text/javascript" src="/javascripts/loginBundle.js">
+        </script>
     </body>
 </html>

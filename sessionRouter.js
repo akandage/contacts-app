@@ -19,6 +19,8 @@ sessionRouter.post('/login', async (req, res, next) => {
 
     try
     {
+        debug(`Login ${username} ${password}`);
+
         let loginOk = await userDb.login(username, password);
 
         if (loginOk)
@@ -32,7 +34,7 @@ sessionRouter.post('/login', async (req, res, next) => {
         }
         else
         {
-            res.status(200)
+            res.status(401)
                 .sendFile(req.app.pathToHtml(LOGIN_FAILED_PAGE));
         }
     }
@@ -50,11 +52,13 @@ sessionRouter.post('/login', async (req, res, next) => {
         else
         {
             next(httpError(500));
+            return;
         }
     }
 });
 
 sessionRouter.get('/logout', async (req, res, next) => {
+    let sessionDb = req.app.get('session-db');
     let session = req.session;
 
     if (session)
@@ -65,15 +69,19 @@ sessionRouter.get('/logout', async (req, res, next) => {
         }
         catch (error)
         {
-            console.error(`Error while trying to logout user ${username}: ${error}`);
+            console.error(`Error while trying to logout user ${session.username}: ${error}`);
             next(httpError(500));
+            return;
         }
 
         res.clearCookie('Session-Id');
+        res.status(200)
+            .sendFile(req.app.pathToHtml(LOGGED_OUT_PAGE));
     }
-
-    res.status(200)
-        .sendFile(req.app.pathToHtml(LOGGED_OUT_PAGE));
+    else
+    {
+        res.redirect('/login');
+    }
 });
 
 module.exports = sessionRouter;

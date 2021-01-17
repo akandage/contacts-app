@@ -100,20 +100,20 @@ app.use(async (req, res, next) => {
  * Set up route handlers.
  */
 
-// app.use('/', (req, res, next) => {
-//     let session = req.session;
+app.use(/^\/$/, (req, res, next) => {
+    let session = req.session;
 
-//     if (session)
-//     {
-//         res.status(200)
-//             .sendFile(req.app.pathToHtml(CONTACTS_APP_PAGE));
-//     }
-//     else
-//     {
-//         res.status(200)
-//             .sendFile(req.app.pathToHtml(CONTACTS_DEFAULT_PAGE));
-//     }
-// });
+    if (session)
+    {
+        res.status(200)
+            .sendFile(req.app.pathToHtml(CONTACTS_APP_PAGE));
+    }
+    else
+    {
+        res.status(200)
+            .sendFile(req.app.pathToHtml(CONTACTS_DEFAULT_PAGE));
+    }
+});
 app.use(sessionRouter);
 
 /**
