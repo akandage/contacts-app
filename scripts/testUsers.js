@@ -1,4 +1,4 @@
-const { Password } = require('../password');
+const { Password } = require('../userCreds');
 
 const testUsers = [
     {

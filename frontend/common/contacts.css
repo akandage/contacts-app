@@ -1,0 +1,26 @@
+body {
+    background-color: #ebeef0;
+}
+
+div.contacts-header-logo {
+    display: flex;
+    flex-direction: row;
+    column-gap: 1em;
+    align-items: center;
+    width: fit-content;
+    max-width: fit-content;
+}
+
+div.contacts-header-logo > img {
+    width: 4em;
+    max-width: 4em;
+    height: 4em;
+    max-height: 4em;
+}
+
+div.contacts-header-logo > h1 {
+    /* TODO: Need a fancy font and color. */
+    font-family: 'Segoe UI', sans-serif;
+    font-size: 2em;
+    font-weight: 800;
+}

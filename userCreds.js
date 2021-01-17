@@ -4,6 +4,24 @@ const INVALID_PASSWORD = 'Invalid password.';
 const DEFAULT_PASSWORD_SALT = 'SECRET_SALT';
 const DEFAULT_PASSWORD_HASH_ENCODING = 'base64';
 
+const USERNAME_REGEX = /^[a-zA-Z][a-zA-Z0-9_]*$/;
+const MIN_USERNAME_LENGTH = 8;
+const INVALID_USERNAME = `Invalid username. Must start with a letter, can only contain alphanumeric characters and underscores and must be at least ${MIN_USERNAME_LENGTH} characters in length.`;
+
+class Username
+{
+    static isValid(username)
+    {
+        if (username === undefined || username === null
+            || typeof username !== 'string' || username.length < MIN_USERNAME_LENGTH)
+        {
+            return false;
+        }
+    
+        return USERNAME_REGEX.test(username);
+    }
+}
+
 class Password
 {
     constructor(password)
@@ -41,5 +59,7 @@ class Password
 
 module.exports = {
     INVALID_PASSWORD,
-    Password
+    INVALID_USERNAME,
+    Password,
+    Username
 }

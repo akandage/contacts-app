@@ -2,12 +2,9 @@ const debug = require('debug')('user-db');
 const mongoose = require('mongoose');
 const { EmailAddress, INVALID_EMAIL_ADDRESS } = require('./emailAddress');
 const { PhoneNumber, INVALID_USA_CANADA_PHONE_NUMBER } = require('./phoneNumber');
-const { Password, INVALID_PASSWORD } = require('./password');
+const { Password, Username, INVALID_PASSWORD, INVALID_USERNAME } = require('./userCreds');
 
 const USER_COLLECTION = 'users';
-const USERNAME_REGEX = /^[a-zA-Z][a-zA-Z0-9_]*$/;
-const MIN_USERNAME_LENGTH = 8;
-const INVALID_USERNAME = `Invalid username. Must start with a letter, can only contain alphanumeric characters and underscores and must be at least ${MIN_USERNAME_LENGTH} characters in length.`;
 
 class UserDb
 {
@@ -49,20 +46,9 @@ class UserDb
         debug('Stopped UserDb.');
     }
 
-    static isValidUsername(username)
-    {
-        if (username === undefined || username === null
-            || typeof username !== 'string' || username.length < MIN_USERNAME_LENGTH)
-        {
-            return false;
-        }
-    
-        return USERNAME_REGEX.test(username);
-    }
-
     async registerUser(username, password, emailAddress, phoneNumber)
     {
-        if (!UserDb.isValidUsername(username))
+        if (!Username.isValid(username))
         {
             throw new Error(INVALID_USERNAME);
         }
@@ -98,7 +84,7 @@ class UserDb
 
     async login(username, password)
     {
-        if (!UserDb.isValidUsername(username))
+        if (!Username.isValid(username))
         {
             throw new Error(INVALID_USERNAME);
         }
@@ -128,7 +114,7 @@ const UserSchema = mongoose.Schema({
         required: true,
         unique: [ true, 'User already exists with this username.' ],
         validate: {
-            validator: UserDb.isValidUsername,
+            validator: Username.isValid,
             message: INVALID_USERNAME
         }
     },
@@ -159,7 +145,6 @@ const UserSchema = mongoose.Schema({
 });
 
 module.exports = {
-    INVALID_USERNAME,
     UserDb,
     UserSchema,
     USER_COLLECTION

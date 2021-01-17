@@ -7,7 +7,7 @@ dotenv.config({
 });
 
 const { connectToDb, disconnectDb, teardownDb } = require('../db');
-const { Password } = require('../password');
+const { Password } = require('../userCreds');
 const { UserDb } = require('../userDb');
 const testUsers = [
     {

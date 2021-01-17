@@ -1,0 +1,22 @@
+#root {
+    width: 100%;
+}
+
+div.login-form-container {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    row-gap: 1em;
+    margin-top: 25vh;
+}
+
+div.login-form {
+    width: 35%;
+    padding: 1em;
+    background-color: white;
+    border-radius: 1em;
+}
+
+div.login-form div.spacer {
+    min-height: 4em;
+}
