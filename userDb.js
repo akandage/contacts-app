@@ -1,5 +1,6 @@
 const debug = require('debug')('user-db');
 const mongoose = require('mongoose');
+const { ContactSchema } = require('./contact');
 const { EmailAddress, INVALID_EMAIL_ADDRESS } = require('./emailAddress');
 const { PhoneNumber, INVALID_USA_CANADA_PHONE_NUMBER } = require('./phoneNumber');
 const { Password, Username, INVALID_PASSWORD, INVALID_USERNAME } = require('./userCreds');
@@ -141,7 +142,10 @@ const UserSchema = mongoose.Schema({
             validator: PhoneNumber.isValidUSAOrCanada,
             message: INVALID_USA_CANADA_PHONE_NUMBER
         }
-    }
+    },
+    contacts: [
+        ContactSchema
+    ]
 });
 
 module.exports = {
