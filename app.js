@@ -16,7 +16,9 @@ const cookieParser = require('cookie-parser');
 const httpError = require('http-errors');
 const mongoose = require('mongoose');
 const path = require('path');
+const { ContactDb } = require('./contactDb');
 const { SessionDb } = require('./sessionDb');
+const contactsApiRouter = require('./contactsApiRouter');
 const sessionRouter = require('./sessionRouter');
 const { UserDb } = require('./userDb');
 
@@ -27,6 +29,7 @@ const NOT_FOUND_PAGE = 'not_found.html';
 const ERROR_PAGE = 'error.html';
 
 const app = express();
+const contactDb = new ContactDb();
 const sessionDb = new SessionDb();
 const userDb = new UserDb();
 
@@ -100,6 +103,7 @@ app.use(async (req, res, next) => {
  * Set up route handlers.
  */
 
+// GET /
 app.use(/^\/$/, (req, res, next) => {
     let session = req.session;
 
@@ -114,6 +118,7 @@ app.use(/^\/$/, (req, res, next) => {
             .sendFile(req.app.pathToHtml(CONTACTS_DEFAULT_PAGE));
     }
 });
+app.use(contactsApiRouter);
 app.use(sessionRouter);
 
 /**
@@ -123,6 +128,10 @@ app.use(sessionRouter);
 app.startup = async function()
 {
     let db = await connectToDb();
+
+    contactDb.connection = db;
+    await contactDb.start();
+    app.set('contact-db', contactDb);
 
     sessionDb.connection = db;
     await sessionDb.start();

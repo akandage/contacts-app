@@ -1,11 +1,11 @@
 const debug = require('debug')('user-db');
 const mongoose = require('mongoose');
-const { ContactSchema } = require('./contact');
 const { EmailAddress, INVALID_EMAIL_ADDRESS } = require('./emailAddress');
 const { PhoneNumber, INVALID_USA_CANADA_PHONE_NUMBER } = require('./phoneNumber');
 const { Password, Username, INVALID_PASSWORD, INVALID_USERNAME } = require('./userCreds');
 
 const USER_COLLECTION = 'users';
+const USER_NOT_FOUND = 'User not found.';
 
 class UserDb
 {
@@ -106,6 +106,23 @@ class UserDb
 
         return loginOk;
     }
+
+    async getUser(username)
+    {
+        if (!Username.isValid(username))
+        {
+            throw new Error(INVALID_USERNAME);
+        }
+
+        let user = await this._model.find({ username });
+
+        if (!user)
+        {
+            throw new Error(USER_NOT_FOUND);
+        }
+
+        return user;
+    }
 }
 
 // TODO: Common logic. Move this somewhere else.
@@ -144,12 +161,16 @@ const UserSchema = mongoose.Schema({
         }
     },
     contacts: [
-        ContactSchema
+        {
+            type: mongoose.Schema.Types.ObjectId,
+            ref: 'ContactModel'
+        }
     ]
 });
 
 module.exports = {
     UserDb,
     UserSchema,
-    USER_COLLECTION
+    USER_COLLECTION,
+    USER_NOT_FOUND
 };

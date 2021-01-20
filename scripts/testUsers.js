@@ -1,5 +1,5 @@
 const { GIVEN_NAMES, LAST_NAMES } = require('./contactNames');
-const { EMAIL_ADDRESS_TYPES, PHONE_NUMBER_TYPES } = require('../contact');
+const { EMAIL_ADDRESS_TYPES, PHONE_NUMBER_TYPES } = require('../contactDb');
 const { Password } = require('../userCreds');
 
 const emailAddresses = new Set();
@@ -198,8 +198,7 @@ const testUsers = [
             hash: Password.hash('Test!Password1')
         },
         emailAddress: 'adam@coolmail.com',
-        phoneNumber: '19051234567',
-        contacts: generateContacts(100)
+        phoneNumber: '19051234567'
     },
     {
         username: 'testuser_bob',
@@ -207,9 +206,11 @@ const testUsers = [
             hash: Password.hash('Test!Password2')
         },
         emailAddress: 'bob@coolmail.com',
-        phoneNumber: '19051234568',
-        contacts: generateContacts(50)
+        phoneNumber: '19051234568'
     }
 ];
 
-module.exports = testUsers;
+module.exports = {
+    generateContacts,
+    testUsers
+}

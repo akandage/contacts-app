@@ -10,6 +10,13 @@ const MONGODB_CONNECT_URL = `${MONGODB_URL}/${MONGODB_DBNAME}`;
 const MONGODB_USER = process.env.MONGODB_USER;
 const MONGODB_PASS = process.env.MONGODB_PASS;
 
+const ORDERBY_DIRECTIONS = [
+    'ASC',
+    'asc',
+    'DESC',
+    'desc'
+];
+
 async function connectToDb(create = false)
 {
     let connectOptions = {
@@ -83,6 +90,31 @@ async function teardownDb()
     }
 
     await disconnectDb();
+}
+
+//
+// Validate orderBy request parameter given to REST API method.
+// 
+function validateOrderBy(orderBy)
+{
+    if (orderBy === null || orderBy === undefined || !Array.isArray(orderBy) || orderBy.length === 0 || orderBy.length % 2 !== 0)
+    {
+        return false;
+    }
+
+    for (let i = 0; i < orderBy.length; i += 2)
+    {
+        let field = orderBy[i];
+        let direction = orderBy[i+1];
+
+        if (field === null || field === undefined || typeof field !== 'string'
+            || field.length === 0 || ORDERBY_DIRECTIONS.indexOf(direction) === -1)
+        {
+            return false;
+        }
+    }
+
+    return true;
 }
 
 module.exports = {

@@ -19,12 +19,32 @@ if (!MONGODB_DBNAME)
 }
 
 const { connectToDb, disconnectDb, teardownDb } = require('../db');
+const { ContactSchema, CONTACT_COLLECTION } = require('../contactDb');
 const { SessionSchema, SESSION_COLLECTION } = require('../sessionDb');
 const { UserSchema, USER_COLLECTION } = require('../userDb');
-const testUsers = require('./testUsers');
+const { generateContacts, testUsers } = require('./testUsers');
 
 console.log('MONGODB_URL: ' + MONGODB_URL);
 console.log('MONGODB_DBNAME: ' + MONGODB_DBNAME);
+
+async function createContactModel(users)
+{
+    const ContactModel = mongoose.connection.model('ContactModel', ContactSchema, CONTACT_COLLECTION);
+
+    // Ensure ContactModel indexes are built.
+    console.log('Initializing contact model.');
+    await ContactModel.init();
+    console.log('Initialized contact model.');
+    
+    for (let user of users)
+    {
+        console.log(`Loading test user '${user.username}' contacts.`);
+        await ContactModel.create(generateContacts().map(contact => Object.assign(contact, { owner: user._id })));
+        console.log(`Loaded test user '${user.username}' contacts.`);
+    }
+
+    return ContactModel;
+}
 
 async function createUserModel()
 {
@@ -62,6 +82,8 @@ async function setupTestDb()
     {
         const userModel = await createUserModel();
         const sessionModel = await createSessionModel();
+        let users = await userModel.find({}).exec();
+        const contactModel = await createContactModel(users);
     }
     catch (error)
     {
