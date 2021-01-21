@@ -114,7 +114,7 @@ class UserDb
             throw new Error(INVALID_USERNAME);
         }
 
-        let user = await this._model.find({ username });
+        let user = await this._model.findOne({ username });
 
         if (!user)
         {

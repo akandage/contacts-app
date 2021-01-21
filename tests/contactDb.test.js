@@ -28,16 +28,12 @@ afterAll(async () => {
     await teardownDb(); 
 });
 
-test('Test successful user login.', async () => {
-    assert.ok(await userDb.login(TEST_USERS[0].username, TEST_USERS[0].password.value));
-    assert.ok(await userDb.login(TEST_USERS[1].username, TEST_USERS[1].password.value));
+test('Test get contact list without session.', async () => {
+
 });
 
-test('Test unsuccessful user login.', async () => {
-    // Unknown user.
-    assert.ok(!(await userDb.login('unknown_user', 'Password123')));
-    // Incorrect password.
-    assert.ok(!(await userDb.login(TEST_USERS[0].username, 'WrongPassword')));
+test('Test get contact list.', async () => {
+
 });
 
 // TODO: Add more positive tests.

@@ -39,7 +39,7 @@ async function createContactModel(users)
     for (let user of users)
     {
         console.log(`Loading test user '${user.username}' contacts.`);
-        await ContactModel.create(generateContacts().map(contact => Object.assign(contact, { owner: user._id })));
+        await ContactModel.create(generateContacts(100).map(contact => Object.assign(contact, { owner: user._id })));
         console.log(`Loaded test user '${user.username}' contacts.`);
     }
 

@@ -97,7 +97,7 @@ async function teardownDb()
 // 
 function validateOrderBy(orderBy)
 {
-    if (orderBy === null || orderBy === undefined || !Array.isArray(orderBy) || orderBy.length === 0 || orderBy.length % 2 !== 0)
+    if (!Array.isArray(orderBy) || orderBy.length === 0 || orderBy.length % 2 !== 0)
     {
         return false;
     }
@@ -120,5 +120,6 @@ function validateOrderBy(orderBy)
 module.exports = {
     connectToDb,
     disconnectDb,
-    teardownDb
+    teardownDb,
+    validateOrderBy
 }

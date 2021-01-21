@@ -14,7 +14,7 @@ function selectRandom(list)
 {
     if (list)
     {
-        return list[Math.ceil(Math.random() * list.length)];
+        return list[Math.ceil(Math.random() * (list.length-1))];
     }
 
     return null;
@@ -27,6 +27,7 @@ function generateEmailAddress(contact, type, localPartSuffix = '')
     switch (type)
     {
         case 'Personal':
+        case 'Other':
             emailDomain = 'coolmail.com';
             break;
         case 'Work':
@@ -39,7 +40,7 @@ function generateEmailAddress(contact, type, localPartSuffix = '')
             break;
     }
 
-    return `${contact.firstName}.${contact.lastName}${localPartSuffix}@${emailDomain}`;
+    return `${contact.firstName.toLowerCase()}.${contact.lastName.toLowerCase()}${localPartSuffix}@${emailDomain}`;
 }
 
 function addEmailAddress(contact, type)
@@ -58,7 +59,7 @@ function addEmailAddress(contact, type)
     }
 
     contact.emailAddresses.push({
-        emailAddress:
+        emailAddress,
         type
     });
 
@@ -174,6 +175,8 @@ function generateContact()
 
     // 50% of contacts have a home number.
     addPhoneNumber(contact, 'Home');
+
+    return contact;
 }
 
 function generateContacts(numContacts)
@@ -211,6 +214,7 @@ const testUsers = [
 ];
 
 module.exports = {
+    generateContact,
     generateContacts,
     testUsers
 }

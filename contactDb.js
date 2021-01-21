@@ -16,7 +16,7 @@ const CONTACT_COLLECTION = 'contacts';
 const DEFAULT_CONTACTS_ORDERBY = ['firstName', 'ASC', 'lastName', 'ASC'];
 // Names (first, middle, last) may only contain letters and must start with a capital letter.
 // Allow single letter names.
-const NAME_REGEX = /^[A-Z][a-zA-Z]*$/;
+const NAME_REGEX = /^[A-Z][a-zA-Z-']*$/;
 const EMAIL_ADDRESS_TYPES = [
     'Personal',
     'Work',
@@ -80,7 +80,7 @@ const ContactSchema = mongoose.Schema({
                 required: true,
                 validate: {
                     validator: emailAddress => EmailAddress.isValid(emailAddress),
-                    message: INVALID_EMAIL_ADDRESS
+                    message: emailAddress => `Invalid email address ${emailAddress.value}`
                 }
             },
             type: {
@@ -99,7 +99,7 @@ const ContactSchema = mongoose.Schema({
                 type: String,
                 required: true,
                 validate: {
-                    validator: phoneNumber => PhoneNumber.isValid(phoneNumber),
+                    validator: phoneNumber => PhoneNumber.isValidUSAOrCanada(phoneNumber),
                     message: INVALID_PHONE_NUMBER
                 }
             },
@@ -155,14 +155,26 @@ class ContactDb
         debug('Stopped ContactDb.');
     }
 
-    async getContactList(user, limit = 0, offset = 0, orderBy = DEFAULT_CONTACTS_ORDERBY)
+    async createContact(user, contact)
     {
         if (user === null || user === undefined || user._id === null || user._id === undefined)
         {
             throw new Error(INVALID_USER);
         }
 
-        if (!Number.isInteger(limit) || limit < 0)
+        contact = await this._model.create(contact);
+
+        return contact;
+    }
+
+    async getContactList(user, limit = null, offset = 0, orderBy = DEFAULT_CONTACTS_ORDERBY)
+    {
+        if (user === null || user === undefined || user._id === null || user._id === undefined)
+        {
+            throw new Error(INVALID_USER);
+        }
+
+        if (limit !== null && (!Number.isInteger(limit) || limit < 0))
         {
             throw new Error('Invalid argument: limit');
         }
@@ -172,29 +184,87 @@ class ContactDb
             throw new Error('Invalid argument: offset');
         }
 
-        if (!validateOrderBy(orderBy))
+        let query = this._model.find({ owner: user._id });
+        let contacts = [];
+
+        if (Array.isArray(orderBy) && orderBy.length > 0)
         {
-            throw new Error('Invalid argument: orderBy');
+            if (!validateOrderBy(orderBy))
+            {
+                throw new Error('Invalid argument: orderBy');
+            }
+
+            let sort = '';
+
+            for (let i = 0; i < orderBy.length; i += 2)
+            {
+                let field = orderBy[i];
+                let direction = orderBy[i+1];
+
+                if (i > 0)
+                {
+                    sort += ' ';
+                }
+
+                sort += direction.toLowerCase() === 'desc' ? `-${field}` : field;
+            }
+
+            query.sort(sort);
         }
 
-        let query = this._model.find({});
-        
-        // TODO
-
-        if (limit > 0)
+        if (limit !== null)
         {
+            let cursor = null;
 
+            try
+            {
+                cursor = query.cursor();
+
+                for (let contact = await cursor.next(), i = 0, n = limit; (limit === null || n > 0) && contact !== null; contact = await cursor.next(), ++i)
+                {
+                    if (i >= offset && (limit === null || n > 0))
+                    {
+                        contacts.push(contact);
+
+                        if (n)
+                        {
+                            --n;
+                        }
+                    }
+                }
+            }
+            catch (error)
+            {
+                // Ensure the cursor is closed.
+                if (cursor)
+                {
+                    try
+                    {
+                        await cursor.close();
+                    }
+                    catch (error)
+                    {
+                        // Ignore.
+                    }
+                }
+
+                throw error;
+            }
         }
         else
         {
-            return await query.exec();
+            contacts = await query.exec();
         }
+
+        return contacts;
     }
 }
 
 module.exports = {
+    CONTACT_COLLECTION,
     ContactDb,
     ContactSchema,
+    DEFAULT_CONTACTS_ORDERBY,
     EMAIL_ADDRESS_TYPES,
     PHONE_NUMBER_TYPES
 };
