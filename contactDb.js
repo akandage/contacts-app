@@ -244,7 +244,7 @@ class ContactDb
                     }
                     catch (error)
                     {
-                        // Ignore.
+                        debug(`Error closing cursor: ${error}`);
                     }
                 }
 

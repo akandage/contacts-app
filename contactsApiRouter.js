@@ -6,6 +6,10 @@ const { DEFAULT_CONTACTS_ORDERBY } = require('./contactDb');
 const { USER_NOT_FOUND } = require('./userDb');
 const contactsApiRouter = express.Router();
 
+contactsApiRouter.put('/api/contacts/:id', async (req, res, next) => {
+
+});
+
 contactsApiRouter.get('/api/contacts', async (req, res, next) => {
     let session = req.session;
     let {
@@ -75,6 +79,8 @@ contactsApiRouter.get('/api/contacts', async (req, res, next) => {
         }
         catch (error)
         {
+            console.log(error);
+
             if (error.message === USER_NOT_FOUND)
             {
                 next(httpError(404, error.message));
@@ -97,8 +103,12 @@ contactsApiRouter.get('/api/contacts', async (req, res, next) => {
     }
 });
 
+contactsApiRouter.delete('/api/contacts/:id', (req, res, next) => {
+
+});
+
 contactsApiRouter.use((err, req, res, next) => {
-    debug(`Contacts API error: ${err.status} ${err.message} ${err}`);
+    console.log(`Contacts API error: ${err.status} ${err.message} ${err}`);
 
     res.status(err.status)
         .send({
