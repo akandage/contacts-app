@@ -1,0 +1,61 @@
+<?xml version="1.0" encoding="UTF-8" standalone="no"?>
+<svg
+   xmlns:dc="http://purl.org/dc/elements/1.1/"
+   xmlns:cc="http://creativecommons.org/ns#"
+   xmlns:rdf="http://www.w3.org/1999/02/22-rdf-syntax-ns#"
+   xmlns:svg="http://www.w3.org/2000/svg"
+   xmlns="http://www.w3.org/2000/svg"
+   xmlns:sodipodi="http://sodipodi.sourceforge.net/DTD/sodipodi-0.dtd"
+   xmlns:inkscape="http://www.inkscape.org/namespaces/inkscape"
+   style="fill-rule:evenodd;text-rendering:geometricPrecision;image-rendering:optimizeQuality;clip-rule:evenodd;shape-rendering:geometricPrecision"
+   xml:space="preserve"
+   viewBox="0 0 1714 2211"
+   version="1.1"
+   id="svg11"
+   sodipodi:docname="contact-icon.svg"
+   inkscape:version="1.0.1 (0767f8302a, 2020-10-17)"><sodipodi:namedview
+   pagecolor="#ffffff"
+   bordercolor="#666666"
+   borderopacity="1"
+   objecttolerance="10"
+   gridtolerance="10"
+   guidetolerance="10"
+   inkscape:pageopacity="0"
+   inkscape:pageshadow="2"
+   inkscape:window-width="2488"
+   inkscape:window-height="1376"
+   id="namedview13"
+   showgrid="false"
+   inkscape:zoom="0.45590231"
+   inkscape:cx="857"
+   inkscape:cy="2121.8605"
+   inkscape:window-x="72"
+   inkscape:window-y="27"
+   inkscape:window-maximized="1"
+   inkscape:current-layer="svg11" />
+ <defs
+   id="defs4">
+  <style
+   type="text/css"
+   id="style2">
+    .fil0 {fill:black}
+  </style>
+ </defs>
+ <g
+   id="Layer_x0020_1"
+   style="fill:#ffffff;fill-opacity:1">
+  <path
+   class="fil0"
+   d="M 1714,2044 C 1714,1454 1330,976 857,976 384,976 0,1454 0,2044 c 0,92 384,167 857,167 473,0 857,-75 857,-167 z M 857,0 c 258,0 467,209 467,467 0,258 -209,467 -467,467 C 599,934 390,725 390,467 390,209 599,0 857,0 Z"
+   id="path6"
+   style="fill:#ffffff;fill-opacity:1" />
+ </g>
+<metadata
+   id="metadata9"><rdf:RDF><cc:Work><dc:format>image/svg+xml</dc:format><dc:type
+         rdf:resource="http://purl.org/dc/dcmitype/StillImage" /><cc:license
+         rdf:resource="http://creativecommons.org/licenses/publicdomain/" /><dc:publisher><cc:Agent
+           rdf:about="http://openclipart.org/"><dc:title>Openclipart</dc:title></cc:Agent></dc:publisher></cc:Work><cc:License
+       rdf:about="http://creativecommons.org/licenses/publicdomain/"><cc:permits
+         rdf:resource="http://creativecommons.org/ns#Reproduction" /><cc:permits
+         rdf:resource="http://creativecommons.org/ns#Distribution" /><cc:permits
+         rdf:resource="http://creativecommons.org/ns#DerivativeWorks" /></cc:License></rdf:RDF></metadata></svg>

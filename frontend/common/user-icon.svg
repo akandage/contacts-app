@@ -1,0 +1,78 @@
+<?xml version="1.0" encoding="UTF-8" standalone="no"?>
+<svg
+   xmlns:dc="http://purl.org/dc/elements/1.1/"
+   xmlns:cc="http://creativecommons.org/ns#"
+   xmlns:rdf="http://www.w3.org/1999/02/22-rdf-syntax-ns#"
+   xmlns:svg="http://www.w3.org/2000/svg"
+   xmlns="http://www.w3.org/2000/svg"
+   xmlns:sodipodi="http://sodipodi.sourceforge.net/DTD/sodipodi-0.dtd"
+   xmlns:inkscape="http://www.inkscape.org/namespaces/inkscape"
+   style="clip-rule:evenodd;fill-rule:evenodd;image-rendering:optimizeQuality;shape-rendering:geometricPrecision;text-rendering:geometricPrecision"
+   xml:space="preserve"
+   viewBox="0 0 1704.0969 1704.0969"
+   version="1.1"
+   id="svg11"
+   sodipodi:docname="user-icon.svg"
+   inkscape:version="1.0.1 (0767f8302a, 2020-10-17)"
+   width="1704.0969"
+   height="1704.0969"><sodipodi:namedview
+   pagecolor="#ffffff"
+   bordercolor="#666666"
+   borderopacity="1"
+   objecttolerance="10"
+   gridtolerance="10"
+   guidetolerance="10"
+   inkscape:pageopacity="0"
+   inkscape:pageshadow="2"
+   inkscape:window-width="2488"
+   inkscape:window-height="1376"
+   id="namedview13"
+   showgrid="false"
+   inkscape:zoom="0.45590231"
+   inkscape:cx="850.0705"
+   inkscape:cy="1060.1468"
+   inkscape:window-x="72"
+   inkscape:window-y="27"
+   inkscape:window-maximized="1"
+   inkscape:current-layer="Layer_x0020_1"
+   inkscape:document-rotation="0"
+   fit-margin-top="0"
+   fit-margin-left="0"
+   fit-margin-right="0"
+   fit-margin-bottom="0" />
+ <defs
+   id="defs4">
+  <style
+   type="text/css"
+   id="style2">
+    .fil0 {fill:black}
+  </style>
+ </defs>
+ <g
+   inkscape:groupmode="layer"
+   id="layer1"
+   inkscape:label="BG"
+   transform="translate(-6.9295044,-8.8565674)"><circle
+     style="fill:#24292e;fill-opacity:1"
+     id="path833"
+     cx="858.97797"
+     cy="860.90503"
+     r="852.04846" /></g><g
+   id="Layer_x0020_1"
+   style="fill:#ffffff;fill-opacity:1"
+   transform="translate(-6.9295044,-8.8565674)">
+  <path
+   class="fil0"
+   d="m 1283.9858,1292.5905 c 0,-293.0569 -190.7354,-530.4827 -425.67765,-530.4827 -234.94227,0 -425.67765,237.4258 -425.67765,530.4827 0,45.697 190.73538,82.95 425.67765,82.95 234.94225,0 425.67765,-37.253 425.67765,-82.95 z M 858.30815,277.32205 c 128.15033,0 231.96205,103.8117 231.96205,231.96203 0,128.15033 -103.81172,231.96204 -231.96205,231.96204 -128.15033,0 -231.96203,-103.81171 -231.96203,-231.96204 0,-128.15033 103.8117,-231.96203 231.96203,-231.96203 z"
+   id="path6"
+   style="fill:#ffffff;fill-opacity:1;stroke-width:0.496707" />
+ </g>
+<metadata
+   id="metadata9"><rdf:RDF><cc:Work><dc:format>image/svg+xml</dc:format><dc:type
+         rdf:resource="http://purl.org/dc/dcmitype/StillImage" /><cc:license
+         rdf:resource="http://creativecommons.org/publicdomain/zero/1.0/" /><dc:publisher><cc:Agent
+           rdf:about="http://openclipart.org/"><dc:title>Openclipart</dc:title></cc:Agent></dc:publisher><dc:title></dc:title></cc:Work><cc:License
+       rdf:about="http://creativecommons.org/publicdomain/zero/1.0/"><cc:permits
+         rdf:resource="http://creativecommons.org/ns#Reproduction" /><cc:permits
+         rdf:resource="http://creativecommons.org/ns#Distribution" /><cc:permits
+         rdf:resource="http://creativecommons.org/ns#DerivativeWorks" /></cc:License></rdf:RDF></metadata></svg>

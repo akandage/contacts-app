@@ -42,7 +42,22 @@ module.exports = {
             },
             {
                 test: /\.svg$/,
-                loader: 'svg-loader'
+                use: [
+                    {
+                        loader: 'babel-loader',
+                        options: {
+                            presets: [
+                                '@babel/preset-react'
+                            ]
+                        }
+                    },
+                    {
+                        loader: 'react-svg-loader',
+                        options: {
+                            jsx: true
+                        }
+                    }
+                ]
             }
         ]
     }
