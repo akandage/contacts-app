@@ -105,18 +105,8 @@ app.use(async (req, res, next) => {
 
 // GET /
 app.use(/^\/$/, (req, res, next) => {
-    let session = req.session;
-
-    if (session)
-    {
-        res.status(200)
-            .sendFile(req.app.pathToHtml(CONTACTS_APP_PAGE));
-    }
-    else
-    {
-        res.status(200)
-            .sendFile(req.app.pathToHtml(CONTACTS_DEFAULT_PAGE));
-    }
+    res.status(200)
+        .sendFile(req.app.pathToHtml(CONTACTS_APP_PAGE));
 });
 app.use(contactsApiRouter);
 app.use(sessionRouter);

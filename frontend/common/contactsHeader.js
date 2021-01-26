@@ -22,7 +22,7 @@ export function ContactsHeader(props)
 {
     const [ loggedInUser, setLoggedInUser ] = useState();
 
-    fetch('/api/username')
+    fetch('/session/username')
         .then(
             response => {
                 if (response.ok)

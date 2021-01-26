@@ -6,22 +6,6 @@ const { DEFAULT_CONTACTS_ORDERBY } = require('./contactDb');
 const { USER_NOT_FOUND } = require('./userDb');
 const contactsApiRouter = express.Router();
 
-contactsApiRouter.get('/api/username', async (req, res, next) => {
-    let session = req.session;
-
-    if (session)
-    {
-        res.status(200)
-            .send({
-                username: session.username
-            });
-    }
-    else
-    {
-        next(httpError(401));
-    }
-});
-
 contactsApiRouter.put('/api/contacts/:id', async (req, res, next) => {
 
 });

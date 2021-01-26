@@ -90,4 +90,60 @@ sessionRouter.get('/logout', async (req, res, next) => {
     }
 });
 
+sessionRouter.get('/session/username', async (req, res, next) => {
+    let session = req.session;
+
+    if (session)
+    {
+        res.status(200)
+            .send({
+                username: session.username
+            });
+    }
+    else
+    {
+        res.status(401)
+            .send({
+                status: 401,
+                message: 'User is not logged in.'
+            });
+    }
+});
+
+sessionRouter.put('/session/heartbeat', async (req, res, next) => {
+    let session = req.session;
+
+    if (session)
+    {
+        let sessionDb = req.app.get('session-db');
+
+        try
+        {
+            await sessionDb.heartbeatSession(session.sessionId);
+        }
+        catch (error)
+        {
+            res.status(500)
+                .send({
+                    status: 500,
+                    message: 'Session heartbeat error.'
+                });
+            return;
+        }
+
+        res.status(200)
+            .send({
+                username: session.username
+            });
+    }
+    else
+    {
+        res.status(401)
+            .send({
+                status: 401,
+                message: 'User is not logged in.'
+            });
+    }
+});
+
 module.exports = sessionRouter;

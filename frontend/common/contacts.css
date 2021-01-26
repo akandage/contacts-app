@@ -40,6 +40,14 @@ div.contacts-header > div.search-form {
     height: 3em;
 }
 
+div.contacts-header > div.login-signup-buttons {
+    display: flex;
+    flex-direction: row;
+    justify-content: space-evenly;
+    column-gap: 0.5em;
+    width: 25%;
+}
+
 /*
 div.contacts-header > a.user-icon-button {
     max-width: fit-content;
