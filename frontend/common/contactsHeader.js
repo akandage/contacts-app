@@ -101,7 +101,7 @@ export function ContactsHeader(props)
             return (
                 <OverlayTrigger trigger='focus' overlay={ UserPopover } placement='bottom'>
                     <a id="user-icon-button" href="#">
-                        <UserIconImage width="64" height="64" viewBox="0 0 1714 2211" />
+                        <UserIconImage width="64" height="64" viewBox="0 0 125 125" />
                     </a>
                 </OverlayTrigger>
             );

@@ -9,13 +9,13 @@
    xmlns:inkscape="http://www.inkscape.org/namespaces/inkscape"
    style="clip-rule:evenodd;fill-rule:evenodd;image-rendering:optimizeQuality;shape-rendering:geometricPrecision;text-rendering:geometricPrecision"
    xml:space="preserve"
-   viewBox="0 0 1704.0969 1704.0969"
+   viewBox="0 0 125.4276 125.4276"
    version="1.1"
    id="svg11"
    sodipodi:docname="user-icon.svg"
    inkscape:version="1.0.1 (0767f8302a, 2020-10-17)"
-   width="1704.0969"
-   height="1704.0969"><sodipodi:namedview
+   width="125.4276"
+   height="125.4276"><sodipodi:namedview
    pagecolor="#ffffff"
    bordercolor="#666666"
    borderopacity="1"
@@ -39,7 +39,8 @@
    fit-margin-top="0"
    fit-margin-left="0"
    fit-margin-right="0"
-   fit-margin-bottom="0" />
+   fit-margin-bottom="0"
+   showguides="false" />
  <defs
    id="defs4">
   <style
@@ -53,19 +54,19 @@
    id="layer1"
    inkscape:label="BG"
    transform="translate(-6.9295044,-8.8565674)"><circle
-     style="fill:#24292e;fill-opacity:1"
+     style="fill:#24292e;fill-opacity:1;stroke-width:0.0736036"
      id="path833"
-     cx="858.97797"
-     cy="860.90503"
-     r="852.04846" /></g><g
+     cx="69.643303"
+     cy="71.570366"
+     r="62.713799" /></g><g
    id="Layer_x0020_1"
    style="fill:#ffffff;fill-opacity:1"
    transform="translate(-6.9295044,-8.8565674)">
   <path
    class="fil0"
-   d="m 1283.9858,1292.5905 c 0,-293.0569 -190.7354,-530.4827 -425.67765,-530.4827 -234.94227,0 -425.67765,237.4258 -425.67765,530.4827 0,45.697 190.73538,82.95 425.67765,82.95 234.94225,0 425.67765,-37.253 425.67765,-82.95 z M 858.30815,277.32205 c 128.15033,0 231.96205,103.8117 231.96205,231.96203 0,128.15033 -103.81172,231.96204 -231.96205,231.96204 -128.15033,0 -231.96203,-103.81171 -231.96203,-231.96204 0,-128.15033 103.8117,-231.96203 231.96203,-231.96203 z"
+   d="m 100.92539,103.34395 c 0,-21.57003 -14.038804,-39.045413 -31.331389,-39.045413 -17.292587,0 -31.331389,17.475383 -31.331389,39.045413 0,3.36346 14.038802,6.10542 31.331389,6.10542 17.292585,0 31.331389,-2.74196 31.331389,-6.10542 z M 69.594001,28.616582 c 9.43232,0 17.073231,7.64091 17.073231,17.07323 0,9.43232 -7.640911,17.073231 -17.073231,17.073231 -9.43232,0 -17.073231,-7.640911 -17.073231,-17.073231 0,-9.43232 7.640911,-17.07323 17.073231,-17.07323 z"
    id="path6"
-   style="fill:#ffffff;fill-opacity:1;stroke-width:0.496707" />
+   style="fill:#ffffff;fill-opacity:1;stroke-width:0.0365594" />
  </g>
 <metadata
    id="metadata9"><rdf:RDF><cc:Work><dc:format>image/svg+xml</dc:format><dc:type
