@@ -2,7 +2,7 @@ import React, { useEffect, useState } from 'react';
 import ReactDOM from 'react-dom';
 import { Alert, Button, Col, Form, Row } from 'react-bootstrap';
 import { ContactsHeaderLogo } from '../common/contactsHeader';
-import './login.css';
+import './stylesheets/login.css';
 
 const { INVALID_USERNAME, INVALID_PASSWORD, isUsernameValid, isPasswordValid } = require('../../userCredsValid');
 const LOGIN_FORM_ACTION = '/login';

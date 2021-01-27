@@ -1,9 +1,9 @@
 import React, { useRef, useState } from 'react';
 import { Button, Form, Nav, Overlay, OverlayTrigger, Popover, PopoverContent } from 'react-bootstrap';
-import ContactsLogoImage from './contacts.svg';
-import SearchIconImage from './search-icon.svg';
-import UserIconImage from './user-icon.svg';
-import './contacts.css';
+import ContactsLogoImage from './images/contacts.svg';
+import SearchIconImage from './images/search-icon.svg';
+import UserIconImage from './images/user-icon.svg';
+import './stylesheets/contacts.css';
 
 export function ContactsHeaderLogo()
 {
