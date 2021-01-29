@@ -1,8 +1,10 @@
 import React from 'react';
 import ReactDOM from 'react-dom';
-import { ContactsHeader } from '../common/contactsHeader';
+import ContactsHeader from '../common/contactsHeader';
+import ContactList from './components/contactList';
+import './stylesheets/contacts.css';
 
-const SESSION_HEARTBEAT_INTERVAL = 5000;
+const SESSION_HEARTBEAT_INTERVAL = 30000;
 
 function startSessionHeartbeat()
 {
@@ -37,9 +39,39 @@ function startSessionHeartbeat()
     }, SESSION_HEARTBEAT_INTERVAL);
 }
 
+function renderContactList()
+{
+    fetch('/api/contacts')
+        .then(
+            response => {
+                if (response.ok)
+                {
+                    response.json().then(
+                        contacts => ReactDOM.render(
+                            <div className="app-container">
+                                <div className="app-list-container">
+                                    <ContactList contacts={ contacts.map(contact => {
+                                        return {
+                                            contact,
+                                            disabled: false,
+                                            selected: false
+                                        };
+                                    }) } />
+                                </div>
+                            </div>,
+                            document.getElementById('contacts-main')
+                        )
+                    )
+                }
+            }
+        )
+    ;
+}
+
 window.onload = function()
 {
     startSessionHeartbeat();
 
     ReactDOM.render(<ContactsHeader /> , document.getElementById('contacts-header'));
+    renderContactList();
 }

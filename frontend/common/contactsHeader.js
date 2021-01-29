@@ -1,15 +1,13 @@
 import React, { useRef, useState } from 'react';
 import { Button, Form, Nav, Overlay, OverlayTrigger, Popover, PopoverContent } from 'react-bootstrap';
-import ContactsLogoImage from './images/contacts.svg';
-import SearchIconImage from './images/search-icon.svg';
-import UserIconImage from './images/user-icon.svg';
-import './stylesheets/contacts.css';
+import { ContactsLogo, SearchIcon, UserIcon } from './contactsImages';
+import './stylesheets/contacts-header.css';
 
 export function ContactsHeaderLogo()
 {
     return (
         <div className="contacts-header-logo">
-            <ContactsLogoImage width="64" height="64" viewBox="0 0 1519 1191" />
+            <ContactsLogo width="64" height="64" />
 
             <h1>
                 contacts
@@ -18,7 +16,7 @@ export function ContactsHeaderLogo()
     );
 }
 
-export function ContactsHeader(props)
+export default function ContactsHeader(props)
 {
     const [ loggedInUser, setLoggedInUser ] = useState();
 
@@ -56,7 +54,7 @@ export function ContactsHeader(props)
             <div className="search-form">
                 <Form.Control as="input" type="text" size="lg" placeholder={ searchPlaceholderText } />
                 <Button size="sm">
-                    <SearchIconImage width="24" height="24" viewBox="-40 0 144 128" />
+                    <SearchIcon width="24" height="24" />
                 </Button>
             </div>
         );
@@ -77,31 +75,31 @@ export function ContactsHeader(props)
         return <></>;
     }
 
-    const UserPopover =
-    (
-        <Popover id='user-popover'>
-            <PopoverContent>
-                <Nav className="flex-column">
-                    <Nav.Item>
-                        <Nav.Link href="#">User Settings</Nav.Link>
-                    </Nav.Item>
-                    <Nav.Item>
-                        <Nav.Link href="/logout">Logout</Nav.Link>
-                    </Nav.Item>
-                </Nav>
-            </PopoverContent>
-        </Popover>
-    );
-
-    function UserIcon(props)
+    function UserMenu(props)
     {
+        const UserMenuPopover =
+        (
+            <Popover id='user-popover'>
+                <PopoverContent>
+                    <Nav className="flex-column">
+                        <Nav.Item>
+                            <Nav.Link href="#">User Settings</Nav.Link>
+                        </Nav.Item>
+                        <Nav.Item>
+                            <Nav.Link href="/logout">Logout</Nav.Link>
+                        </Nav.Item>
+                    </Nav>
+                </PopoverContent>
+            </Popover>
+        );
+
         if (loggedInUser)
         {
             // TODO: Retrieve user profile photo from server.
             return (
-                <OverlayTrigger trigger='focus' overlay={ UserPopover } placement='bottom'>
+                <OverlayTrigger trigger='focus' overlay={ UserMenuPopover } placement='bottom'>
                     <a id="user-icon-button" href="#">
-                        <UserIconImage width="64" height="64" viewBox="0 0 125 125" />
+                        <UserIcon width="48" height="48" />
                     </a>
                 </OverlayTrigger>
             );
@@ -115,7 +113,7 @@ export function ContactsHeader(props)
             <ContactsHeaderLogo />
             <SearchForm {...props} />
             <LoginSignUp {...props} />
-            <UserIcon {...props} />
+            <UserMenu {...props} />
         </div>
     );
 }

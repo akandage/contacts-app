@@ -176,6 +176,9 @@ function generateContact()
     // 50% of contacts have a home number.
     addPhoneNumber(contact, 'Home');
 
+    // No favorites by default.
+    contact.favorite = false;
+
     return contact;
 }
 

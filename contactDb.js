@@ -112,7 +112,11 @@ const ContactSchema = mongoose.Schema({
                 }
             }
         }
-    ]
+    ],
+    favorite: {
+        type: Boolean,
+        required: true
+    }
 });
 
 class ContactDb
