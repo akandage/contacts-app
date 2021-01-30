@@ -105,8 +105,11 @@ app.use(async (req, res, next) => {
 
 // GET /
 app.use(/^\/$/, (req, res, next) => {
+    let session = req.session;
+    let page = session ? CONTACTS_APP_PAGE : CONTACTS_DEFAULT_PAGE;
+
     res.status(200)
-        .sendFile(req.app.pathToHtml(CONTACTS_APP_PAGE));
+        .sendFile(req.app.pathToHtml(page));
 });
 app.use(contactsApiRouter);
 app.use(sessionRouter);

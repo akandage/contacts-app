@@ -1,7 +1,10 @@
 import React from 'react';
 import ReactDOM from 'react-dom';
+import { connect, Provider } from 'react-redux';
+import * as ContactAppActions from './actions/contactAppActions';
 import ContactsHeader from '../common/contactsHeader';
 import ContactList from './components/contactList';
+import ContactAppStore from './stores/contactAppStore';
 import './stylesheets/contacts.css';
 
 const SESSION_HEARTBEAT_INTERVAL = 30000;
@@ -39,39 +42,54 @@ function startSessionHeartbeat()
     }, SESSION_HEARTBEAT_INTERVAL);
 }
 
-function renderContactList()
+function connectContactList()
 {
-    fetch('/api/contacts')
-        .then(
-            response => {
-                if (response.ok)
-                {
-                    response.json().then(
-                        contacts => ReactDOM.render(
-                            <div className="app-container">
-                                <div className="app-list-container">
-                                    <ContactList contacts={ contacts.map(contact => {
-                                        return {
-                                            contact,
-                                            disabled: false,
-                                            selected: false
-                                        };
-                                    }) } />
-                                </div>
-                            </div>,
-                            document.getElementById('contacts-main')
-                        )
-                    )
-                }
-            }
-        )
-    ;
+    return connect(
+        state => {
+            return {
+                contacts: state.contacts,
+                disabled: state.disabled
+            };
+        },
+        dispatch => {
+
+        }
+    )(ContactList);
+}
+
+function renderContactsApp()
+{
+    let authState = document.getElementById('auth-state');
+
+    if (authState && authState.value === 'LOGGED_IN')
+    {
+        let store = ContactAppStore();
+        let ContactList = connectContactList();
+    
+        ReactDOM.render(<ContactsHeader /> , document.getElementById('contacts-header'));
+        ReactDOM.render(
+            <div className="app-container">
+                <div className="app-list-container">
+                    <Provider store={ store }>
+                        <ContactList />
+                    </Provider>
+                </div>
+            </div>,
+            document.getElementById('contacts-main')
+        );
+    
+        setTimeout(() => {
+            store.dispatch(ContactAppActions.initContacts());
+        }, 0);
+    }
+    else
+    {
+        ReactDOM.render(<ContactsHeader /> , document.getElementById('contacts-header'));
+    }
 }
 
 window.onload = function()
 {
     startSessionHeartbeat();
-
-    ReactDOM.render(<ContactsHeader /> , document.getElementById('contacts-header'));
-    renderContactList();
+    renderContactsApp();
 }

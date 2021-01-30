@@ -2,6 +2,7 @@ import React, { useState } from 'react';
 import PropTypes from 'prop-types';
 import { Form } from 'react-bootstrap';
 import { DeleteIcon, FavoriteIcon, UserIcon } from '../../common/contactsImages';
+import { DEFAULT_CONTACTS_ORDERBY } from '../constants';
 
 const DELETE_BUTTON_WIDTH = 32;
 const DELETE_BUTTON_HEIGHT = 32;
@@ -148,7 +149,7 @@ export default function ContactList(props)
 ContactList.defaultProps = {
     contacts: [],
     disabled: false,
-    orderBy: ['firstName', 'ASC'],
+    orderBy: DEFAULT_CONTACTS_ORDERBY,
     onDeleteClicked: (contact) => {},
     onFavoriteClicked: (favorite) => {}
 };
