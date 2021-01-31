@@ -15,6 +15,8 @@ export default function ContactList(props)
         contacts,
         disabled,
         orderBy,
+        onSelected,
+        onDeselected,
         onDeleteClicked,
         onFavoriteClicked
     } = props;
@@ -57,7 +59,7 @@ export default function ContactList(props)
                         outline={ !favorite && !hover }
                     />
                 </a> :
-                <FavoriteIcon width={ FAVORITE_BUTTON_WIDTH } height={ FAVORITE_BUTTON_HEIGHT } outline={ favorite } />
+                <FavoriteIcon width={ FAVORITE_BUTTON_WIDTH } height={ FAVORITE_BUTTON_HEIGHT } outline={ !favorite } />
         );
     }
 
@@ -74,6 +76,8 @@ export default function ContactList(props)
                 <div className="check">
                     <Form.Check as="input" type="checkbox"
                         disabled={ disabled }
+                        checked={ selected }
+                        onChange={ () => !selected ? onSelected(contact) : onDeselected(contact) }
                     />
                 </div>
 
@@ -84,9 +88,9 @@ export default function ContactList(props)
                 </span>
 
                 <div className="action-buttons">
-                    <FavoriteButton disabled={ disabled } favorite={ contact.favorite } onClick={ onFavoriteClicked(contact) } />
+                    <FavoriteButton disabled={ disabled } favorite={ contact.favorite } onClick={ () => onFavoriteClicked(contact) } />
 
-                    <DeleteButton disabled={ disabled } onClick={ onDeleteClicked(contact) } />
+                    <DeleteButton disabled={ disabled } onClick={ () => onDeleteClicked(contact) } />
                 </div>
             </li>
         );
@@ -150,8 +154,10 @@ ContactList.defaultProps = {
     contacts: [],
     disabled: false,
     orderBy: DEFAULT_CONTACTS_ORDERBY,
+    onSelected: (contact) => {},
+    onDeselected: (contact) => {},
     onDeleteClicked: (contact) => {},
-    onFavoriteClicked: (favorite) => {}
+    onFavoriteClicked: (contact) => {}
 };
 
 ContactList.propTypes = {
@@ -164,6 +170,8 @@ ContactList.propTypes = {
     ).isRequired,
     disabled: PropTypes.bool,
     orderBy: PropTypes.array,
+    onSelected: PropTypes.func,
+    onDeselected: PropTypes.func,
     onDeleteClicked: PropTypes.func,
     onFavoriteClicked: PropTypes.func
 }

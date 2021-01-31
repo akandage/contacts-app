@@ -18,7 +18,7 @@ div.contacts-header-logo > h1 {
     font-weight: 800;
 }
 
-header.contacts-header {
+header#contacts-header {
     position: fixed;
     width: 100%;
     max-height: 6em;

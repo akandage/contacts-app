@@ -3,34 +3,43 @@ import { createLogger } from 'redux-logger';
 import thunkMiddleware from 'redux-thunk';
 import { ACTION_TYPE } from '../actions/contactAppActions';
 
-const STATUS = {
+export const STATUS = {
     START: 'START',
     LOADING: 'LOADING',
     REFRESHING: 'REFRESHING',
+    CONFIRM_ACTION: 'CONFIRM_ACTION',
     IDLE: 'IDLE'
 }
+
+export const CONFIRM_ACTION_TYPE = {
+    DELETE: 'DELETE'
+};
 
 const INITIAL_STATE = {
     status: STATUS.START,
     error: null,
     contacts:[],
-    disabled: false
+    disabled: false,
+    confirmAction: {
+        type: null,
+        subjects: []
+    },
 };
 
 const REDUCER = combineReducers({
     status: (state = INITIAL_STATE.status, action) => {
         let next = state;
-        
+
         switch (action.type)
         {
+            case ACTION_TYPE.CONFIRM_DELETE_CONTACT:
+                next = STATUS.CONFIRM_ACTION;
+                break;
             case ACTION_TYPE.RETRIEVING_CONTACTS:
                 next = state !== STATUS.START ? STATUS.REFRESHING : STATUS.LOADING;
                 break;
-            case ACTION_TYPE.ERROR_RETRIEVING_CONTACTS:
-            case ACTION_TYPE.RETRIEVED_CONTACTS:
-                next = STATUS.IDLE;
-                break;
             default:
+                next = state !== STATUS.START ? STATUS.IDLE : STATUS.START;
                 break;
         }
 
@@ -55,6 +64,33 @@ const REDUCER = combineReducers({
 
         switch (action.type)
         {
+            case ACTION_TYPE.SELECT_CONTACT:
+            case ACTION_TYPE.DESELECT_CONTACT:
+                next = state.map(contact => {
+                    if (action.contact._id === contact.contact._id)
+                    {
+                        contact.selected = action.type === ACTION_TYPE.SELECT_CONTACT ? true : false;
+                    }
+                    
+                    return contact;
+                });
+                break;
+            case ACTION_TYPE.DELETING_CONTACT:
+            case ACTION_TYPE.ERROR_DELETING_CONTACT:
+                next = state.map(contact => {
+                    if (action.contact._id === contact.contact._id)
+                    {
+                        contact.disabled = action.type === ACTION_TYPE.DELETING_CONTACT ? true : false;
+                    }
+
+                    return contact;
+                });
+                break;
+            case ACTION_TYPE.DELETED_CONTACT:
+                next = state.filter(contact => {
+                    return contact.contact._id !== action.contact._id;
+                });
+                break;
             case ACTION_TYPE.RETRIEVED_CONTACTS:
                 next = action.contacts.map(contact => {
                     return {
@@ -75,13 +111,30 @@ const REDUCER = combineReducers({
 
         switch (action.type)
         {
+            case ACTION_TYPE.CONFIRM_DELETE_CONTACT:
             case ACTION_TYPE.RETRIEVING_CONTACTS:
                 next = true;
                 break;
-            case ACTION_TYPE.RETRIEVED_CONTACTS:
+            default:
                 next = false;
                 break;
+        }
+
+        return next;
+    },
+    confirmAction: (state = INITIAL_STATE.confirmAction, action) => {
+        let next = state;
+
+        switch (action.type)
+        {
+            case ACTION_TYPE.CONFIRM_DELETE_CONTACT:
+                next = {
+                    type: CONFIRM_ACTION_TYPE.DELETE,
+                    subjects: [ action.contact ]
+                };
+                break;
             default:
+                next = INITIAL_STATE.confirmAction;
                 break;
         }
 

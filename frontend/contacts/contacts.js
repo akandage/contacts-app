@@ -3,8 +3,9 @@ import ReactDOM from 'react-dom';
 import { connect, Provider } from 'react-redux';
 import * as ContactAppActions from './actions/contactAppActions';
 import ContactsHeader from '../common/contactsHeader';
+import ConfirmActionDialog from './components/confirmActionDialog';
 import ContactList from './components/contactList';
-import ContactAppStore from './stores/contactAppStore';
+import ContactAppStore, { STATUS, CONFIRM_ACTION_TYPE } from './stores/contactAppStore';
 import './stylesheets/contacts.css';
 
 const SESSION_HEARTBEAT_INTERVAL = 30000;
@@ -52,9 +53,59 @@ function connectContactList()
             };
         },
         dispatch => {
-
+            return {
+                onSelected: (contact) => dispatch(ContactAppActions.selectContact(contact)),
+                onDeselected: (contact) => dispatch(ContactAppActions.deselectContact(contact)),
+                onDeleteClicked: (contact) => dispatch(ContactAppActions.confirmDeleteContact(contact))
+            };
         }
     )(ContactList);
+}
+
+function connectConfirmDeleteContactsDialog()
+{
+    return connect(
+        state => {
+            let status = state.status;
+            let confirmAction = state.confirmAction;
+            let contacts = confirmAction.subjects;
+
+            return {
+                show: status === STATUS.CONFIRM_ACTION,
+                title: status === STATUS.CONFIRM_ACTION ? 
+                        (`Delete Contact${contacts.length > 1 ? 's' : ''}`) :
+                        '',
+                bodyText: status === STATUS.CONFIRM_ACTION ?
+                        (contacts.length > 1 ? `Delete ${contacts.length} contacts?` : `Delete contact ${contacts[0].firstName} ${contacts[0].lastName}?`) :
+                        '',
+                subjects: contacts
+            };
+        },
+        dispatch => {
+            return {
+                onAccepted: (contacts) => { 
+                    if (contacts.length > 1)
+                    {
+                        // TODO
+                    }
+                    else
+                    {
+                        dispatch(ContactAppActions.deleteContact(contacts[0]));
+                    }
+                },
+                onCancelled: (contacts) => {
+                    if (contacts.length > 1)
+                    {
+                        // TODO
+                    }
+                    else
+                    {
+                        dispatch(ContactAppActions.cancelledDeleteContact(contacts[0]));
+                    }
+                }
+            };
+        }
+    )(ConfirmActionDialog);
 }
 
 function renderContactsApp()
@@ -64,6 +115,7 @@ function renderContactsApp()
     if (authState && authState.value === 'LOGGED_IN')
     {
         let store = ContactAppStore();
+        let ConfirmDeleteContactsDialog = connectConfirmDeleteContactsDialog();
         let ContactList = connectContactList();
     
         ReactDOM.render(<ContactsHeader /> , document.getElementById('contacts-header'));
@@ -71,6 +123,7 @@ function renderContactsApp()
             <div className="app-container">
                 <div className="app-list-container">
                     <Provider store={ store }>
+                        <ConfirmDeleteContactsDialog />
                         <ContactList />
                     </Provider>
                 </div>

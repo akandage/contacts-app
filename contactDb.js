@@ -11,6 +11,7 @@ const INVALID_TITLE = 'Invalid title.';
 const INVALID_EMAIL_ADDRESS_TYPE = 'Invalid email address type.';
 const INVALID_PHONE_NUMBER_TYPE = 'Invalid phone number type.';
 const INVALID_USER = 'Invalid user.';
+const CONTACT_NOT_FOUND = 'Contact not found.';
 
 const CONTACT_COLLECTION = 'contacts';
 const DEFAULT_CONTACTS_ORDERBY = ['firstName', 'ASC', 'lastName', 'ASC'];
@@ -166,9 +167,39 @@ class ContactDb
             throw new Error(INVALID_USER);
         }
 
+        contact.owner = user._id;
         contact = await this._model.create(contact);
 
         return contact;
+    }
+
+    async getContact(user, id)
+    {
+        if (user === null || user === undefined || user._id === null || user._id === undefined)
+        {
+            throw new Error(INVALID_USER);
+        }
+
+        let contact = await this._model.findOne({ owner: user._id, _id: id }).exec();
+
+        if (!contact)
+        {
+            throw new Error(CONTACT_NOT_FOUND);
+        }
+
+        return contact;
+    }
+
+    async deleteContact(user, id)
+    {
+        if (user === null || user === undefined || user._id === null || user._id === undefined)
+        {
+            throw new Error(INVALID_USER);
+        }
+
+        let contact = await this.getContact(user, id);
+
+        await contact.remove();
     }
 
     async getContactList(user, limit = null, offset = 0, orderBy = DEFAULT_CONTACTS_ORDERBY)
@@ -266,6 +297,7 @@ class ContactDb
 
 module.exports = {
     CONTACT_COLLECTION,
+    CONTACT_NOT_FOUND,
     ContactDb,
     ContactSchema,
     DEFAULT_CONTACTS_ORDERBY,
