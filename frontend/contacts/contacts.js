@@ -5,7 +5,7 @@ import * as ContactAppActions from './actions/contactAppActions';
 import ContactsHeader from '../common/contactsHeader';
 import ConfirmActionDialog from './components/confirmActionDialog';
 import ContactList from './components/contactList';
-import ContactAppStore, { STATUS, CONFIRM_ACTION_TYPE } from './stores/contactAppStore';
+import ContactAppStore, { STATUS } from './stores/contactAppStore';
 import './stylesheets/contacts.css';
 
 const SESSION_HEARTBEAT_INTERVAL = 30000;
@@ -56,7 +56,8 @@ function connectContactList()
             return {
                 onSelected: (contact) => dispatch(ContactAppActions.selectContact(contact)),
                 onDeselected: (contact) => dispatch(ContactAppActions.deselectContact(contact)),
-                onDeleteClicked: (contact) => dispatch(ContactAppActions.confirmDeleteContact(contact))
+                onDeleteClicked: (contact) => dispatch(ContactAppActions.confirmDeleteContact(contact)),
+                onFavoriteClicked: (contact) => dispatch(ContactAppActions.favoriteContact(contact))
             };
         }
     )(ContactList);

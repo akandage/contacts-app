@@ -9,6 +9,9 @@ export const ACTION_TYPE = {
     DELETING_CONTACT: 'DELETING_CONTACT',
     ERROR_DELETING_CONTACT: 'ERROR_DELETING_CONTACT',
     DELETED_CONTACT: 'DELETED_CONTACT',
+    FAVORITING_CONTACT: 'FAVORITING_CONTACT',
+    ERROR_FAVORITING_CONTACT: 'ERROR_FAVORITING_CONTACT',
+    FAVORITED_CONTACT: 'FAVORITED_CONTACT',
     RETRIEVING_CONTACTS: 'RETRIEVING_CONTACTS',
     RETRIEVED_CONTACTS: 'RETRIEVED_CONTACTS',
     ERROR_RETRIEVING_CONTACTS: 'ERROR_RETRIEVING_CONTACTS'
@@ -100,6 +103,64 @@ export function errorDeletingContact(contact, error)
 {
     return {
         type: ACTION_TYPE.ERROR_DELETING_CONTACT,
+        contact,
+        error
+    }
+}
+
+export function favoriteContact(contact, favorite)
+{
+    return async (dispatch) => {
+        dispatch(favoritingContact(contact));
+
+        if (favorite === null || favorite === undefined)
+        {
+            favorite = !contact.favorite;
+        }
+
+        try
+        {
+            let response = await fetch(`/api/contacts/${contact._id}/favorite?value=${favorite}`, {
+                method: 'PUT'
+            });
+
+            if (response.ok)
+            {
+                contact = await response.json();
+                dispatch(favoritedContact(contact));
+            }
+            else
+            {
+                dispatch(errorFavoritingContact(contact, `Error favoriting contact ${response.status} ${response.statusText}`));
+            }
+        }
+        catch (error)
+        {
+            dispatch(errorFavoritingContact(contact, `Error favoriting contact: ${error.message}`));
+        }
+    }
+}
+
+export function favoritingContact(contact)
+{
+    return {
+        type: ACTION_TYPE.FAVORITING_CONTACT,
+        contact
+    }
+}
+
+export function favoritedContact(contact)
+{
+    return {
+        type: ACTION_TYPE.FAVORITED_CONTACT,
+        contact
+    }
+}
+
+export function errorFavoritingContact(contact, error)
+{
+    return {
+        type: ACTION_TYPE.ERROR_FAVORITING_CONTACT,
         contact,
         error
     }

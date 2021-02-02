@@ -50,6 +50,8 @@ const REDUCER = combineReducers({
 
         switch (action.type)
         {
+            case ACTION_TYPE.ERROR_DELETING_CONTACT:
+            case ACTION_TYPE.ERROR_FAVORITING_CONTACT:
             case ACTION_TYPE.ERROR_RETRIEVING_CONTACTS:
                 next = action.error;
                 break;
@@ -76,11 +78,22 @@ const REDUCER = combineReducers({
                 });
                 break;
             case ACTION_TYPE.DELETING_CONTACT:
-            case ACTION_TYPE.ERROR_DELETING_CONTACT:
+            case ACTION_TYPE.FAVORITING_CONTACT:
                 next = state.map(contact => {
                     if (action.contact._id === contact.contact._id)
                     {
-                        contact.disabled = action.type === ACTION_TYPE.DELETING_CONTACT ? true : false;
+                        contact.disabled = true;
+                    }
+
+                    return contact;
+                });
+                break;
+            case ACTION_TYPE.ERROR_DELETING_CONTACT:
+            case ACTION_TYPE.ERROR_FAVORITING_CONTACT:
+                next = state.map(contact => {
+                    if (action.contact._id === contact.contact._id)
+                    {
+                        contact.disabled = false;
                     }
 
                     return contact;
@@ -89,6 +102,17 @@ const REDUCER = combineReducers({
             case ACTION_TYPE.DELETED_CONTACT:
                 next = state.filter(contact => {
                     return contact.contact._id !== action.contact._id;
+                });
+                break;
+            case ACTION_TYPE.FAVORITED_CONTACT:
+                next = state.map(contact => {
+                    if (action.contact._id === contact.contact._id)
+                    {
+                        contact.contact = action.contact;
+                        contact.disabled = false;
+                    }
+
+                    return contact;
                 });
                 break;
             case ACTION_TYPE.RETRIEVED_CONTACTS:

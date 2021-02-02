@@ -10,6 +10,67 @@ contactsApiRouter.put('/api/contacts/:id', async (req, res, next) => {
 
 });
 
+contactsApiRouter.put('/api/contacts/:id/favorite', async (req, res, next) => {
+    let session = req.session;
+    let contactId = req.params.id;
+    let {
+        value
+    } = req.query;
+
+    if (contactId === null || contactId === undefined || contactId.length === 0)
+    {
+        next(httpError(400, 'Contact id is invalid.'));
+        return;
+    }
+
+    if (value !== 'true' && value !== 'false')
+    {
+        next(httpError(400, 'Request parameter \'value\' is invalid.'));
+        return;
+    }
+
+    if (session)
+    {
+        debug(`Request session ${session.sessionId}`);
+
+        let userDb = req.app.get('user-db');
+        let contactDb = req.app.get('contact-db');
+        let user = null;
+        let contact = null;
+
+        try
+        {
+            user = await userDb.getUser(session.username);
+            debug(`Request user ${user.username}`);
+            contact = await contactDb.favoriteContact(user, contactId, value === 'true');
+            debug(`Set contact ${contactId} favorite=${value}`);
+        }
+        catch (error)
+        {
+            console.log(error);
+
+            if (error.message === CONTACT_NOT_FOUND || error.message === USER_NOT_FOUND)
+            {
+                next(httpError(404, error.message));
+            }
+            else
+            {
+                next(httpError(500, error.message));
+            }
+
+            return;
+        }
+
+        res.status(200)
+            .send(contact);
+    }
+    else
+    {
+        debug('Request does not have session.');
+        next(httpError(401));
+    }
+});
+
 contactsApiRouter.get('/api/contacts', async (req, res, next) => {
     let session = req.session;
     let {
@@ -106,6 +167,12 @@ contactsApiRouter.get('/api/contacts', async (req, res, next) => {
 contactsApiRouter.delete('/api/contacts/:id', async (req, res, next) => {
     let session = req.session;
     let contactId = req.params.id;
+
+    if (contactId === null || contactId === undefined || contactId.length === 0)
+    {
+        next(httpError(400, 'Contact id is invalid.'));
+        return;
+    }
 
     if (session)
     {

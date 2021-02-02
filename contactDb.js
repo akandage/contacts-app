@@ -190,6 +190,16 @@ class ContactDb
         return contact;
     }
 
+    async favoriteContact(user, id, favorite = true)
+    {
+        let contact = await this.getContact(user, id);
+
+        contact.favorite = favorite;
+        await contact.save();
+
+        return contact;
+    }
+
     async deleteContact(user, id)
     {
         if (user === null || user === undefined || user._id === null || user._id === undefined)
