@@ -77,6 +77,14 @@ const REDUCER = combineReducers({
                     return contact;
                 });
                 break;
+            case ACTION_TYPE.SELECT_ALL_CONTACTS:
+            case ACTION_TYPE.DESELECT_ALL_CONTACTS:
+                next = state.map(contact => {
+                    contact.selected = action.type === ACTION_TYPE.SELECT_ALL_CONTACTS ? true : false;
+                    
+                    return contact;
+                });
+                break;
             case ACTION_TYPE.DELETING_CONTACT:
             case ACTION_TYPE.FAVORITING_CONTACT:
                 next = state.map(contact => {

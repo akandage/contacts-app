@@ -3,7 +3,9 @@ import { DEFAULT_CONTACTS_ORDERBY } from '../constants';
 
 export const ACTION_TYPE = {
     SELECT_CONTACT: 'SELECT_CONTACT',
+    SELECT_ALL_CONTACTS: 'SELECT_ALL_CONTACTS',
     DESELECT_CONTACT: 'DESELECT_CONTACT',
+    DESELECT_ALL_CONTACTS: 'DESELECT_ALL_CONTACTS',
     CONFIRM_DELETE_CONTACT: 'CONFIRM_DELETE_CONTACT',
     CANCELLED_DELETE_CONTACT: 'CANCELLED_DELETE_CONTACT',
     DELETING_CONTACT: 'DELETING_CONTACT',
@@ -32,11 +34,25 @@ export function selectContact(contact)
     }
 }
 
+export function selectAllContacts()
+{
+    return {
+        type: ACTION_TYPE.SELECT_ALL_CONTACTS
+    }
+}
+
 export function deselectContact(contact)
 {
     return {
         type: ACTION_TYPE.DESELECT_CONTACT,
         contact
+    }
+}
+
+export function deselectAllContacts()
+{
+    return {
+        type: ACTION_TYPE.DESELECT_ALL_CONTACTS
     }
 }
 

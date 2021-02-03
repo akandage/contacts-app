@@ -28,7 +28,7 @@ sessionRouter.post('/login', async (req, res, next) => {
             let session = await sessionDb.registerSession(username);
 
             res.cookie('Session-Id', session.sessionId, {
-                expires: new Date(session.expires),
+                expires: 0,
                 httpOnly: true,
                 sameSite: 'Strict'
             });
@@ -77,7 +77,7 @@ sessionRouter.get('/logout', async (req, res, next) => {
         }
 
         res.clearCookie('Session-Id', {
-            expires: new Date(session.expires),
+            expires: 0,
             httpOnly: true,
             sameSite: 'Strict'
         });

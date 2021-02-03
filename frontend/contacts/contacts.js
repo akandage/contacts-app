@@ -54,8 +54,11 @@ function connectContactList()
         },
         dispatch => {
             return {
+                onRefreshClicked: () => dispatch(ContactAppActions.retrieveContacts()),
                 onSelected: (contact) => dispatch(ContactAppActions.selectContact(contact)),
+                onSelectAll: () => dispatch(ContactAppActions.selectAllContacts()),
                 onDeselected: (contact) => dispatch(ContactAppActions.deselectContact(contact)),
+                onDeselectAll: () => dispatch(ContactAppActions.deselectAllContacts()),
                 onDeleteClicked: (contact) => dispatch(ContactAppActions.confirmDeleteContact(contact)),
                 onFavoriteClicked: (contact) => dispatch(ContactAppActions.favoriteContact(contact))
             };

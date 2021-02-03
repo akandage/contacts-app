@@ -26,17 +26,36 @@ export default function ContactList(props)
         contacts,
         disabled,
         orderBy,
+        onRefreshClicked,
         onSelected,
+        onSelectAll,
         onDeselected,
+        onDeselectAll,
         onDeleteClicked,
         onFavoriteClicked
     } = props;
 
+    let numSelected = contacts.reduce((total, contact) => {
+        return contact.selected ? total+1 : total;
+    }, 0);
+
     function ListToolbar(props)
     {
+        function onCheckClicked()
+        {
+            if (numSelected > 0)
+            {
+                onDeselectAll();
+            }
+            else
+            {
+                onSelectAll();
+            }
+        }
+
         return (
             <>
-                <Form.Check />
+                <Form.Check checked={ numSelected > 0 } onChange={ onCheckClicked } />
 
                 <ButtonGroup>
                     <Button>
@@ -51,7 +70,7 @@ export default function ContactList(props)
                     <Button>
                         <GroupIcon width={ GROUP_TOOLBAR_BUTTON_WIDTH } height={ GROUP_TOOLBAR_BUTTON_HEIGHT } />
                     </Button>
-                    <Button>
+                    <Button onClick={ onRefreshClicked }>
                         <RefreshIcon width={ REFRESH_TOOLBAR_BUTTON_WIDTH } height={ REFRESH_TOOLBAR_BUTTON_HEIGHT } />
                     </Button>
                 </ButtonGroup>
@@ -204,8 +223,11 @@ ContactList.defaultProps = {
     contacts: [],
     disabled: false,
     orderBy: DEFAULT_CONTACTS_ORDERBY,
+    onRefreshClicked: () => {},
     onSelected: (contact) => {},
+    onSelectAll: () => {},
     onDeselected: (contact) => {},
+    onDeselectAll: () => {},
     onDeleteClicked: (contact) => {},
     onFavoriteClicked: (contact) => {}
 };
@@ -220,8 +242,11 @@ ContactList.propTypes = {
     ).isRequired,
     disabled: PropTypes.bool,
     orderBy: PropTypes.array,
+    onRefreshClicked: PropTypes.func,
     onSelected: PropTypes.func,
+    onSelectAll: PropTypes.func,
     onDeselected: PropTypes.func,
+    onDeselectAll: PropTypes.func,
     onDeleteClicked: PropTypes.func,
     onFavoriteClicked: PropTypes.func
 }
