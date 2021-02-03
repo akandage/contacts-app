@@ -20,11 +20,21 @@ main#contacts-main > .app-container > .app-list-container {
     width: 100%;
 }
 
+div.contact-list-toolbar {
+    display: flex;
+    flex-direction: row;
+    align-items: center;
+    column-gap: 0.5em;
+    width: 100%;
+    padding: 0.5em;
+}
+
 ol.contact-list
 {
     list-style-type: none;
     display: block;
     width: 100%;
+    padding-left: 0;
     font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
 }
 

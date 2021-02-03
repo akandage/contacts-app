@@ -1,13 +1,24 @@
 import React, { useState } from 'react';
 import PropTypes from 'prop-types';
-import { Form } from 'react-bootstrap';
-import { DeleteIcon, FavoriteIcon, UserIcon } from '../../common/contactsImages';
+import { Button, ButtonGroup, Dropdown, DropdownButton, Form, InputGroup } from 'react-bootstrap';
+import { AddIcon, DeleteIcon, FavoriteIcon, GroupIcon, RefreshIcon, StarIcon, UserIcon } from '../../common/contactsImages';
 import { DEFAULT_CONTACTS_ORDERBY } from '../constants';
 
-const DELETE_BUTTON_WIDTH = 32;
-const DELETE_BUTTON_HEIGHT = 32;
-const FAVORITE_BUTTON_WIDTH = 32;
-const FAVORITE_BUTTON_HEIGHT = 32;
+const DELETE_BUTTON_WIDTH = 24;
+const DELETE_BUTTON_HEIGHT = 24;
+const FAVORITE_BUTTON_WIDTH = 24;
+const FAVORITE_BUTTON_HEIGHT = 24;
+
+const ADD_TOOLBAR_BUTTON_WIDTH = 24;
+const ADD_TOOLBAR_BUTTON_HEIGHT = 24;
+const DELETE_TOOLBAR_BUTTON_WIDTH = 24;
+const DELETE_TOOLBAR_BUTTON_HEIGHT = 24;
+const FAVORITE_TOOLBAR_BUTTON_WIDTH = 24;
+const FAVORITE_TOOLBAR_BUTTON_HEIGHT = 24;
+const GROUP_TOOLBAR_BUTTON_WIDTH = 24;
+const GROUP_TOOLBAR_BUTTON_HEIGHT = 24;
+const REFRESH_TOOLBAR_BUTTON_WIDTH = 24;
+const REFRESH_TOOLBAR_BUTTON_HEIGHT = 24;
 
 export default function ContactList(props)
 {
@@ -20,6 +31,40 @@ export default function ContactList(props)
         onDeleteClicked,
         onFavoriteClicked
     } = props;
+
+    function ListToolbar(props)
+    {
+        return (
+            <>
+                <Form.Check />
+
+                <ButtonGroup>
+                    <Button>
+                        <AddIcon width={ ADD_TOOLBAR_BUTTON_WIDTH } height={ ADD_TOOLBAR_BUTTON_HEIGHT } />
+                    </Button>
+                    <Button>
+                        <DeleteIcon width={ DELETE_TOOLBAR_BUTTON_WIDTH } height={ DELETE_TOOLBAR_BUTTON_HEIGHT } />
+                    </Button>
+                    <Button>
+                        <StarIcon width={ FAVORITE_TOOLBAR_BUTTON_WIDTH } height={ FAVORITE_TOOLBAR_BUTTON_HEIGHT } />
+                    </Button>
+                    <Button>
+                        <GroupIcon width={ GROUP_TOOLBAR_BUTTON_WIDTH } height={ GROUP_TOOLBAR_BUTTON_HEIGHT } />
+                    </Button>
+                    <Button>
+                        <RefreshIcon width={ REFRESH_TOOLBAR_BUTTON_WIDTH } height={ REFRESH_TOOLBAR_BUTTON_HEIGHT } />
+                    </Button>
+                </ButtonGroup>
+
+                <DropdownButton title="Sort">
+                    <Dropdown.Item eventKey="firstNameAsc">First Name Ascending</Dropdown.Item>
+                    <Dropdown.Item eventKey="firstNameDesc">First Name Descending</Dropdown.Item>
+                    <Dropdown.Item eventKey="lastNameAsc">Last Name Ascending</Dropdown.Item>
+                    <Dropdown.Item eventKey="lastNameDesc">Last Name Descending</Dropdown.Item>
+                </DropdownButton>
+            </>
+        );
+    }
 
     function DeleteButton(props)
     {
@@ -113,40 +158,45 @@ export default function ContactList(props)
     let currSeparator = null;
 
     return (
-        <ol className="contact-list">
-            {
-                contacts.flatMap(contact => {
-                    let listItems = [];
+        <>
+            <div className="contact-list-toolbar">
+                <ListToolbar />
+            </div>
+            <ol className="contact-list">
+                {
+                    contacts.flatMap(contact => {
+                        let listItems = [];
 
-                    if (addSeparators)
-                    {
-                        let separator = null;
-
-                        if (sortField === 'firstName')
+                        if (addSeparators)
                         {
-                            separator = contact.contact.firstName[0].toUpperCase();
-                        }
-                        else
-                        {
-                            separator = contact.contact.lastName[0].toUpperCase();
+                            let separator = null;
+
+                            if (sortField === 'firstName')
+                            {
+                                separator = contact.contact.firstName[0].toUpperCase();
+                            }
+                            else
+                            {
+                                separator = contact.contact.lastName[0].toUpperCase();
+                            }
+
+                            if (currSeparator !== separator)
+                            {
+                                listItems.push(<ListItemSeparator key={ listIndex }>{ separator }</ListItemSeparator>);
+                                currSeparator = separator;
+                            }
+
+                            ++listIndex;
                         }
 
-                        if (currSeparator !== separator)
-                        {
-                            listItems.push(<ListItemSeparator key={ listIndex }>{ separator }</ListItemSeparator>);
-                            currSeparator = separator;
-                        }
-
+                        listItems.push(<ListItem key={ listIndex } contact={ contact.contact } disabled={ disabled || contact.disabled } selected={ contact.selected } />);
                         ++listIndex;
-                    }
 
-                    listItems.push(<ListItem key={ listIndex } contact={ contact.contact } disabled={ disabled || contact.disabled } selected={ contact.selected } />);
-                    ++listIndex;
-
-                    return listItems;
-                })
-            }
-        </ol>
+                        return listItems;
+                    })
+                }
+            </ol>
+        </>
     );
 }
 

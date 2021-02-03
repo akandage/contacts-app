@@ -1,9 +1,13 @@
 import React from 'react';
 import ContactsLogoImage from './images/contacts.svg';
+import AddIconImage from './images/add-icon.svg';
 import DeleteIconImage from './images/delete-icon.svg';
-import SearchIconImage from './images/search-icon.svg';
 import FavoriteIconImage from './images/favorite-icon.svg';
 import FavoriteIconOutlineImage from './images/favorite-icon-outline.svg';
+import GroupIconImage from './images/group-icon.svg';
+import RefreshIconImage from './images/refresh-icon.svg';
+import SearchIconImage from './images/search-icon.svg';
+import StarIconImage from './images/star-icon.svg';
 import UserIconImage from './images/user-icon.svg';
 
 export function ContactsLogo(props)
@@ -12,6 +16,15 @@ export function ContactsLogo(props)
 
     return (
         <ContactsLogoImage width={ width } height={ height } viewBox="0 0 150 117" />
+    );
+}
+
+export function AddIcon(props)
+{
+    let { width, height } = props;
+
+    return (
+        <AddIconImage width={ width } height={ height } viewBox="0 0 125 125" />
     );
 }
 
@@ -35,6 +48,24 @@ export function FavoriteIcon(props)
     )
 }
 
+export function GroupIcon(props)
+{
+    let { width, height } = props;
+
+    return (
+        <GroupIconImage width={ width } height={ height } viewBox="0 0 125 98" />
+    );
+}
+
+export function RefreshIcon(props)
+{
+    let { width, height } = props;
+
+    return (
+        <RefreshIconImage width={ width } height={ height } viewBox="0 0 125 101" />
+    );
+}
+
 export function SearchIcon(props)
 {
     let { width, height } = props;
@@ -42,6 +73,15 @@ export function SearchIcon(props)
     // TODO: Fix the viewbox so it can be at (X=0, Y=0).
     return (
         <SearchIconImage width={ width } height={ height } viewBox="-40 0 144 128" />
+    );
+}
+
+export function StarIcon(props)
+{
+    let { width, height } = props;
+
+    return (
+        <StarIconImage width={ width } height={ height } viewBox="0 0 125 130" />
     );
 }
 
