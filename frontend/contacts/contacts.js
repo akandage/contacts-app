@@ -60,6 +60,7 @@ function connectContactList()
                 onDeselected: (contact) => dispatch(ContactAppActions.deselectContact(contact)),
                 onDeselectAll: () => dispatch(ContactAppActions.deselectAllContacts()),
                 onDeleteClicked: (contact) => dispatch(ContactAppActions.confirmDeleteContact(contact)),
+                onDeleteMultipleClicked: (contacts) => dispatch(ContactAppActions.confirmDeleteContacts(contacts)),
                 onFavoriteClicked: (contact) => dispatch(ContactAppActions.favoriteContact(contact))
             };
         }
@@ -90,7 +91,7 @@ function connectConfirmDeleteContactsDialog()
                 onAccepted: (contacts) => { 
                     if (contacts.length > 1)
                     {
-                        // TODO
+                        dispatch(ContactAppActions.deleteContacts(contacts));
                     }
                     else
                     {
@@ -100,7 +101,7 @@ function connectConfirmDeleteContactsDialog()
                 onCancelled: (contacts) => {
                     if (contacts.length > 1)
                     {
-                        // TODO
+                        dispatch(ContactAppActions.cancelledDeleteContacts(contacts));
                     }
                     else
                     {

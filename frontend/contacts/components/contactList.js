@@ -32,18 +32,18 @@ export default function ContactList(props)
         onDeselected,
         onDeselectAll,
         onDeleteClicked,
+        onDeleteMultipleClicked,
         onFavoriteClicked
     } = props;
 
-    let numSelected = contacts.reduce((total, contact) => {
-        return contact.selected ? total+1 : total;
-    }, 0);
+    let selectedContacts = contacts.filter(contact => contact.selected);
+    let isContactsSelected = selectedContacts.length > 0;
 
     function ListToolbar(props)
     {
         function onCheckClicked()
         {
-            if (numSelected > 0)
+            if (isContactsSelected)
             {
                 onDeselectAll();
             }
@@ -53,21 +53,29 @@ export default function ContactList(props)
             }
         }
 
+        function onDeleteButtonClicked()
+        {
+            if (isContactsSelected)
+            {
+                onDeleteMultipleClicked(selectedContacts.map(contact => contact.contact));
+            }
+        }
+
         return (
             <>
-                <Form.Check checked={ numSelected > 0 } onChange={ onCheckClicked } />
+                <Form.Check checked={ isContactsSelected } onChange={ onCheckClicked } />
 
                 <ButtonGroup>
                     <Button>
                         <AddIcon width={ ADD_TOOLBAR_BUTTON_WIDTH } height={ ADD_TOOLBAR_BUTTON_HEIGHT } />
                     </Button>
-                    <Button>
+                    <Button disabled={ !isContactsSelected } onClick={ onDeleteButtonClicked }>
                         <DeleteIcon width={ DELETE_TOOLBAR_BUTTON_WIDTH } height={ DELETE_TOOLBAR_BUTTON_HEIGHT } />
                     </Button>
-                    <Button>
+                    <Button disabled={ !isContactsSelected }>
                         <StarIcon width={ FAVORITE_TOOLBAR_BUTTON_WIDTH } height={ FAVORITE_TOOLBAR_BUTTON_HEIGHT } />
                     </Button>
-                    <Button>
+                    <Button disabled={ !isContactsSelected }>
                         <GroupIcon width={ GROUP_TOOLBAR_BUTTON_WIDTH } height={ GROUP_TOOLBAR_BUTTON_HEIGHT } />
                     </Button>
                     <Button onClick={ onRefreshClicked }>
@@ -229,6 +237,7 @@ ContactList.defaultProps = {
     onDeselected: (contact) => {},
     onDeselectAll: () => {},
     onDeleteClicked: (contact) => {},
+    onDeleteMultipleClicked: (contacts) => {},
     onFavoriteClicked: (contact) => {}
 };
 
@@ -248,5 +257,6 @@ ContactList.propTypes = {
     onDeselected: PropTypes.func,
     onDeselectAll: PropTypes.func,
     onDeleteClicked: PropTypes.func,
+    onDeleteMultipleClicked: PropTypes.func,
     onFavoriteClicked: PropTypes.func
 }

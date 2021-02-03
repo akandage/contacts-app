@@ -33,6 +33,7 @@ const REDUCER = combineReducers({
         switch (action.type)
         {
             case ACTION_TYPE.CONFIRM_DELETE_CONTACT:
+            case ACTION_TYPE.CONFIRM_DELETE_CONTACTS:
                 next = STATUS.CONFIRM_ACTION;
                 break;
             case ACTION_TYPE.RETRIEVING_CONTACTS:
@@ -63,6 +64,7 @@ const REDUCER = combineReducers({
     },
     contacts: (state = INITIAL_STATE.contacts, action) => {
         let next = state;
+        let contactIds = null;
 
         switch (action.type)
         {
@@ -107,9 +109,40 @@ const REDUCER = combineReducers({
                     return contact;
                 });
                 break;
+            case ACTION_TYPE.DELETING_CONTACTS:
+                contactIds = new Set(action.contacts.map(contact => contact._id));
+
+                next = state.map(contact => {
+                    if (contactIds.has(contact.contact._id))
+                    {
+                        contact.disabled = true;
+                    }
+
+                    return contact;
+                });
+                break;
+            case ACTION_TYPE.ERROR_DELETING_CONTACTS:
+                contactIds = new Set(action.contacts.map(contact => contact._id));
+
+                next = state.map(contact => {
+                    if (contactIds.has(contact.contact._id))
+                    {
+                        contact.disabled = false;
+                    }
+
+                    return contact;
+                });
+                break;
             case ACTION_TYPE.DELETED_CONTACT:
                 next = state.filter(contact => {
                     return contact.contact._id !== action.contact._id;
+                });
+                break;
+            case ACTION_TYPE.DELETED_CONTACTS:
+                contactIds = new Set(action.contacts.map(contact => contact._id));
+
+                next = state.filter(contact => {
+                    return !contactIds.has(contact.contact._id);
                 });
                 break;
             case ACTION_TYPE.FAVORITED_CONTACT:
@@ -163,6 +196,12 @@ const REDUCER = combineReducers({
                 next = {
                     type: CONFIRM_ACTION_TYPE.DELETE,
                     subjects: [ action.contact ]
+                };
+                break;
+            case ACTION_TYPE.CONFIRM_DELETE_CONTACTS:
+                next = {
+                    type: CONFIRM_ACTION_TYPE.DELETE,
+                    subjects: action.contacts
                 };
                 break;
             default:
