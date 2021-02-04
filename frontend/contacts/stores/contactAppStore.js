@@ -2,6 +2,7 @@ import { applyMiddleware, combineReducers, createStore } from 'redux';
 import { createLogger } from 'redux-logger';
 import thunkMiddleware from 'redux-thunk';
 import { ACTION_TYPE } from '../actions/contactAppActions';
+import { DEFAULT_CONTACTS_ORDERBY } from '../constants';
 
 export const STATUS = {
     START: 'START',
@@ -20,6 +21,7 @@ const INITIAL_STATE = {
     error: null,
     contacts:[],
     disabled: false,
+    orderBy: DEFAULT_CONTACTS_ORDERBY,
     confirmAction: {
         type: null,
         subjects: []
@@ -182,6 +184,20 @@ const REDUCER = combineReducers({
                 break;
             default:
                 next = false;
+                break;
+        }
+
+        return next;
+    },
+    orderBy: (state = INITIAL_STATE.orderBy, action) => {
+        let next = state;
+
+        switch (action.type)
+        {
+            case ACTION_TYPE.RETRIEVED_CONTACTS:
+                next = action.orderBy;
+                break;
+            default:
                 break;
         }
 

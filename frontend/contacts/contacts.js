@@ -49,7 +49,8 @@ function connectContactList()
         state => {
             return {
                 contacts: state.contacts,
-                disabled: state.disabled
+                disabled: state.disabled,
+                orderBy: state.orderBy
             };
         },
         dispatch => {
@@ -61,7 +62,8 @@ function connectContactList()
                 onDeselectAll: () => dispatch(ContactAppActions.deselectAllContacts()),
                 onDeleteClicked: (contact) => dispatch(ContactAppActions.confirmDeleteContact(contact)),
                 onDeleteMultipleClicked: (contacts) => dispatch(ContactAppActions.confirmDeleteContacts(contacts)),
-                onFavoriteClicked: (contact) => dispatch(ContactAppActions.favoriteContact(contact))
+                onFavoriteClicked: (contact) => dispatch(ContactAppActions.favoriteContact(contact)),
+                onSortChanged: (orderBy) => dispatch(ContactAppActions.sortContacts(orderBy))
             };
         }
     )(ContactList);

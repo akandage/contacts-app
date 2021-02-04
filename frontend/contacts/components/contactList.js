@@ -2,7 +2,9 @@ import React, { useState } from 'react';
 import PropTypes from 'prop-types';
 import { Button, ButtonGroup, Dropdown, DropdownButton, Form, InputGroup } from 'react-bootstrap';
 import { AddIcon, DeleteIcon, FavoriteIcon, GroupIcon, RefreshIcon, StarIcon, UserIcon } from '../../common/contactsImages';
-import { DEFAULT_CONTACTS_ORDERBY } from '../constants';
+import { DEFAULT_CONTACTS_ORDERBY, CONTACTS_ORDERBY_FIRSTNAME_ASC,
+    CONTACTS_ORDERBY_FIRSTNAME_DESC, CONTACTS_ORDERBY_LASTNAME_ASC, 
+    CONTACTS_ORDERBY_LASTNAME_DESC } from '../constants';
 
 const DELETE_BUTTON_WIDTH = 24;
 const DELETE_BUTTON_HEIGHT = 24;
@@ -33,11 +35,34 @@ export default function ContactList(props)
         onDeselectAll,
         onDeleteClicked,
         onDeleteMultipleClicked,
-        onFavoriteClicked
+        onFavoriteClicked,
+        onSortChanged
     } = props;
 
     let selectedContacts = contacts.filter(contact => contact.selected);
     let isContactsSelected = selectedContacts.length > 0;
+    let sortField = getSortField();
+    let sortKey = getSortKey();
+
+    function getSortField()
+    {
+        if (orderBy !== null && orderBy !== undefined && orderBy.length >= 2)
+        {
+            return orderBy[0];
+        }
+
+        return DEFAULT_CONTACTS_ORDERBY[0];
+    }
+
+    function getSortKey()
+    {
+        if (orderBy !== null && orderBy !== undefined && orderBy.length >= 2)
+        {
+            return orderBy.slice(0, 2).join('');
+        }
+
+        return DEFAULT_CONTACTS_ORDERBY.slice(0, 2).join('');
+    }
 
     function ListToolbar(props)
     {
@@ -58,6 +83,34 @@ export default function ContactList(props)
             if (isContactsSelected)
             {
                 onDeleteMultipleClicked(selectedContacts.map(contact => contact.contact));
+            }
+        }
+
+        function onSortSelected(eventKey)
+        {
+            if (eventKey !== sortKey)
+            {
+                let orderBy = DEFAULT_CONTACTS_ORDERBY;
+
+                switch (eventKey)
+                {
+                    case 'firstNameASC':
+                        orderBy = CONTACTS_ORDERBY_FIRSTNAME_ASC;
+                        break;
+                    case 'firstNameDESC':
+                        orderBy = CONTACTS_ORDERBY_FIRSTNAME_DESC;
+                        break;
+                    case 'lastNameASC':
+                        orderBy = CONTACTS_ORDERBY_LASTNAME_ASC;
+                        break;
+                    case 'lastNameDESC':
+                        orderBy = CONTACTS_ORDERBY_LASTNAME_DESC;
+                        break;
+                    default:
+                        break;
+                }
+
+                onSortChanged(orderBy);
             }
         }
 
@@ -83,11 +136,11 @@ export default function ContactList(props)
                     </Button>
                 </ButtonGroup>
 
-                <DropdownButton title="Sort">
-                    <Dropdown.Item eventKey="firstNameAsc">First Name Ascending</Dropdown.Item>
-                    <Dropdown.Item eventKey="firstNameDesc">First Name Descending</Dropdown.Item>
-                    <Dropdown.Item eventKey="lastNameAsc">Last Name Ascending</Dropdown.Item>
-                    <Dropdown.Item eventKey="lastNameDesc">Last Name Descending</Dropdown.Item>
+                <DropdownButton title="Sort" onSelect={ onSortSelected }>
+                    <Dropdown.Item eventKey="firstNameASC" active={ sortKey === 'firstNameASC' }>First Name Ascending</Dropdown.Item>
+                    <Dropdown.Item eventKey="firstNameDESC" active={ sortKey === 'firstNameDESC' }>First Name Descending</Dropdown.Item>
+                    <Dropdown.Item eventKey="lastNameASC" active={ sortKey === 'lastNameASC' }>Last Name Ascending</Dropdown.Item>
+                    <Dropdown.Item eventKey="lastNameDESC" active={ sortKey === 'lastNameDESC' }>Last Name Descending</Dropdown.Item>
                 </DropdownButton>
             </>
         );
@@ -180,7 +233,6 @@ export default function ContactList(props)
     }
 
     let listIndex = 0;
-    let sortField = orderBy[0];
     let addSeparators = sortField === 'firstName' || sortField === 'lastName';
     let currSeparator = null;
 
@@ -238,7 +290,8 @@ ContactList.defaultProps = {
     onDeselectAll: () => {},
     onDeleteClicked: (contact) => {},
     onDeleteMultipleClicked: (contacts) => {},
-    onFavoriteClicked: (contact) => {}
+    onFavoriteClicked: (contact) => {},
+    onSortChanged: (orderBy) => {}
 };
 
 ContactList.propTypes = {
@@ -258,5 +311,6 @@ ContactList.propTypes = {
     onDeselectAll: PropTypes.func,
     onDeleteClicked: PropTypes.func,
     onDeleteMultipleClicked: PropTypes.func,
-    onFavoriteClicked: PropTypes.func
+    onFavoriteClicked: PropTypes.func,
+    onSortChanged: PropTypes.func
 }

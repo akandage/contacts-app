@@ -21,7 +21,8 @@ export const ACTION_TYPE = {
     FAVORITED_CONTACT: 'FAVORITED_CONTACT',
     RETRIEVING_CONTACTS: 'RETRIEVING_CONTACTS',
     RETRIEVED_CONTACTS: 'RETRIEVED_CONTACTS',
-    ERROR_RETRIEVING_CONTACTS: 'ERROR_RETRIEVING_CONTACTS'
+    ERROR_RETRIEVING_CONTACTS: 'ERROR_RETRIEVING_CONTACTS',
+    SORT_CONTACTS: 'SORT_CONTACTS'
 };
 
 export function initContacts()
@@ -282,13 +283,13 @@ export function retrieveContacts(limit = null, offset = 0, orderBy = DEFAULT_CON
                 qs.orderBy = orderBy;
             }
 
-            let response = await fetch(`/api/contacts?${queryString.stringify(qs)}`);
+            let response = await fetch(`${url}?${queryString.stringify(qs)}`);
             
             if (response.ok)
             {
                 let contacts = await response.json();
 
-                dispatch(retrievedContacts(contacts));
+                dispatch(retrievedContacts(contacts, limit, offset, orderBy));
             }
             else
             {
@@ -309,11 +310,14 @@ export function retrievingContacts()
     };
 }
 
-export function retrievedContacts(contacts)
+export function retrievedContacts(contacts, limit, offset, orderBy)
 {
     return {
         type: ACTION_TYPE.RETRIEVED_CONTACTS,
-        contacts
+        contacts,
+        limit,
+        offset,
+        orderBy
     }
 }
 
@@ -323,4 +327,11 @@ export function errorRetrievingContacts(error)
         type: ACTION_TYPE.ERROR_RETRIEVING_CONTACTS,
         error
     }
+}
+
+export function sortContacts(orderBy = DEFAULT_CONTACTS_ORDERBY)
+{
+    return async (dispatch) => {
+        dispatch(retrieveContacts(null, 0, orderBy));
+    };
 }
