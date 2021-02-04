@@ -2,7 +2,7 @@ import React, { useState } from 'react';
 import PropTypes from 'prop-types';
 import { Button, ButtonGroup, Dropdown, DropdownButton, Form, InputGroup } from 'react-bootstrap';
 import { AddIcon, DeleteIcon, FavoriteIcon, GroupIcon, RefreshIcon, StarIcon, UserIcon } from '../../common/contactsImages';
-import { DEFAULT_CONTACTS_ORDERBY, CONTACTS_ORDERBY_FIRSTNAME_ASC,
+import { STATUS, DEFAULT_CONTACTS_ORDERBY, CONTACTS_ORDERBY_FIRSTNAME_ASC,
     CONTACTS_ORDERBY_FIRSTNAME_DESC, CONTACTS_ORDERBY_LASTNAME_ASC, 
     CONTACTS_ORDERBY_LASTNAME_DESC } from '../constants';
 
@@ -25,6 +25,7 @@ const REFRESH_TOOLBAR_BUTTON_HEIGHT = 24;
 export default function ContactList(props)
 {
     let {
+        status,
         contacts,
         disabled,
         orderBy,
@@ -131,12 +132,12 @@ export default function ContactList(props)
                     <Button disabled={ !isContactsSelected }>
                         <GroupIcon width={ GROUP_TOOLBAR_BUTTON_WIDTH } height={ GROUP_TOOLBAR_BUTTON_HEIGHT } />
                     </Button>
-                    <Button onClick={ onRefreshClicked }>
+                    <Button onClick={ onRefreshClicked } disabled={ status === STATUS.LOADING || status === STATUS.REFRESHING }>
                         <RefreshIcon width={ REFRESH_TOOLBAR_BUTTON_WIDTH } height={ REFRESH_TOOLBAR_BUTTON_HEIGHT } />
                     </Button>
                 </ButtonGroup>
 
-                <DropdownButton title="Sort" onSelect={ onSortSelected }>
+                <DropdownButton title="Sort" onSelect={ onSortSelected } disabled={ status === STATUS.LOADING || status === STATUS.REFRESHING }>
                     <Dropdown.Item eventKey="firstNameASC" active={ sortKey === 'firstNameASC' }>First Name Ascending</Dropdown.Item>
                     <Dropdown.Item eventKey="firstNameDESC" active={ sortKey === 'firstNameDESC' }>First Name Descending</Dropdown.Item>
                     <Dropdown.Item eventKey="lastNameASC" active={ sortKey === 'lastNameASC' }>Last Name Ascending</Dropdown.Item>
@@ -280,6 +281,7 @@ export default function ContactList(props)
 }
 
 ContactList.defaultProps = {
+    status: '',
     contacts: [],
     disabled: false,
     orderBy: DEFAULT_CONTACTS_ORDERBY,
@@ -295,6 +297,7 @@ ContactList.defaultProps = {
 };
 
 ContactList.propTypes = {
+    status: PropTypes.string,
     contacts: PropTypes.arrayOf(
         PropTypes.shape({
             contact: PropTypes.shape.isRequired,

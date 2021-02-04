@@ -2,19 +2,7 @@ import { applyMiddleware, combineReducers, createStore } from 'redux';
 import { createLogger } from 'redux-logger';
 import thunkMiddleware from 'redux-thunk';
 import { ACTION_TYPE } from '../actions/contactAppActions';
-import { DEFAULT_CONTACTS_ORDERBY } from '../constants';
-
-export const STATUS = {
-    START: 'START',
-    LOADING: 'LOADING',
-    REFRESHING: 'REFRESHING',
-    CONFIRM_ACTION: 'CONFIRM_ACTION',
-    IDLE: 'IDLE'
-}
-
-export const CONFIRM_ACTION_TYPE = {
-    DELETE: 'DELETE'
-};
+import { STATUS, CONFIRM_ACTION_TYPE, DEFAULT_CONTACTS_ORDERBY } from '../constants';
 
 const INITIAL_STATE = {
     status: STATUS.START,

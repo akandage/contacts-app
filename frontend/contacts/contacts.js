@@ -1,11 +1,12 @@
 import React from 'react';
 import ReactDOM from 'react-dom';
 import { connect, Provider } from 'react-redux';
+import { STATUS } from './constants';
 import * as ContactAppActions from './actions/contactAppActions';
 import ContactsHeader from '../common/contactsHeader';
 import ConfirmActionDialog from './components/confirmActionDialog';
 import ContactList from './components/contactList';
-import ContactAppStore, { STATUS } from './stores/contactAppStore';
+import ContactAppStore from './stores/contactAppStore';
 import './stylesheets/contacts.css';
 
 const SESSION_HEARTBEAT_INTERVAL = 30000;
@@ -48,6 +49,7 @@ function connectContactList()
     return connect(
         state => {
             return {
+                status: state.status,
                 contacts: state.contacts,
                 disabled: state.disabled,
                 orderBy: state.orderBy
