@@ -1,10 +1,12 @@
 import React from 'react';
 import ContactsLogoImage from './images/contacts.svg';
 import AddIconImage from './images/add-icon.svg';
+import CrossIconImage from './images/cross-icon.svg';
 import DeleteIconImage from './images/delete-icon.svg';
 import FavoriteIconImage from './images/favorite-icon.svg';
 import FavoriteIconOutlineImage from './images/favorite-icon-outline.svg';
 import GroupIconImage from './images/group-icon.svg';
+import PlusIconImage from './images/plus-icon.svg';
 import RefreshIconImage from './images/refresh-icon.svg';
 import SearchIconImage from './images/search-icon.svg';
 import StarIconImage from './images/star-icon.svg';
@@ -25,6 +27,15 @@ export function AddIcon(props)
 
     return (
         <AddIconImage width={ width } height={ height } viewBox="0 0 125 125" />
+    );
+}
+
+export function CrossIcon(props)
+{
+    let { width, height } = props;
+
+    return (
+        <CrossIconImage width={ width } height={ height } viewBox="0 0 125 125" />
     );
 }
 
@@ -56,6 +67,16 @@ export function GroupIcon(props)
         <GroupIconImage width={ width } height={ height } viewBox="0 0 125 98" />
     );
 }
+
+export function PlusIcon(props)
+{
+    let { width, height } = props;
+
+    return (
+        <PlusIconImage width={ width } height={ height } viewBox="0 0 125 126" />
+    );
+}
+
 
 export function RefreshIcon(props)
 {
