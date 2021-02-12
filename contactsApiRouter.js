@@ -2,7 +2,7 @@ const debug = require('debug')('contacts-api-router');
 const express = require('express');
 const httpError = require('http-errors');
 const { validateOrderBy } = require('./db');
-const { CONTACT_NOT_FOUND, DEFAULT_CONTACTS_ORDERBY } = require('./contactDb');
+const { CONTACT_NOT_FOUND, INVALID_CONTACT, DEFAULT_CONTACTS_ORDERBY } = require('./contactDb');
 const { USER_NOT_FOUND } = require('./userDb');
 const contactsApiRouter = express.Router();
 
@@ -33,7 +33,7 @@ contactsApiRouter.post('/api/contacts', async (req, res, next) => {
             {
                 next(httpError(404, error.message));
             }
-            else if (error.message.indexOf('validation failed') !== -1)
+            else if (error.message === INVALID_CONTACT)
             {
                 next(httpError(400, error.message));
             }
@@ -57,7 +57,55 @@ contactsApiRouter.post('/api/contacts', async (req, res, next) => {
 });
 
 contactsApiRouter.put('/api/contacts/:id', async (req, res, next) => {
+    let session = req.session;
+    let contactId = req.params.id;
 
+    if (session)
+    {
+        debug(`Request session ${session.sessionId}`);
+
+        let userDb = req.app.get('user-db');
+        let contactDb = req.app.get('contact-db');
+        let user = null;
+        let contact = Object.assign({}, req.body);
+
+        contact._id = contactId;
+
+        try
+        {
+            user = await userDb.getUser(session.username);
+            debug(`Request user ${user.username}`);
+            await contactDb.putContact(user, contact);
+            debug(`Put contact ${contact._id}`);
+        }
+        catch (error)
+        {
+            console.log(error);
+
+            if (error.message === USER_NOT_FOUND)
+            {
+                next(httpError(404, error.message));
+            }
+            else if (error.message === INVALID_CONTACT)
+            {
+                next(httpError(400, error.message));
+            }
+            else
+            {
+                next(httpError(500, error.message));
+            }
+
+            return;
+        }
+
+        res.status(200)
+            .send();
+    }
+    else
+    {
+        debug('Request does not have session.');
+        next(httpError(401));
+    }
 });
 
 contactsApiRouter.put('/api/contacts/:id/favorite', async (req, res, next) => {

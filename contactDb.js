@@ -10,6 +10,7 @@ const INVALID_LAST_NAME = 'Invalid last name.';
 const INVALID_TITLE = 'Invalid title.';
 const INVALID_EMAIL_ADDRESS_TYPE = 'Invalid email address type.';
 const INVALID_PHONE_NUMBER_TYPE = 'Invalid phone number type.';
+const INVALID_CONTACT = 'Invalid contact.';
 const INVALID_USER = 'Invalid user.';
 const CONTACT_NOT_FOUND = 'Contact not found.';
 
@@ -160,6 +161,26 @@ class ContactDb
         debug('Stopped ContactDb.');
     }
 
+    async validateContact(contact)
+    {
+        if (contact === null || contact === undefined)
+        {
+            throw new Error(INVALID_CONTACT);
+        }
+
+        try
+        {
+            await this._model.validate(contact);
+        }
+        catch (error)
+        {
+            if (error instanceof mongoose.Error.ValidationError)
+            {
+                throw new Error(INVALID_CONTACT);
+            }
+        }
+    }
+
     async createContact(user, contact)
     {
         if (user === null || user === undefined || user._id === null || user._id === undefined)
@@ -167,10 +188,34 @@ class ContactDb
             throw new Error(INVALID_USER);
         }
 
+        await this.validateContact(contact);
+
         contact.owner = user._id;
         contact = await this._model.create(contact);
 
         return contact;
+    }
+
+    async putContact(user, contact)
+    {
+        if (user === null || user === undefined || user._id === null || user._id === undefined)
+        {
+            throw new Error(INVALID_USER);
+        }
+
+        await this.validateContact(contact);
+
+        contact.owner = user._id;
+
+        // Since we're using replace, the version field won't be updated.
+        let prevContact = await this._model.findOneAndReplace({ _id: contact._id }, contact).exec();
+
+        if (!prevContact)
+        {
+            throw new Error(CONTACT_NOT_FOUND);
+        }
+
+        return prevContact;
     }
 
     async getContact(user, id)
@@ -192,6 +237,11 @@ class ContactDb
 
     async favoriteContact(user, id, favorite = true)
     {
+        if (user === null || user === undefined || user._id === null || user._id === undefined)
+        {
+            throw new Error(INVALID_USER);
+        }
+
         let contact = await this.getContact(user, id);
 
         contact.favorite = favorite;
@@ -308,6 +358,8 @@ class ContactDb
 module.exports = {
     CONTACT_COLLECTION,
     CONTACT_NOT_FOUND,
+    INVALID_CONTACT,
+    INVALID_USER,
     ContactDb,
     ContactSchema,
     DEFAULT_CONTACTS_ORDERBY,
