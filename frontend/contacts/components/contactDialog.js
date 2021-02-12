@@ -15,12 +15,14 @@ export const CONTACT_DIALOG_MODE = {
     VIEW_CONTACT: 'VIEW_CONTACT'
 };
 
-export default function ContactDialog(props)
+function Dialog(props)
 {
     let {
         mode,
         size,
-        centered
+        centered,
+        onSaved,
+        onCancelled
     } = props;
     let title = getTitle();
     const [ activeTab, setActiveTab ] = useState('contactTab');
@@ -68,6 +70,7 @@ export default function ContactDialog(props)
         phoneNumbers: phoneNumbers.map(phoneNumber => validatePhoneNumber(phoneNumber))
     });
     const [ showState, setShowState ] = useState(true);
+    const [ saveClicked, setSaveClicked ] = useState(false);
 
     function getTitle()
     {
@@ -81,6 +84,18 @@ export default function ContactDialog(props)
         }
 
         return 'Contact';
+    }
+
+    function getContact()
+    {
+        return {
+            firstName,
+            middleNames,
+            lastName,
+            emailAddresses,
+            phoneNumbers,
+            favorite: false
+        };
     }
 
     function ContactTabPage(props)
@@ -278,7 +293,7 @@ export default function ContactDialog(props)
             mode === CONTACT_DIALOG_MODE.ADD_CONTACT || mode === CONTACT_DIALOG_MODE.EDIT_CONTACT ?
                 <Modal.Footer>
                     <Button variant="primary" onClick={ onSaveClicked } disabled={ !allowSave() }>Save</Button>
-                    <Button variant="secondary" onClick={ onCancelClicked }>Cancel</Button>
+                    <Button variant="secondary" onClick={ hide }>Cancel</Button>
                 </Modal.Footer> :
                 <Modal.Footer />
         );
@@ -647,28 +662,31 @@ export default function ContactDialog(props)
         }
     }
 
-    function onSaveClicked()
-    {
-        // TODO
-    }
-
-    function onCancelClicked()
-    {
-        // TODO
-    }
-
-    function onClose()
+    function hide()
     {
         setShowState(false);
     }
 
+    function onSaveClicked()
+    {
+        setSaveClicked(true);
+        hide();
+    }
+
     function onClosed()
     {
-        // TODO
+        if (saveClicked)
+        {
+            onSaved(getContact());
+        }
+        else
+        {
+            onCancelled();
+        }
     }
 
     return (
-        <Modal size={ size } centered={ centered } show={ showState } onHide={ onClose } onExited={ onClosed } scrollable>
+        <Modal size={ size } centered={ centered } show={ showState } onHide={ hide } onExited={ onClosed } scrollable>
             <Modal.Header closeButton>
                 <Modal.Title>
                     { title }
@@ -684,14 +702,33 @@ export default function ContactDialog(props)
     );
 }
 
+export default function ContactDialog(props)
+{
+    let {
+        show
+    } = props;
+
+    return (
+        show ?
+            <Dialog {...props} /> :
+            <></>
+    );
+}
+
 ContactDialog.defaultProps = {
+    show: false,
     mode: CONTACT_DIALOG_MODE.ADD_CONTACT,
     size: 'xl',
-    centered: true
+    centered: true,
+    onSaved: (contact) => {},
+    onCancelled: () => {}
 };
 
 ContactDialog.propTypes = {
+    show: PropTypes.bool,
     mode: PropTypes.string,
     size: PropTypes.string,
-    centered: PropTypes.bool
+    centered: PropTypes.bool,
+    onSaved: PropTypes.func,
+    onCancelled: PropTypes.func
 };

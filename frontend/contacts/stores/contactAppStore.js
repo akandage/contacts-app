@@ -22,6 +22,9 @@ const REDUCER = combineReducers({
 
         switch (action.type)
         {
+            case ACTION_TYPE.ADD_CONTACT:
+                next = STATUS.ADD_CONTACT;
+                break;
             case ACTION_TYPE.CONFIRM_DELETE_CONTACT:
             case ACTION_TYPE.CONFIRM_DELETE_CONTACTS:
                 next = STATUS.CONFIRM_ACTION;
@@ -41,6 +44,7 @@ const REDUCER = combineReducers({
 
         switch (action.type)
         {
+            case ACTION_TYPE.ADD_CONTACT_ERROR_SAVING:
             case ACTION_TYPE.ERROR_DELETING_CONTACT:
             case ACTION_TYPE.ERROR_FAVORITING_CONTACT:
             case ACTION_TYPE.ERROR_RETRIEVING_CONTACTS:

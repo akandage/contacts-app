@@ -29,6 +29,7 @@ export default function ContactList(props)
         contacts,
         disabled,
         orderBy,
+        onAddContactClicked,
         onRefreshClicked,
         onSelected,
         onSelectAll,
@@ -120,7 +121,7 @@ export default function ContactList(props)
                 <Form.Check checked={ isContactsSelected } onChange={ onCheckClicked } />
 
                 <ButtonGroup>
-                    <Button>
+                    <Button disabled={ isContactsSelected } onClick={ onAddContactClicked }>
                         <AddIcon width={ ADD_TOOLBAR_BUTTON_WIDTH } height={ ADD_TOOLBAR_BUTTON_HEIGHT } />
                     </Button>
                     <Button disabled={ !isContactsSelected } onClick={ onDeleteButtonClicked }>
@@ -285,6 +286,7 @@ ContactList.defaultProps = {
     contacts: [],
     disabled: false,
     orderBy: DEFAULT_CONTACTS_ORDERBY,
+    onAddContactClicked: () => {},
     onRefreshClicked: () => {},
     onSelected: (contact) => {},
     onSelectAll: () => {},
@@ -307,6 +309,7 @@ ContactList.propTypes = {
     ).isRequired,
     disabled: PropTypes.bool,
     orderBy: PropTypes.array,
+    onAddContactClicked: PropTypes.func,
     onRefreshClicked: PropTypes.func,
     onSelected: PropTypes.func,
     onSelectAll: PropTypes.func,

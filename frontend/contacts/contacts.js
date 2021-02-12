@@ -4,6 +4,7 @@ import { connect, Provider } from 'react-redux';
 import { STATUS } from './constants';
 import * as ContactAppActions from './actions/contactAppActions';
 import ContactsHeader from '../common/contactsHeader';
+import ContactDialog, { CONTACT_DIALOG_MODE } from './components/contactDialog';
 import ConfirmActionDialog from './components/confirmActionDialog';
 import ContactList from './components/contactList';
 import ContactAppStore from './stores/contactAppStore';
@@ -57,6 +58,7 @@ function connectContactList()
         },
         dispatch => {
             return {
+                onAddContactClicked: () => dispatch(ContactAppActions.addContact()),
                 onRefreshClicked: () => dispatch(ContactAppActions.retrieveContacts()),
                 onSelected: (contact) => dispatch(ContactAppActions.selectContact(contact)),
                 onSelectAll: () => dispatch(ContactAppActions.selectAllContacts()),
@@ -69,6 +71,24 @@ function connectContactList()
             };
         }
     )(ContactList);
+}
+
+function connectAddContactDialog()
+{
+    return connect(
+        state => {
+            return {
+                show: state.status === STATUS.ADD_CONTACT,
+                mode: CONTACT_DIALOG_MODE.ADD_CONTACT
+            };
+        },
+        dispatch => {
+            return {
+                onSaved: (contact) => dispatch(ContactAppActions.addContactSave(contact)),
+                onCancelled: () => dispatch(ContactAppActions.addContactCancel())
+            };
+        }
+    )(ContactDialog);
 }
 
 function connectConfirmDeleteContactsDialog()
@@ -124,6 +144,7 @@ function renderContactsApp()
     if (authState && authState.value === 'LOGGED_IN')
     {
         let store = ContactAppStore();
+        let AddContactDialog = connectAddContactDialog();
         let ConfirmDeleteContactsDialog = connectConfirmDeleteContactsDialog();
         let ContactList = connectContactList();
     
@@ -132,6 +153,7 @@ function renderContactsApp()
             <div className="app-container">
                 <div className="app-list-container">
                     <Provider store={ store }>
+                        <AddContactDialog />
                         <ConfirmDeleteContactsDialog />
                         <ContactList />
                     </Provider>

@@ -2,6 +2,11 @@ import queryString from 'query-string';
 import { DEFAULT_CONTACTS_ORDERBY } from '../constants';
 
 export const ACTION_TYPE = {
+    ADD_CONTACT: 'ADD_CONTACT',
+    ADD_CONTACT_CANCEL: 'ADD_CONTACT_CANCEL',
+    ADD_CONTACT_SAVING: 'ADD_CONTACT_SAVING',
+    ADD_CONTACT_SAVED: 'ADD_CONTACT_SAVED',
+    ADD_CONTACT_ERROR_SAVING: 'ADD_CONTACT_ERROR_SAVING',
     SELECT_CONTACT: 'SELECT_CONTACT',
     SELECT_ALL_CONTACTS: 'SELECT_ALL_CONTACTS',
     DESELECT_CONTACT: 'DESELECT_CONTACT',
@@ -29,6 +34,79 @@ export function initContacts()
 {
     return (dispatch) => {
         dispatch(retrieveContacts());
+    }
+}
+
+export function addContact()
+{
+    return {
+        type: ACTION_TYPE.ADD_CONTACT
+    }
+}
+
+export function addContactCancel()
+{
+    return {
+        type: ACTION_TYPE.ADD_CONTACT_CANCEL
+    }
+}
+
+export function addContactSave(contact)
+{
+    return async (dispatch) => {
+        dispatch(addContactSaving(contact));
+
+        try
+        {
+            let response = await fetch(`/api/contacts`, {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json'
+                },
+                body: JSON.stringify(contact)
+            });
+
+            if (response.ok)
+            {
+                contact = await response.json();
+
+                dispatch(addContactSaved(contact));
+                dispatch(retrieveContacts());
+            }
+            else
+            {
+                dispatch(addContactErrorSaving(contact, `Error adding contact ${response.status} ${response.statusText}`));
+            }
+        }
+        catch (error)
+        {
+            dispatch(errorDeletingContact(contact, `Error deleting contact: ${error.message}`));
+        }
+    }
+}
+
+export function addContactSaving(contact)
+{
+    return {
+        type: ACTION_TYPE.ADD_CONTACT_SAVING,
+        contact
+    };
+}
+
+export function addContactSaved(contact)
+{
+    return {
+        type: ACTION_TYPE.ADD_CONTACT_SAVED,
+        contact
+    };
+}
+
+export function addContactErrorSaving(contact, error)
+{
+    return {
+        type: ACTION_TYPE.ADD_CONTACT_ERROR_SAVING,
+        contact,
+        error
     }
 }
 
