@@ -50,12 +50,14 @@ ol.contact-list li.contact-list-item {
     margin-bottom: 0.25em;
 }
 
-ol.contact-list li.contact-list-item > .contact-name {
+ol.contact-list li.contact-list-item .contact-name {
+    display: block;
     width: 100%;
+    height: 100%;
     margin-left: 0.5em;
 }
 
-ol.contact-list li.contact-list-item > .action-buttons {
+ol.contact-list li.contact-list-item .action-buttons {
     display: flex;
     flex-direction: row;
     align-items: center;

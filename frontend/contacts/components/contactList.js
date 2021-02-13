@@ -30,6 +30,7 @@ export default function ContactList(props)
         disabled,
         orderBy,
         onAddContactClicked,
+        onEditContactClicked,
         onRefreshClicked,
         onSelected,
         onSelectAll,
@@ -210,9 +211,11 @@ export default function ContactList(props)
 
                 <UserIcon width="32" height="32" />
 
-                <span className="contact-name">
-                    {`${contact.firstName} ${contact.lastName}`}
-                </span>
+                <a href="#" className="contact-name" onClick={ () => onEditContactClicked(contact) }>
+                    <span>
+                        {`${contact.firstName} ${contact.lastName}`}
+                    </span>
+                </a>
 
                 <div className="action-buttons">
                     <FavoriteButton disabled={ disabled } favorite={ contact.favorite } onClick={ () => onFavoriteClicked(contact) } />
@@ -287,6 +290,7 @@ ContactList.defaultProps = {
     disabled: false,
     orderBy: DEFAULT_CONTACTS_ORDERBY,
     onAddContactClicked: () => {},
+    onEditContactClicked: (contact) => {},
     onRefreshClicked: () => {},
     onSelected: (contact) => {},
     onSelectAll: () => {},
@@ -310,6 +314,7 @@ ContactList.propTypes = {
     disabled: PropTypes.bool,
     orderBy: PropTypes.array,
     onAddContactClicked: PropTypes.func,
+    onEditContactClicked: PropTypes.func,
     onRefreshClicked: PropTypes.func,
     onSelected: PropTypes.func,
     onSelectAll: PropTypes.func,

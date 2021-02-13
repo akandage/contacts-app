@@ -7,6 +7,11 @@ export const ACTION_TYPE = {
     ADD_CONTACT_SAVING: 'ADD_CONTACT_SAVING',
     ADD_CONTACT_SAVED: 'ADD_CONTACT_SAVED',
     ADD_CONTACT_ERROR_SAVING: 'ADD_CONTACT_ERROR_SAVING',
+    EDIT_CONTACT: 'EDIT_CONTACT',
+    EDIT_CONTACT_CANCEL: 'EDIT_CONTACT_CANCEL',
+    EDIT_CONTACT_SAVING: 'EDIT_CONTACT_SAVING',
+    EDIT_CONTACT_SAVED: 'EDIT_CONTACT_SAVED',
+    EDIT_CONTACT_ERROR_SAVING: 'EDIT_CONTACT_ERROR_SAVING',
     SELECT_CONTACT: 'SELECT_CONTACT',
     SELECT_ALL_CONTACTS: 'SELECT_ALL_CONTACTS',
     DESELECT_CONTACT: 'DESELECT_CONTACT',
@@ -80,7 +85,7 @@ export function addContactSave(contact)
         }
         catch (error)
         {
-            dispatch(errorDeletingContact(contact, `Error deleting contact: ${error.message}`));
+            dispatch(addContactErrorSaving(contact, `Error adding contact: ${error.message}`));
         }
     }
 }
@@ -108,6 +113,79 @@ export function addContactErrorSaving(contact, error)
         contact,
         error
     }
+}
+
+export function editContact(contact)
+{
+    return {
+        type: ACTION_TYPE.EDIT_CONTACT,
+        contact
+    };
+}
+
+export function editContactCancel(contact)
+{
+    return {
+        type: ACTION_TYPE.EDIT_CONTACT_CANCEL,
+        contact
+    };
+}
+
+export function editContactSaving(contact)
+{
+    return {
+        type: ACTION_TYPE.EDIT_CONTACT_SAVING,
+        contact
+    };
+}
+
+export function editContactSave(contact)
+{
+    return async (dispatch) => {
+        dispatch(editContactSaving(contact));
+
+        try
+        {
+            let response = await fetch(`/api/contacts/${contact._id}`, {
+                method: 'PUT',
+                headers: {
+                    'Content-Type': 'application/json'
+                },
+                body: JSON.stringify(contact)
+            });
+
+            if (response.ok)
+            {
+                dispatch(editContactSaved(contact));
+                dispatch(retrieveContacts());
+            }
+            else
+            {
+                dispatch(editContactErrorSaving(contact, `Error editing contact ${response.status} ${response.statusText}`));
+            }
+        }
+        catch (error)
+        {
+            dispatch(editContactErrorSaving(contact, `Error editing contact: ${error.message}`));
+        }
+    }
+}
+
+export function editContactSaved(contact)
+{
+    return {
+        type: ACTION_TYPE.EDIT_CONTACT_SAVED,
+        contact
+    };
+}
+
+export function editContactErrorSaving(contact, error)
+{
+    return {
+        type: ACTION_TYPE.EDIT_CONTACT_ERROR_SAVING,
+        contact,
+        error
+    };
 }
 
 export function selectContact(contact)

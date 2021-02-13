@@ -19,6 +19,7 @@ function Dialog(props)
 {
     let {
         mode,
+        contact,
         size,
         centered,
         onSaved,
@@ -26,49 +27,16 @@ function Dialog(props)
     } = props;
     let title = getTitle();
     const [ activeTab, setActiveTab ] = useState('contactTab');
-    const [ firstName, setFirstName ] = useState('');
-    const [ middleName, setMiddleName ] = useState('');
-    const [ middleNames, setMiddleNames ] = useState([]);
-    const [ lastName, setLastName ] = useState('');
-    const [ phoneNumber, setPhoneNumber ] = useState({
-        phoneNumber: '',
-        type: PHONE_NUMBER_TYPES[0]
-    });
-    const [ phoneNumbers, setPhoneNumbers ] = useState([]);
-    const [ emailAddress, setEmailAddress ] = useState({
-        emailAddress: '',
-        type: EMAIL_ADDRESS_TYPES[0]
-    });
-    const [ emailAddresses, setEmailAddresses ] = useState([]);
-    const [ dirtyState, setDirtyState ] = useState({
-        firstName: false,
-        middleNames: [],
-        middleName: false,
-        lastName: false,
-        emailAddress: false,
-        emailAddresses: [],
-        phoneNumber: false,
-        phoneNumbers: []
-    });
-    const [ validState, setValidState ] = useState({
-        firstName: validateName(firstName, 'First Name'),
-        middleNames: middleNames.map(middleName => validateName(middleName, 'Middle Name')),
-        middleName: {
-            isValid: false,
-            invalidFeedback: null
-        },
-        lastName: validateName(lastName, 'Last Name'),
-        emailAddress: {
-            isValid: false,
-            invalidFeedback: null
-        },
-        emailAddresses: emailAddresses.map(emailAddress => validateEmailAddress(emailAddress)),
-        phoneNumber: {
-            isValid: false,
-            invalidFeedback: null
-        },
-        phoneNumbers: phoneNumbers.map(phoneNumber => validatePhoneNumber(phoneNumber))
-    });
+    const [ firstName, setFirstName ] = useState(getInitialValue('firstName'));
+    const [ middleName, setMiddleName ] = useState(getInitialValue('middleName'));
+    const [ middleNames, setMiddleNames ] = useState(getInitialValue('middleNames'));
+    const [ lastName, setLastName ] = useState(getInitialValue('lastName'));
+    const [ phoneNumber, setPhoneNumber ] = useState(getInitialValue('phoneNumber'));
+    const [ phoneNumbers, setPhoneNumbers ] = useState(getInitialValue('phoneNumbers'));
+    const [ emailAddress, setEmailAddress ] = useState(getInitialValue('emailAddress'));
+    const [ emailAddresses, setEmailAddresses ] = useState(getInitialValue('emailAddresses'));
+    const [ dirtyState, setDirtyState ] = useState(getInitialValue('dirtyState'));
+    const [ validState, setValidState ] = useState(getInitialValue('validState'));
     const [ showState, setShowState ] = useState(true);
     const [ saveClicked, setSaveClicked ] = useState(false);
 
@@ -86,9 +54,110 @@ function Dialog(props)
         return 'Contact';
     }
 
-    function getContact()
+    function getInitialValue(key)
+    {
+        // Ensure deep copies are made where necessary.
+
+        if (key === 'firstName')
+        {
+            return mode === CONTACT_DIALOG_MODE.ADD_CONTACT ? 
+                '' :
+                contact.firstName;
+        }
+        else if (key === 'middleName')
+        {
+            return '';
+        }
+        else if (key === 'middleNames')
+        {
+            return mode === CONTACT_DIALOG_MODE.ADD_CONTACT ?
+                [] :
+                contact.middleNames.slice();
+        }
+        else if (key === 'lastName')
+        {
+            return mode === CONTACT_DIALOG_MODE.ADD_CONTACT ?
+                '' :
+                contact.lastName;
+        }
+        else if (key === 'phoneNumber')
+        {
+            return {
+                phoneNumber: '',
+                type: PHONE_NUMBER_TYPES[0]
+            };
+        }
+        else if (key === 'phoneNumbers')
+        {
+            return mode === CONTACT_DIALOG_MODE.ADD_CONTACT ?
+                [] :
+                contact.phoneNumbers.map(phoneNumber => Object.assign({}, phoneNumber));
+        }
+        else if (key === 'emailAddress')
+        {
+            return {
+                emailAddress: '',
+                type: EMAIL_ADDRESS_TYPES[0]
+            };
+        }
+        else if (key === 'emailAddresses')
+        {
+            return mode === CONTACT_DIALOG_MODE.ADD_CONTACT ?
+                [] :
+                contact.emailAddresses.map(emailAddress => Object.assign({}, emailAddress));
+        }
+        else if (key === 'dirtyState')
+        {
+            return getInitialDirtyState();
+        }
+        else if (key === 'validState')
+        {
+            return getInitialValidState();
+        }
+
+        throw new Error();
+    }
+
+    function getInitialDirtyState()
     {
         return {
+            firstName: false,
+            middleNames: mode === CONTACT_DIALOG_MODE.ADD_CONTACT ? [] : contact.middleNames.map(middleName => false),
+            middleName: false,
+            lastName: false,
+            emailAddress: false,
+            emailAddresses: mode === CONTACT_DIALOG_MODE.ADD_CONTACT ? [] : contact.emailAddresses.map(emailAddress => false),
+            phoneNumber: false,
+            phoneNumbers: mode === CONTACT_DIALOG_MODE.ADD_CONTACT ? [] : contact.phoneNumbers.map(phoneNumber => false)
+        };
+    }
+
+    function getInitialValidState()
+    {
+        return {
+            firstName: validateName(firstName, 'First Name'),
+            middleNames: middleNames.map(middleName => validateName(middleName, 'Middle Name')),
+            middleName: {
+                isValid: false,
+                invalidFeedback: null
+            },
+            lastName: validateName(lastName, 'Last Name'),
+            emailAddress: {
+                isValid: false,
+                invalidFeedback: null
+            },
+            emailAddresses: emailAddresses.map(emailAddress => validateEmailAddress(emailAddress.emailAddress)),
+            phoneNumber: {
+                isValid: false,
+                invalidFeedback: null
+            },
+            phoneNumbers: phoneNumbers.map(phoneNumber => validatePhoneNumber(phoneNumber.phoneNumber))
+        };
+    }
+
+    function getContact()
+    {
+        let c = {
             firstName,
             middleNames,
             lastName,
@@ -96,6 +165,13 @@ function Dialog(props)
             phoneNumbers,
             favorite: false
         };
+
+        if (mode === CONTACT_DIALOG_MODE.EDIT_CONTACT)
+        {
+            c._id = contact._id;
+        }
+
+        return c;
     }
 
     function ContactTabPage(props)
@@ -619,6 +695,15 @@ function Dialog(props)
         setValidState(Object.assign({}, validState, { emailAddresses: v }));
     }
 
+    function isDirty()
+    {
+        return dirtyState.firstName ||
+            dirtyState.middleNames.some(dirty => dirty) ||
+            dirtyState.lastName ||
+            dirtyState.phoneNumbers.some(dirty => dirty) ||
+            dirtyState.emailAddresses.some(dirty => dirty);
+    }
+
     function isAllValid()
     {
         if (!validState.firstName.isValid)
@@ -657,8 +742,7 @@ function Dialog(props)
         }
         else if (mode === CONTACT_DIALOG_MODE.EDIT_CONTACT)
         {
-            // TODO: Check dirty.
-            return isAllValid();
+            return isDirty() && isAllValid();
         }
     }
 
@@ -718,6 +802,7 @@ export default function ContactDialog(props)
 ContactDialog.defaultProps = {
     show: false,
     mode: CONTACT_DIALOG_MODE.ADD_CONTACT,
+    contact: null,
     size: 'xl',
     centered: true,
     onSaved: (contact) => {},
@@ -727,6 +812,7 @@ ContactDialog.defaultProps = {
 ContactDialog.propTypes = {
     show: PropTypes.bool,
     mode: PropTypes.string,
+    contact: PropTypes.object,
     size: PropTypes.string,
     centered: PropTypes.bool,
     onSaved: PropTypes.func,

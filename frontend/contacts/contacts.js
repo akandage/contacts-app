@@ -59,6 +59,7 @@ function connectContactList()
         dispatch => {
             return {
                 onAddContactClicked: () => dispatch(ContactAppActions.addContact()),
+                onEditContactClicked: (contact) => dispatch(ContactAppActions.editContact(contact)),
                 onRefreshClicked: () => dispatch(ContactAppActions.retrieveContacts()),
                 onSelected: (contact) => dispatch(ContactAppActions.selectContact(contact)),
                 onSelectAll: () => dispatch(ContactAppActions.selectAllContacts()),
@@ -86,6 +87,25 @@ function connectAddContactDialog()
             return {
                 onSaved: (contact) => dispatch(ContactAppActions.addContactSave(contact)),
                 onCancelled: () => dispatch(ContactAppActions.addContactCancel())
+            };
+        }
+    )(ContactDialog);
+}
+
+function connectEditContactDialog()
+{
+    return connect(
+        state => {
+            return {
+                show: state.status === STATUS.EDIT_CONTACT,
+                mode: CONTACT_DIALOG_MODE.EDIT_CONTACT,
+                contact: state.contact
+            };
+        },
+        dispatch => {
+            return {
+                onSaved: (contact) => dispatch(ContactAppActions.editContactSave(contact)),
+                onCancelled: () => dispatch(ContactAppActions.editContactCancel())
             };
         }
     )(ContactDialog);
@@ -145,6 +165,7 @@ function renderContactsApp()
     {
         let store = ContactAppStore();
         let AddContactDialog = connectAddContactDialog();
+        let EditContactDialog = connectEditContactDialog();
         let ConfirmDeleteContactsDialog = connectConfirmDeleteContactsDialog();
         let ContactList = connectContactList();
     
@@ -154,6 +175,7 @@ function renderContactsApp()
                 <div className="app-list-container">
                     <Provider store={ store }>
                         <AddContactDialog />
+                        <EditContactDialog />
                         <ConfirmDeleteContactsDialog />
                         <ContactList />
                     </Provider>

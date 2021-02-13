@@ -7,6 +7,7 @@ import { STATUS, CONFIRM_ACTION_TYPE, DEFAULT_CONTACTS_ORDERBY } from '../consta
 const INITIAL_STATE = {
     status: STATUS.START,
     error: null,
+    contact: null,
     contacts:[],
     disabled: false,
     orderBy: DEFAULT_CONTACTS_ORDERBY,
@@ -24,6 +25,9 @@ const REDUCER = combineReducers({
         {
             case ACTION_TYPE.ADD_CONTACT:
                 next = STATUS.ADD_CONTACT;
+                break;
+            case ACTION_TYPE.EDIT_CONTACT:
+                next = STATUS.EDIT_CONTACT;
                 break;
             case ACTION_TYPE.CONFIRM_DELETE_CONTACT:
             case ACTION_TYPE.CONFIRM_DELETE_CONTACTS:
@@ -51,6 +55,21 @@ const REDUCER = combineReducers({
                 next = action.error;
                 break;
             default:
+                break;
+        }
+
+        return next;
+    },
+    contact: (state = INITIAL_STATE.contact, action) => {
+        let next = state;
+
+        switch (action.type)
+        {
+            case ACTION_TYPE.EDIT_CONTACT:
+                next = action.contact;
+                break;
+            default:
+                next = null;
                 break;
         }
 
