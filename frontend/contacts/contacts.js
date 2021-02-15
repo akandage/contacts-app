@@ -1,7 +1,7 @@
 import React from 'react';
 import ReactDOM from 'react-dom';
 import { connect, Provider } from 'react-redux';
-import { STATUS } from './constants';
+import { STATUS, CONFIRM_ACTION_TYPE } from './constants';
 import * as ContactAppActions from './actions/contactAppActions';
 import ContactsHeader from '../common/contactsHeader';
 import ContactDialog, { CONTACT_DIALOG_MODE } from './components/contactDialog';
@@ -68,6 +68,7 @@ function connectContactList()
                 onDeleteClicked: (contact) => dispatch(ContactAppActions.confirmDeleteContact(contact)),
                 onDeleteMultipleClicked: (contacts) => dispatch(ContactAppActions.confirmDeleteContacts(contacts)),
                 onFavoriteClicked: (contact) => dispatch(ContactAppActions.favoriteContact(contact)),
+                onFavoriteMultipleClicked: (contacts) => contacts.length > 1 ? dispatch(ContactAppActions.confirmFavoriteContacts(contacts)) : dispatch(ContactAppActions.favoriteContact(contacts[0])),
                 onSortChanged: (orderBy) => dispatch(ContactAppActions.sortContacts(orderBy))
             };
         }
@@ -120,7 +121,7 @@ function connectConfirmDeleteContactsDialog()
             let contacts = confirmAction.subjects;
 
             return {
-                show: status === STATUS.CONFIRM_ACTION,
+                show: status === STATUS.CONFIRM_ACTION && confirmAction.type === CONFIRM_ACTION_TYPE.DELETE,
                 title: status === STATUS.CONFIRM_ACTION ? 
                         (`Delete Contact${contacts.length > 1 ? 's' : ''}`) :
                         '',
@@ -157,6 +158,38 @@ function connectConfirmDeleteContactsDialog()
     )(ConfirmActionDialog);
 }
 
+function connectConfirmFavoriteContactsDialog()
+{
+    return connect(
+        state => {
+            let status = state.status;
+            let confirmAction = state.confirmAction;
+            let contacts = confirmAction.subjects;
+
+            return {
+                show: status === STATUS.CONFIRM_ACTION && confirmAction.type === CONFIRM_ACTION_TYPE.FAVORITE,
+                title: status === STATUS.CONFIRM_ACTION ? 
+                        'Favorite Contacts' :
+                        '',
+                bodyText: status === STATUS.CONFIRM_ACTION ?
+                        `Favorite ${contacts.length} contacts?`:
+                        '',
+                subjects: contacts
+            };
+        },
+        dispatch => {
+            return {
+                onAccepted: (contacts) => { 
+                    dispatch(ContactAppActions.favoriteContacts(contacts));
+                },
+                onCancelled: (contacts) => {
+                    dispatch(ContactAppActions.cancelledFavoriteContacts(contacts));
+                }
+            };
+        }
+    )(ConfirmActionDialog);
+}
+
 function renderContactsApp()
 {
     let authState = document.getElementById('auth-state');
@@ -167,6 +200,7 @@ function renderContactsApp()
         let AddContactDialog = connectAddContactDialog();
         let EditContactDialog = connectEditContactDialog();
         let ConfirmDeleteContactsDialog = connectConfirmDeleteContactsDialog();
+        let ConfirmFavoriteContactsDialog = connectConfirmFavoriteContactsDialog();
         let ContactList = connectContactList();
     
         ReactDOM.render(<ContactsHeader /> , document.getElementById('contacts-header'));
@@ -177,6 +211,7 @@ function renderContactsApp()
                         <AddContactDialog />
                         <EditContactDialog />
                         <ConfirmDeleteContactsDialog />
+                        <ConfirmFavoriteContactsDialog />
                         <ContactList />
                     </Provider>
                 </div>

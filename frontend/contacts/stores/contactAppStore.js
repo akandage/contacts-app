@@ -31,6 +31,7 @@ const REDUCER = combineReducers({
                 break;
             case ACTION_TYPE.CONFIRM_DELETE_CONTACT:
             case ACTION_TYPE.CONFIRM_DELETE_CONTACTS:
+            case ACTION_TYPE.CONFIRM_FAVORITE_CONTACTS:
                 next = STATUS.CONFIRM_ACTION;
                 break;
             case ACTION_TYPE.RETRIEVING_CONTACTS:
@@ -49,8 +50,11 @@ const REDUCER = combineReducers({
         switch (action.type)
         {
             case ACTION_TYPE.ADD_CONTACT_ERROR_SAVING:
+            case ACTION_TYPE.EDIT_CONTACT_ERROR_SAVING:
             case ACTION_TYPE.ERROR_DELETING_CONTACT:
+            case ACTION_TYPE.ERROR_DELETING_CONTACTS:
             case ACTION_TYPE.ERROR_FAVORITING_CONTACT:
+            case ACTION_TYPE.ERROR_FAVORITING_CONTACTS:
             case ACTION_TYPE.ERROR_RETRIEVING_CONTACTS:
                 next = action.error;
                 break;
@@ -78,6 +82,7 @@ const REDUCER = combineReducers({
     contacts: (state = INITIAL_STATE.contacts, action) => {
         let next = state;
         let contactIds = null;
+        let contactsMap = null;
 
         switch (action.type)
         {
@@ -123,6 +128,7 @@ const REDUCER = combineReducers({
                 });
                 break;
             case ACTION_TYPE.DELETING_CONTACTS:
+            case ACTION_TYPE.FAVORITING_CONTACTS:
                 contactIds = new Set(action.contacts.map(contact => contact._id));
 
                 next = state.map(contact => {
@@ -135,6 +141,7 @@ const REDUCER = combineReducers({
                 });
                 break;
             case ACTION_TYPE.ERROR_DELETING_CONTACTS:
+            case ACTION_TYPE.ERROR_FAVORITING_CONTACTS:
                 contactIds = new Set(action.contacts.map(contact => contact._id));
 
                 next = state.map(contact => {
@@ -164,6 +171,22 @@ const REDUCER = combineReducers({
                     {
                         contact.contact = action.contact;
                         contact.disabled = false;
+                        contact.selected = false;
+                    }
+
+                    return contact;
+                });
+                break;
+            case ACTION_TYPE.FAVORITED_CONTACTS:
+                contactIds = new Set(action.contacts.map(contact => contact._id));
+                contactsMap = new Map(action.contacts.map(contact => [contact._id, contact]));
+
+                next = state.map(contact => {
+                    if (contactIds.has(contact.contact._id))
+                    {
+                        contact.contact = contactsMap.get(contact.contact._id);
+                        contact.disabled = false;
+                        contact.selected = false;
                     }
 
                     return contact;
@@ -230,6 +253,12 @@ const REDUCER = combineReducers({
                     type: CONFIRM_ACTION_TYPE.DELETE,
                     subjects: action.contacts
                 };
+                break;
+            case ACTION_TYPE.CONFIRM_FAVORITE_CONTACTS:
+                next = {
+                    type: CONFIRM_ACTION_TYPE.FAVORITE,
+                    subjects: action.contacts
+                }
                 break;
             default:
                 next = INITIAL_STATE.confirmAction;

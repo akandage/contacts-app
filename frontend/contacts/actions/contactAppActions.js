@@ -18,8 +18,10 @@ export const ACTION_TYPE = {
     DESELECT_ALL_CONTACTS: 'DESELECT_ALL_CONTACTS',
     CONFIRM_DELETE_CONTACT: 'CONFIRM_DELETE_CONTACT',
     CONFIRM_DELETE_CONTACTS: 'CONFIRM_DELETE_CONTACTS',
+    CONFIRM_FAVORITE_CONTACTS: 'CONFIRM_FAVORITE_CONTACTS',
     CANCELLED_DELETE_CONTACT: 'CANCELLED_DELETE_CONTACT',
     CANCELLED_DELETE_CONTACTS: 'CANCELLED_DELETE_CONTACTS',
+    CANCELLED_FAVORITE_CONTACTS: 'CANCELLED_FAVORITE_CONTACTS',
     DELETING_CONTACT: 'DELETING_CONTACT',
     ERROR_DELETING_CONTACT: 'ERROR_DELETING_CONTACT',
     DELETED_CONTACT: 'DELETED_CONTACT',
@@ -29,6 +31,9 @@ export const ACTION_TYPE = {
     FAVORITING_CONTACT: 'FAVORITING_CONTACT',
     ERROR_FAVORITING_CONTACT: 'ERROR_FAVORITING_CONTACT',
     FAVORITED_CONTACT: 'FAVORITED_CONTACT',
+    FAVORITING_CONTACTS: 'FAVORITING_CONTACTS',
+    ERROR_FAVORITING_CONTACTS: 'ERROR_FAVORITING_CONTACTS',
+    FAVORITED_CONTACTS: 'FAVORITED_CONTACTS',
     RETRIEVING_CONTACTS: 'RETRIEVING_CONTACTS',
     RETRIEVED_CONTACTS: 'RETRIEVED_CONTACTS',
     ERROR_RETRIEVING_CONTACTS: 'ERROR_RETRIEVING_CONTACTS',
@@ -234,6 +239,14 @@ export function confirmDeleteContacts(contacts)
     }
 }
 
+export function confirmFavoriteContacts(contacts)
+{
+    return {
+        type: ACTION_TYPE.CONFIRM_FAVORITE_CONTACTS,
+        contacts
+    }
+}
+
 export function cancelledDeleteContact(contact)
 {
     return {
@@ -246,6 +259,14 @@ export function cancelledDeleteContacts(contacts)
 {
     return {
         type: ACTION_TYPE.CANCELLED_DELETE_CONTACTS,
+        contacts
+    }
+}
+
+export function cancelledFavoriteContacts(contacts)
+{
+    return {
+        type: ACTION_TYPE.CANCELLED_FAVORITE_CONTACTS,
         contacts
     }
 }
@@ -361,7 +382,7 @@ export function favoriteContact(contact, favorite)
     return async (dispatch) => {
         dispatch(favoritingContact(contact));
 
-        if (favorite === null || favorite === undefined)
+        if (favorite !== true && favorite !== false)
         {
             favorite = !contact.favorite;
         }
@@ -410,6 +431,67 @@ export function errorFavoritingContact(contact, error)
     return {
         type: ACTION_TYPE.ERROR_FAVORITING_CONTACT,
         contact,
+        error
+    }
+}
+
+export function favoriteContacts(contacts, favorite)
+{
+    return async (dispatch) => {
+        dispatch(favoritingContacts(contacts));
+
+        try
+        {
+            let favContacts = [];
+
+            for (let contact of contacts)
+            {
+                let response = await fetch(`/api/contacts/${contact._id}/favorite?value=${favorite === true || favorite === false ? favorite : true}`, {
+                    method: 'PUT'
+                });
+    
+                if (response.ok)
+                {
+                    contact = await response.json();
+                    favContacts.push(contact);
+                }
+                else
+                {
+                    dispatch(errorFavoritingContacts(contacts, `Error favoriting contacts ${response.status} ${response.statusText}`));
+                    return;
+                }     
+            }
+
+            dispatch(favoritedContacts(favContacts));
+        }
+        catch (error)
+        {
+            dispatch(errorFavoritingContacts(contacts, `Error favoriting contacts: ${error.message}`));
+        }
+    }
+}
+
+export function favoritingContacts(contacts)
+{
+    return {
+        type: ACTION_TYPE.FAVORITING_CONTACTS,
+        contacts
+    }
+}
+
+export function favoritedContacts(contacts)
+{
+    return {
+        type: ACTION_TYPE.FAVORITED_CONTACTS,
+        contacts
+    }
+}
+
+export function errorFavoritingContacts(contacts, error)
+{
+    return {
+        type: ACTION_TYPE.ERROR_FAVORITING_CONTACTS,
+        contacts,
         error
     }
 }

@@ -9,7 +9,8 @@ export const STATUS = {
 }
 
 export const CONFIRM_ACTION_TYPE = {
-    DELETE: 'DELETE'
+    DELETE: 'DELETE',
+    FAVORITE: 'FAVORITE'
 };
 
 export const CONTACTS_ORDERBY_FIRSTNAME_ASC = ['firstName', 'ASC', 'lastName', 'ASC'];
