@@ -30,11 +30,14 @@ function Dialog(props)
     const [ firstName, setFirstName ] = useState(getInitialValue('firstName'));
     const [ middleName, setMiddleName ] = useState(getInitialValue('middleName'));
     const [ middleNames, setMiddleNames ] = useState(getInitialValue('middleNames'));
+    const [ middleNamesDirty, setMiddleNamesDirty ] = useState(false);
     const [ lastName, setLastName ] = useState(getInitialValue('lastName'));
     const [ phoneNumber, setPhoneNumber ] = useState(getInitialValue('phoneNumber'));
     const [ phoneNumbers, setPhoneNumbers ] = useState(getInitialValue('phoneNumbers'));
+    const [ phoneNumbersDirty, setPhoneNumbersDirty ] = useState(false);
     const [ emailAddress, setEmailAddress ] = useState(getInitialValue('emailAddress'));
     const [ emailAddresses, setEmailAddresses ] = useState(getInitialValue('emailAddresses'));
+    const [ emailAddressesDirty, setEmailAddressesDirty ] = useState(false);
     const [ dirtyState, setDirtyState ] = useState(getInitialValue('dirtyState'));
     const [ validState, setValidState ] = useState(getInitialValue('validState'));
     const [ showState, setShowState ] = useState(true);
@@ -169,6 +172,7 @@ function Dialog(props)
         if (mode === CONTACT_DIALOG_MODE.EDIT_CONTACT)
         {
             c._id = contact._id;
+            c.favorite = contact.favorite;
         }
 
         return c;
@@ -447,6 +451,11 @@ function Dialog(props)
                 invalidFeedback: null
             });
 
+            if (!middleNamesDirty)
+            {
+                setMiddleNamesDirty(true);
+            }
+
             setMiddleNames(m);
             setMiddleName('');
             setDirtyState(Object.assign({}, dirtyState, {
@@ -468,6 +477,11 @@ function Dialog(props)
         let m = middleNames.filter((middleName, i) => i !== index);
         let d = dirtyState.middleNames.filter((isDirty, i) => i !== index);
         let v = validState.middleNames.filter((valid, i) => i !== index);
+
+        if (!middleNamesDirty)
+        {
+            setMiddleNamesDirty(true);
+        }
 
         setMiddleNames(m);
         setDirtyState(Object.assign({}, dirtyState, { middleNames: d }));
@@ -558,6 +572,11 @@ function Dialog(props)
                 invalidFeedback: null
             });
 
+            if (!phoneNumbersDirty)
+            {
+                setPhoneNumbersDirty(true);
+            }
+
             setPhoneNumbers(p);
             setPhoneNumber({
                 phoneNumber: '',
@@ -582,6 +601,11 @@ function Dialog(props)
         let p = phoneNumbers.filter((phoneNumber, i) => i !== index);
         let d = dirtyState.phoneNumbers.filter((isDirty, i) => i !== index);
         let v = validState.phoneNumbers.filter((valid, i) => i !== index);
+
+        if (!phoneNumbersDirty)
+        {
+            setPhoneNumbersDirty(true);
+        }
 
         setPhoneNumbers(p);
         setDirtyState(Object.assign({}, dirtyState, { phoneNumbers: d }));
@@ -665,6 +689,11 @@ function Dialog(props)
                 invalidFeedback: null
             });
 
+            if (!emailAddressesDirty)
+            {
+                setEmailAddressesDirty(true);
+            }
+
             setEmailAddresses(e);
             setEmailAddress({
                 emailAddress: '',
@@ -690,6 +719,11 @@ function Dialog(props)
         let d = dirtyState.emailAddresses.filter((isDirty, i) => i !== index);
         let v = validState.emailAddresses.filter((valid, i) => i !== index);
 
+        if (!emailAddressesDirty)
+        {
+            setEmailAddressesDirty(true);
+        }
+
         setEmailAddresses(e);
         setDirtyState(Object.assign({}, dirtyState, { emailAddresses: d }));
         setValidState(Object.assign({}, validState, { emailAddresses: v }));
@@ -699,9 +733,12 @@ function Dialog(props)
     {
         return dirtyState.firstName ||
             dirtyState.middleNames.some(dirty => dirty) ||
+            middleNamesDirty ||
             dirtyState.lastName ||
             dirtyState.phoneNumbers.some(dirty => dirty) ||
-            dirtyState.emailAddresses.some(dirty => dirty);
+            phoneNumbersDirty ||
+            dirtyState.emailAddresses.some(dirty => dirty) ||
+            emailAddressesDirty;
     }
 
     function isAllValid()
