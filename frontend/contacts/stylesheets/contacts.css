@@ -60,7 +60,10 @@ div.contacts-nav > .contacts-nav-active-link {
 }
 
 div.contacts-nav > hr {
-    color: #333333;
+    border-top: 1px solid #333333;
+    width: 90%;
+    margin-top: 1em;
+    margin-bottom: 1em;
 }
 
 div.contact-list-toolbar {
