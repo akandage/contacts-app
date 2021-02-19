@@ -1,6 +1,7 @@
 import React from 'react';
 import ContactsLogoImage from './images/contacts.svg';
 import AddIconImage from './images/add-icon.svg';
+import ContactIconImage from './images/contact-icon.svg';
 import CrossIconImage from './images/cross-icon.svg';
 import DeleteIconImage from './images/delete-icon.svg';
 import FavoriteIconImage from './images/favorite-icon.svg';
@@ -9,6 +10,7 @@ import GroupIconImage from './images/group-icon.svg';
 import PlusIconImage from './images/plus-icon.svg';
 import RefreshIconImage from './images/refresh-icon.svg';
 import SearchIconImage from './images/search-icon.svg';
+import SettingsIconImage from './images/gear-icon.svg';
 import StarIconImage from './images/star-icon.svg';
 import UserIconImage from './images/user-icon.svg';
 
@@ -27,6 +29,15 @@ export function AddIcon(props)
 
     return (
         <AddIconImage width={ width } height={ height } viewBox="0 0 125 125" />
+    );
+}
+
+export function ContactIcon(props)
+{
+    let { width, height } = props;
+
+    return (
+        <ContactIconImage width={ width } height={ height } viewBox="0 0 128 164" />
     );
 }
 
@@ -94,6 +105,16 @@ export function SearchIcon(props)
     // TODO: Fix the viewbox so it can be at (X=0, Y=0).
     return (
         <SearchIconImage width={ width } height={ height } viewBox="-40 0 144 128" />
+    );
+}
+
+export function SettingsIcon(props)
+{
+    let { width, height } = props;
+
+    // TODO: Fix the viewbox so it can be at (X=0, Y=0).
+    return (
+        <SettingsIconImage width={ width } height={ height } viewBox="0 0 120 120" />
     );
 }
 

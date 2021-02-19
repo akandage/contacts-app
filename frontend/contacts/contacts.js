@@ -1,16 +1,22 @@
 import React from 'react';
+import PropTypes from 'prop-types';
 import ReactDOM from 'react-dom';
 import { connect, Provider } from 'react-redux';
+import { BrowserRouter as Router, Redirect, Route, Switch } from 'react-router-dom';
 import { STATUS, CONFIRM_ACTION_TYPE } from './constants';
 import * as ContactAppActions from './actions/contactAppActions';
 import ContactsHeader from '../common/contactsHeader';
+import { ContactIcon, FavoriteIcon, SettingsIcon } from '../common/contactsImages';
 import ContactDialog, { CONTACT_DIALOG_MODE } from './components/contactDialog';
 import ConfirmActionDialog from './components/confirmActionDialog';
 import ContactList from './components/contactList';
+import ContactsNav from './components/contactsNav';
 import ContactAppStore from './stores/contactAppStore';
 import './stylesheets/contacts.css';
 
 const SESSION_HEARTBEAT_INTERVAL = 30000;
+const APP_NAV_ICON_WIDTH = 24;
+const APP_NAV_ICON_HEIGHT = 24;
 
 function startSessionHeartbeat()
 {
@@ -45,13 +51,13 @@ function startSessionHeartbeat()
     }, SESSION_HEARTBEAT_INTERVAL);
 }
 
-function connectContactList()
+function connectContactList(isFavoritesList = false)
 {
     return connect(
         state => {
             return {
                 status: state.status,
-                contacts: state.contacts,
+                contacts: isFavoritesList ? state.contacts.filter(contact => contact.contact.favorite) : state.contacts,
                 disabled: state.disabled,
                 orderBy: state.orderBy
             };
@@ -190,6 +196,44 @@ function connectConfirmFavoriteContactsDialog()
     )(ConfirmActionDialog);
 }
 
+function ContactsView(props)
+{
+    let {
+        isFavoritesList
+    } = props;
+
+    let AddContactDialog = connectAddContactDialog();
+    let EditContactDialog = connectEditContactDialog();
+    let ConfirmDeleteContactsDialog = connectConfirmDeleteContactsDialog();
+    let ConfirmFavoriteContactsDialog = connectConfirmFavoriteContactsDialog();
+    let ContactList = connectContactList(isFavoritesList);
+
+    return (
+        <>
+            <AddContactDialog />
+            <EditContactDialog />
+            <ConfirmDeleteContactsDialog />
+            <ConfirmFavoriteContactsDialog />
+            <ContactList />
+        </>
+    );
+}
+
+ContactsView.defaultProps = {
+    isFavoritesList: false
+}
+
+ContactsView.propTypes = {
+    isFavoritesList: PropTypes.bool
+}
+
+function FavoritesView()
+{
+    return (
+        <ContactsView isFavoritesList={ true } />
+    );
+}
+
 function renderContactsApp()
 {
     let authState = document.getElementById('auth-state');
@@ -197,24 +241,37 @@ function renderContactsApp()
     if (authState && authState.value === 'LOGGED_IN')
     {
         let store = ContactAppStore();
-        let AddContactDialog = connectAddContactDialog();
-        let EditContactDialog = connectEditContactDialog();
-        let ConfirmDeleteContactsDialog = connectConfirmDeleteContactsDialog();
-        let ConfirmFavoriteContactsDialog = connectConfirmFavoriteContactsDialog();
-        let ContactList = connectContactList();
-    
+
         ReactDOM.render(<ContactsHeader /> , document.getElementById('contacts-header'));
         ReactDOM.render(
             <div className="app-container">
-                <div className="app-list-container">
-                    <Provider store={ store }>
-                        <AddContactDialog />
-                        <EditContactDialog />
-                        <ConfirmDeleteContactsDialog />
-                        <ConfirmFavoriteContactsDialog />
-                        <ContactList />
-                    </Provider>
-                </div>
+                <Router>
+                    <ContactsNav>
+                        <ContactsNav.Link to="/contacts" icon={ <ContactIcon width={ APP_NAV_ICON_WIDTH } height={ APP_NAV_ICON_HEIGHT } /> } linkText="Contacts" />
+                        <ContactsNav.Link to="/favorites" icon={ <FavoriteIcon width={ APP_NAV_ICON_WIDTH } height={ APP_NAV_ICON_HEIGHT } outline={ false } /> } linkText="Favorites" />
+                        <ContactsNav.Divider />
+                        <ContactsNav.Link to="/settings" icon={ <SettingsIcon width={ APP_NAV_ICON_WIDTH } height={ APP_NAV_ICON_HEIGHT } /> } linkText="Settings" />
+                    </ContactsNav>
+
+                    <div className="app-list-container">
+                        
+                            <Switch>
+                                <Route exact path="/">
+                                    <Redirect to="/contacts" />
+                                </Route>
+                                <Route exact path="/contacts">
+                                    <Provider store={ store }>
+                                        <ContactsView />
+                                    </Provider>
+                                </Route>
+                                <Route exact path="/favorites">
+                                    <Provider store={ store }>
+                                        <FavoritesView />
+                                    </Provider>
+                                </Route>
+                            </Switch>
+                    </div>
+                </Router>
             </div>,
             document.getElementById('contacts-main')
         );

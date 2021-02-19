@@ -9,13 +9,13 @@
    xmlns:inkscape="http://www.inkscape.org/namespaces/inkscape"
    style="clip-rule:evenodd;fill-rule:evenodd;image-rendering:optimizeQuality;shape-rendering:geometricPrecision;text-rendering:geometricPrecision"
    xml:space="preserve"
-   viewBox="0 0 135.61055 174.93286"
+   viewBox="0 0 128 164.24562"
    version="1.1"
    id="svg11"
    sodipodi:docname="contact-icon.svg"
    inkscape:version="1.0.1 (0767f8302a, 2020-10-17)"
-   width="135.61055"
-   height="174.93286"><sodipodi:namedview
+   width="128"
+   height="164.24562"><sodipodi:namedview
    pagecolor="#ffffff"
    bordercolor="#666666"
    borderopacity="1"
@@ -28,9 +28,9 @@
    inkscape:window-height="1376"
    id="namedview13"
    showgrid="false"
-   inkscape:zoom="0.45590231"
-   inkscape:cx="857"
-   inkscape:cy="1023.3319"
+   inkscape:zoom="2.947377"
+   inkscape:cx="178.21333"
+   inkscape:cy="96.807397"
    inkscape:window-x="72"
    inkscape:window-y="27"
    inkscape:window-maximized="1"
@@ -50,13 +50,13 @@
  </defs>
  <g
    id="Layer_x0020_1"
-   style="fill:#ffffff;fill-opacity:1"
-   transform="scale(0.07911934)">
+   style="fill:#ffffff;fill-opacity:1;stroke:#333333;stroke-width:41.136;stroke-miterlimit:4;stroke-dasharray:none;stroke-opacity:1"
+   transform="matrix(0.07292882,0,0,0.07292882,1.5,1.5)">
   <path
    class="fil0"
    d="M 1714,2044 C 1714,1454 1330,976 857,976 384,976 0,1454 0,2044 c 0,92 384,167 857,167 473,0 857,-75 857,-167 z M 857,0 c 258,0 467,209 467,467 0,258 -209,467 -467,467 C 599,934 390,725 390,467 390,209 599,0 857,0 Z"
    id="path6"
-   style="fill:#ffffff;fill-opacity:1" />
+   style="fill:#ffffff;fill-opacity:1;stroke:#333333;stroke-width:41.136;stroke-miterlimit:4;stroke-dasharray:none;stroke-opacity:1" />
  </g>
 <metadata
    id="metadata9"><rdf:RDF><cc:Work><dc:format>image/svg+xml</dc:format><dc:type

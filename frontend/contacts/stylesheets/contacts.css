@@ -17,7 +17,50 @@ main#contacts-main > .app-container > .app-list-container {
     flex-direction: column;
     align-items: flex-start;
     row-gap: 0.5em;
+    width: 75%;
+}
+
+div.contacts-nav {
+    display: flex;
+    flex-direction: column;
+    align-items: flex-start;
+    row-gap: 0.2em;
+    width: 25%;
+    height: 90vh;
+    max-height: 90vh;
+    border-right: 1px solid #333333;
+    margin-right: 2em;
+}
+
+div.contacts-nav > .contacts-nav-link {
+    display: flex;
+    flex-direction: row;
+    align-items: center;
+    column-gap: 1em;
+    padding-left: 1em;
+    padding-top: 1em;
+    padding-bottom: 1em;
     width: 100%;
+    font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+    font-size: 1em;
+    text-decoration: none;
+    color: #333333;
+}
+
+div.contacts-nav > .contacts-nav-link#hover {
+    text-decoration: none;
+    color: #333333;
+}
+
+div.contacts-nav > .contacts-nav-active-link {
+    border-top-left-radius: 5px;
+    border-bottom-left-radius: 5px;
+    background-color: #333333;
+    color: white;
+}
+
+div.contacts-nav > hr {
+    color: #333333;
 }
 
 div.contact-list-toolbar {
