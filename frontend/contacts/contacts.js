@@ -73,8 +73,40 @@ function connectContactList(isFavoritesList = false)
                 onDeselectAll: () => dispatch(ContactAppActions.deselectAllContacts()),
                 onDeleteClicked: (contact) => dispatch(ContactAppActions.confirmDeleteContact(contact)),
                 onDeleteMultipleClicked: (contacts) => dispatch(ContactAppActions.confirmDeleteContacts(contacts)),
-                onFavoriteClicked: (contact) => dispatch(ContactAppActions.favoriteContact(contact)),
-                onFavoriteMultipleClicked: (contacts) => contacts.length > 1 ? dispatch(ContactAppActions.confirmFavoriteContacts(contacts)) : dispatch(ContactAppActions.favoriteContact(contacts[0])),
+                onFavoriteClicked: (contact) => {
+                    if (isFavoritesList)
+                    {
+                        dispatch(ContactAppActions.confirmUnfavoriteContact(contact));
+                    }
+                    else
+                    {
+                        dispatch(ContactAppActions.favoriteContact(contact));
+                    }
+                },
+                onFavoriteMultipleClicked: (contacts) => {
+                    if (isFavoritesList)
+                    {
+                        if (contacts.length > 1)
+                        {
+                            dispatch(ContactAppActions.confirmUnfavoriteContacts(contacts));
+                        }
+                        else
+                        {
+                            dispatch(ContactAppActions.confirmUnfavoriteContact(contacts[0]));
+                        }
+                    }
+                    else
+                    {
+                        if (contacts.length > 1)
+                        {
+                            dispatch(ContactAppActions.confirmFavoriteContacts(contacts));
+                        }
+                        else
+                        {
+                            dispatch(ContactAppActions.favoriteContact(contacts[0]));
+                        }
+                    }
+                },
                 onSortChanged: (orderBy) => dispatch(ContactAppActions.sortContacts(orderBy))
             };
         }
@@ -134,12 +166,13 @@ function connectConfirmDeleteContactsDialog()
                 bodyText: status === STATUS.CONFIRM_ACTION ?
                         (contacts.length > 1 ? `Delete ${contacts.length} contacts?` : `Delete contact ${contacts[0].firstName} ${contacts[0].lastName}?`) :
                         '',
+                actionType: status === STATUS.CONFIRM_ACTION ? confirmAction.type : '',
                 subjects: contacts
             };
         },
         dispatch => {
             return {
-                onAccepted: (contacts) => { 
+                onAccepted: (actionType, contacts) => { 
                     if (contacts.length > 1)
                     {
                         dispatch(ContactAppActions.deleteContacts(contacts));
@@ -149,7 +182,7 @@ function connectConfirmDeleteContactsDialog()
                         dispatch(ContactAppActions.deleteContact(contacts[0]));
                     }
                 },
-                onCancelled: (contacts) => {
+                onCancelled: (actionType, contacts) => {
                     if (contacts.length > 1)
                     {
                         dispatch(ContactAppActions.cancelledDeleteContacts(contacts));
@@ -173,22 +206,31 @@ function connectConfirmFavoriteContactsDialog()
             let contacts = confirmAction.subjects;
 
             return {
-                show: status === STATUS.CONFIRM_ACTION && confirmAction.type === CONFIRM_ACTION_TYPE.FAVORITE,
+                show: status === STATUS.CONFIRM_ACTION && (confirmAction.type === CONFIRM_ACTION_TYPE.FAVORITE || confirmAction.type === CONFIRM_ACTION_TYPE.UNFAVORITE),
                 title: status === STATUS.CONFIRM_ACTION ? 
-                        'Favorite Contacts' :
+                        (confirmAction.type === CONFIRM_ACTION_TYPE.FAVORITE ?
+                            `Favorite Contact${contacts.length > 1 ? 's' : ''}` :
+                            `Unfavorite Contact${contacts.length > 1 ? 's' : ''}`) :
                         '',
                 bodyText: status === STATUS.CONFIRM_ACTION ?
-                        `Favorite ${contacts.length} contacts?`:
+                        (confirmAction.type === CONFIRM_ACTION_TYPE.FAVORITE ?
+                            `Favorite ${contacts.length} contacts?` :
+                            (contacts.length > 1 ?
+                                `Unfavorite ${contacts.length} contacts?` :
+                                `Unfavorite contact ${contacts[0].firstName} ${contacts[0].lastName}?`)) :
                         '',
+                actionType: status === STATUS.CONFIRM_ACTION ? confirmAction.type : '',
                 subjects: contacts
             };
         },
         dispatch => {
             return {
-                onAccepted: (contacts) => { 
-                    dispatch(ContactAppActions.favoriteContacts(contacts));
+                onAccepted: (actionType, contacts) => { 
+                    actionType === CONFIRM_ACTION_TYPE.FAVORITE ? 
+                        dispatch(ContactAppActions.favoriteContacts(contacts)) :
+                        dispatch(ContactAppActions.favoriteContacts(contacts, false));
                 },
-                onCancelled: (contacts) => {
+                onCancelled: (actionType, contacts) => {
                     dispatch(ContactAppActions.cancelledFavoriteContacts(contacts));
                 }
             };

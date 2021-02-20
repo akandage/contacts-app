@@ -19,9 +19,13 @@ export const ACTION_TYPE = {
     CONFIRM_DELETE_CONTACT: 'CONFIRM_DELETE_CONTACT',
     CONFIRM_DELETE_CONTACTS: 'CONFIRM_DELETE_CONTACTS',
     CONFIRM_FAVORITE_CONTACTS: 'CONFIRM_FAVORITE_CONTACTS',
+    CONFIRM_UNFAVORITE_CONTACT: 'CONFIRM_UNFAVORITE_CONTACT',
+    CONFIRM_UNFAVORITE_CONTACTS: 'CONFIRM_UNFAVORITE_CONTACTS',
     CANCELLED_DELETE_CONTACT: 'CANCELLED_DELETE_CONTACT',
     CANCELLED_DELETE_CONTACTS: 'CANCELLED_DELETE_CONTACTS',
     CANCELLED_FAVORITE_CONTACTS: 'CANCELLED_FAVORITE_CONTACTS',
+    CANCELLED_UNFAVORITE_CONTACT: 'CANCELLED_UNFAVORITE_CONTACT',
+    CANCELLED_UNFAVORITE_CONTACTS: 'CANCELLED_UNFAVORITE_CONTACTS',
     DELETING_CONTACT: 'DELETING_CONTACT',
     ERROR_DELETING_CONTACT: 'ERROR_DELETING_CONTACT',
     DELETED_CONTACT: 'DELETED_CONTACT',
@@ -247,6 +251,22 @@ export function confirmFavoriteContacts(contacts)
     }
 }
 
+export function confirmUnfavoriteContact(contact)
+{
+    return {
+        type: ACTION_TYPE.CONFIRM_UNFAVORITE_CONTACT,
+        contact
+    }
+}
+
+export function confirmUnfavoriteContacts(contacts)
+{
+    return {
+        type: ACTION_TYPE.CONFIRM_UNFAVORITE_CONTACTS,
+        contacts
+    }
+}
+
 export function cancelledDeleteContact(contact)
 {
     return {
@@ -267,6 +287,22 @@ export function cancelledFavoriteContacts(contacts)
 {
     return {
         type: ACTION_TYPE.CANCELLED_FAVORITE_CONTACTS,
+        contacts
+    }
+}
+
+export function cancelledUnfavoriteContact(contact)
+{
+    return {
+        type: ACTION_TYPE.CANCELLED_UNFAVORITE_CONTACT,
+        contact
+    }
+}
+
+export function cancelledUnfavoriteContacts(contacts)
+{
+    return {
+        type: ACTION_TYPE.CANCELLED_UNFAVORITE_CONTACTS,
         contacts
     }
 }

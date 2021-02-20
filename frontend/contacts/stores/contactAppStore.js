@@ -32,6 +32,8 @@ const REDUCER = combineReducers({
             case ACTION_TYPE.CONFIRM_DELETE_CONTACT:
             case ACTION_TYPE.CONFIRM_DELETE_CONTACTS:
             case ACTION_TYPE.CONFIRM_FAVORITE_CONTACTS:
+            case ACTION_TYPE.CONFIRM_UNFAVORITE_CONTACT:
+            case ACTION_TYPE.CONFIRM_UNFAVORITE_CONTACTS:
                 next = STATUS.CONFIRM_ACTION;
                 break;
             case ACTION_TYPE.RETRIEVING_CONTACTS:
@@ -260,6 +262,18 @@ const REDUCER = combineReducers({
                     subjects: action.contacts
                 }
                 break;
+            case ACTION_TYPE.CONFIRM_UNFAVORITE_CONTACT:
+                next = {
+                    type: CONFIRM_ACTION_TYPE.UNFAVORITE,
+                    subjects: [ action.contact ]
+                };
+                break;
+            case ACTION_TYPE.CONFIRM_UNFAVORITE_CONTACTS:
+                    next = {
+                        type: CONFIRM_ACTION_TYPE.UNFAVORITE,
+                        subjects: action.contacts
+                    }
+                    break;
             default:
                 next = INITIAL_STATE.confirmAction;
                 break;

@@ -5,6 +5,7 @@ import { Button, Modal } from 'react-bootstrap';
 function Dialog(props)
 {
     let {
+        actionType,
         subjects,
         title,
         bodyText,
@@ -39,11 +40,11 @@ function Dialog(props)
     {
         if (accepted)
         {
-            onAccepted(subjects);
+            onAccepted(actionType, subjects);
         }
         else
         {
-            onCancelled(subjects);
+            onCancelled(actionType, subjects);
         }
     }
 
@@ -80,18 +81,20 @@ export default function ConfirmActionDialog(props)
 
 ConfirmActionDialog.defaultProps = {
     show: false,
+    actionType: '',
     subjects: [],
     title: '',
     bodyText: '',
     acceptText: 'OK',
     cancelText: 'Cancel',
     centered: false,
-    onAccepted: (subjects) => {},
-    onCancelled: (subjects) => {}
+    onAccepted: (actionType, subjects) => {},
+    onCancelled: (actionType, subjects) => {}
 };
 
 ConfirmActionDialog.propTypes = {
     show: PropTypes.bool,
+    actionType: PropTypes.string,
     subjects: PropTypes.array,
     title: PropTypes.string,
     bodyText: PropTypes.string,
