@@ -113,13 +113,14 @@ function connectContactList(isFavoritesList = false)
     )(ContactList);
 }
 
-function connectAddContactDialog()
+function connectAddContactDialog(isFavoritesList = false)
 {
     return connect(
         state => {
             return {
                 show: state.status === STATUS.ADD_CONTACT,
-                mode: CONTACT_DIALOG_MODE.ADD_CONTACT
+                mode: CONTACT_DIALOG_MODE.ADD_CONTACT,
+                isFavorite: isFavoritesList
             };
         },
         dispatch => {
@@ -244,7 +245,7 @@ function ContactsView(props)
         isFavoritesList
     } = props;
 
-    let AddContactDialog = connectAddContactDialog();
+    let AddContactDialog = connectAddContactDialog(isFavoritesList);
     let EditContactDialog = connectEditContactDialog();
     let ConfirmDeleteContactsDialog = connectConfirmDeleteContactsDialog();
     let ConfirmFavoriteContactsDialog = connectConfirmFavoriteContactsDialog();

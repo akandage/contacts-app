@@ -20,6 +20,7 @@ function Dialog(props)
     let {
         mode,
         contact,
+        isFavorite,
         size,
         centered,
         onSaved,
@@ -166,7 +167,7 @@ function Dialog(props)
             lastName,
             emailAddresses,
             phoneNumbers,
-            favorite: false
+            favorite: isFavorite
         };
 
         if (mode === CONTACT_DIALOG_MODE.EDIT_CONTACT)
@@ -840,6 +841,7 @@ ContactDialog.defaultProps = {
     show: false,
     mode: CONTACT_DIALOG_MODE.ADD_CONTACT,
     contact: null,
+    isFavorite: false,
     size: 'xl',
     centered: true,
     onSaved: (contact) => {},
@@ -850,6 +852,7 @@ ContactDialog.propTypes = {
     show: PropTypes.bool,
     mode: PropTypes.string,
     contact: PropTypes.object,
+    isFavorite: PropTypes.bool,
     size: PropTypes.string,
     centered: PropTypes.bool,
     onSaved: PropTypes.func,
