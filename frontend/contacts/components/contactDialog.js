@@ -179,195 +179,6 @@ function Dialog(props)
         return c;
     }
 
-    function ContactTabPage(props)
-    {
-        return (
-            <div className="contact-dialog-tab">
-                <UploadImage />
-                
-                <div className="contact-dialog-form">
-                    <Form noValidate>
-                        <CustomTextBox id="firstName"
-                            labelText="First Name"
-                            value={ firstName }
-                            isInvalid={ dirtyState.firstName && !validState.firstName.isValid }
-                            invalidFeedback={ validState.firstName.invalidFeedback }
-                            onChanged={ onFirstNameChanged }
-                        >
-                        </CustomTextBox>
-                        
-                        {
-                            middleNames.map(
-                                (middleName, index) =>
-                                    <CustomTextBox id={ `middleName-${index+1}` }
-                                        key={ index }
-                                        labelText="Middle Name"
-                                        value={ middleName }
-                                        isInvalid={ dirtyState.middleNames[index] && !validState.middleNames[index].isValid }
-                                        invalidFeedback={ validState.middleNames[index].invalidFeedback }
-                                        onChanged={ (value) => onMiddleNameChanged(value, index) }
-                                    >
-                                        <RemoveButton 
-                                            onClick={ () => onRemoveMiddleNameClicked(index) }
-                                        />
-                                    </CustomTextBox>
-                            )
-                        }
-
-                        <CustomTextBox id="middleName"
-                            labelText="Middle Name"
-                            value={ middleName }
-                            isInvalid={ dirtyState.middleName && !validState.middleName.isValid }
-                            invalidFeedback={ validState.middleName.invalidFeedback }
-                            onChanged={ onMiddleNameChanged }
-                        >
-                            <AddButton 
-                                onClick={ onAddMiddleNameClicked }
-                                disabled={ !validState.middleName.isValid }
-                            />
-                        </CustomTextBox>
-
-                        <CustomTextBox id="lastName"
-                            labelText="Last Name"
-                            value={ lastName }
-                            isInvalid={ dirtyState.lastName && !validState.lastName.isValid }
-                            invalidFeedback={ validState.lastName.invalidFeedback }
-                            onChanged={ onLastNameChanged }
-                        >
-                        </CustomTextBox>
-                    </Form>
-                </div>
-            </div>
-        );
-    }
-
-    function PhoneNumberTabPage(props)
-    {
-        return (
-            <div className="contact-dialog-tab">
-                <div className="contact-dialog-form">
-                    <Form noValidate>
-                        <div className="contact-dialog-sticky">
-                            <CustomTextBox id="phoneNumber"
-                                labelText="Phone Number"
-                                value={ phoneNumber.phoneNumber }
-                                isInvalid={ dirtyState.phoneNumber && !validState.phoneNumber.isValid }
-                                invalidFeedback={ validState.phoneNumber.invalidFeedback }
-                                onChanged={ onPhoneNumberChanged }
-                            >
-                                <CustomSelect
-                                    options={ PHONE_NUMBER_TYPES }
-                                    value={ phoneNumber.type }
-                                    onChanged={ onPhoneNumberTypeChanged }
-                                />
-
-                                <AddButton 
-                                    onClick={ onAddPhoneNumberClicked }
-                                    disabled={ !validState.phoneNumber.isValid }
-                                />
-                            </CustomTextBox>
-                        </div>
-
-                        {
-                            phoneNumbers.map((phoneNumber, index) =>
-                                <CustomTextBox id={ `phoneNumber-${index+1}` }
-                                    key={ index }
-                                    labelText="Phone Number"
-                                    value={ phoneNumber.phoneNumber }
-                                    isInvalid={ dirtyState.phoneNumbers[index] && !validState.phoneNumbers[index].isValid }
-                                    invalidFeedback={ validState.phoneNumbers[index].invalidFeedback }
-                                    onChanged={ (value) => onPhoneNumberChanged(value, index) }
-                                >
-                                    <CustomSelect
-                                        options={ PHONE_NUMBER_TYPES }
-                                        value={ phoneNumber.type }
-                                        onChanged={ (value) => onPhoneNumberTypeChanged(value, index) }
-                                    />
-                                
-                                    <RemoveButton 
-                                        onClick={ () => onRemovePhoneNumberClicked(index) }
-                                    />
-                                </CustomTextBox>
-                            )
-                        }
-                    </Form>
-                </div>
-            </div>
-        );
-    }
-
-    function EmailAddressTabPage(props)
-    {
-        return (
-            <div className="contact-dialog-tab">
-                <div className="contact-dialog-form">
-                    <Form noValidate>
-                        <div className="contact-dialog-sticky">
-                            <CustomTextBox id="emailAddress"
-                                labelText="Email Address"
-                                value={ emailAddress.emailAddress }
-                                isInvalid={ dirtyState.emailAddress && !validState.emailAddress.isValid }
-                                invalidFeedback={ validState.emailAddress.invalidFeedback }
-                                onChanged={ onEmailAddressChanged }
-                            >
-                                <CustomSelect
-                                    options={ EMAIL_ADDRESS_TYPES }
-                                    value={ emailAddress.type }
-                                    onChanged={ onEmailAddressTypeChanged }
-                                />
-                                
-                                <AddButton 
-                                    onClick={ onAddEmailAddressClicked }
-                                    disabled={ !validState.emailAddress.isValid }
-                                />
-                            </CustomTextBox>
-                        </div>
-
-                        {
-                            emailAddresses.map((emailAddress, index) =>
-                                <CustomTextBox id={ `emailAddress-${index+1}` }
-                                    key={ index }
-                                    labelText="Email Address"
-                                    value={ emailAddress.emailAddress }
-                                    isInvalid={ dirtyState.emailAddresses[index] && !validState.emailAddresses[index].isValid }
-                                    invalidFeedback={ validState.emailAddresses[index].invalidFeedback }
-                                    onChanged={ (value) => onEmailAddressChanged(value, index) }
-                                >
-                                    <CustomSelect
-                                        options={ EMAIL_ADDRESS_TYPES }
-                                        value={ emailAddress.type }
-                                        onChanged={ (value) => onEmailAddressTypeChanged(value, index) }
-                                    />
-                                
-                                    <RemoveButton 
-                                        onClick={ () => onRemoveEmailAddressClicked(index) }
-                                    />
-                                </CustomTextBox>
-                            )
-                        }
-                    </Form>
-                </div>
-            </div>
-        );
-    }
-
-    function DialogBody(props)
-    {
-        return (
-            <Tabs id="contact-dialog-tabs" activeKey={ activeTab } onSelect={ onTabSelected }>
-                <Tab eventKey="contactTab" title="Contact">
-                    <ContactTabPage />
-                </Tab>
-                <Tab eventKey="phoneNumberTab" title="Phone Numbers">
-                    <PhoneNumberTabPage />
-                </Tab>
-                <Tab eventKey="contact" title="Email Addresses">
-                    <EmailAddressTabPage />
-                </Tab>
-            </Tabs>
-        );
-    }
-
     function DialogFooter()
     {
         return (
@@ -807,6 +618,9 @@ function Dialog(props)
         }
     }
 
+    // Note: The tabs and tabpages were previously separated out into separate functions.
+    // However, this caused the tabpage to be clobbered by React upon any state change.
+    // TODO: Investigate this in future so this may be cleaned up.
     return (
         <Modal size={ size } centered={ centered } show={ showState } onHide={ hide } onExited={ onClosed } scrollable>
             <Modal.Header closeButton>
@@ -816,7 +630,168 @@ function Dialog(props)
             </Modal.Header>
 
             <Modal.Body>
-                <DialogBody />
+                <Tabs id="contact-dialog-tabs" activeKey={ activeTab } onSelect={ onTabSelected }>
+                    <Tab eventKey="contactTab" title="Contact">
+                        <div className="contact-dialog-tab">
+                            <UploadImage />
+                            
+                            <div className="contact-dialog-form">
+                                <Form noValidate>
+                                    <CustomTextBox id="firstName"
+                                        labelText="First Name"
+                                        value={ firstName }
+                                        isInvalid={ dirtyState.firstName && !validState.firstName.isValid }
+                                        invalidFeedback={ validState.firstName.invalidFeedback }
+                                        onChanged={ onFirstNameChanged }
+                                    >
+                                    </CustomTextBox>
+                                    
+                                    {
+                                        middleNames.map(
+                                            (middleName, index) =>
+                                                <CustomTextBox id={ `middleName-${index+1}` }
+                                                    key={ index }
+                                                    labelText="Middle Name"
+                                                    value={ middleName }
+                                                    isInvalid={ dirtyState.middleNames[index] && !validState.middleNames[index].isValid }
+                                                    invalidFeedback={ validState.middleNames[index].invalidFeedback }
+                                                    onChanged={ (value) => onMiddleNameChanged(value, index) }
+                                                >
+                                                    <RemoveButton 
+                                                        onClick={ () => onRemoveMiddleNameClicked(index) }
+                                                    />
+                                                </CustomTextBox>
+                                        )
+                                    }
+
+                                    <CustomTextBox id="middleName"
+                                        labelText="Middle Name"
+                                        value={ middleName }
+                                        isInvalid={ dirtyState.middleName && !validState.middleName.isValid }
+                                        invalidFeedback={ validState.middleName.invalidFeedback }
+                                        onChanged={ onMiddleNameChanged }
+                                    >
+                                        <AddButton 
+                                            onClick={ onAddMiddleNameClicked }
+                                            disabled={ !validState.middleName.isValid }
+                                        />
+                                    </CustomTextBox>
+
+                                    <CustomTextBox id="lastName"
+                                        labelText="Last Name"
+                                        value={ lastName }
+                                        isInvalid={ dirtyState.lastName && !validState.lastName.isValid }
+                                        invalidFeedback={ validState.lastName.invalidFeedback }
+                                        onChanged={ onLastNameChanged }
+                                    >
+                                    </CustomTextBox>
+                                </Form>
+                            </div>
+                        </div>
+                    </Tab>
+                    <Tab eventKey="phoneNumberTab" title="Phone Numbers">
+                        <div className="contact-dialog-tab">
+                            <div className="contact-dialog-form">
+                                <Form noValidate>
+                                    <div className="contact-dialog-sticky">
+                                        <CustomTextBox id="phoneNumber"
+                                            labelText="Phone Number"
+                                            value={ phoneNumber.phoneNumber }
+                                            isInvalid={ dirtyState.phoneNumber && !validState.phoneNumber.isValid }
+                                            invalidFeedback={ validState.phoneNumber.invalidFeedback }
+                                            onChanged={ onPhoneNumberChanged }
+                                        >
+                                            <CustomSelect
+                                                options={ PHONE_NUMBER_TYPES }
+                                                value={ phoneNumber.type }
+                                                onChanged={ onPhoneNumberTypeChanged }
+                                            />
+
+                                            <AddButton 
+                                                onClick={ onAddPhoneNumberClicked }
+                                                disabled={ !validState.phoneNumber.isValid }
+                                            />
+                                        </CustomTextBox>
+                                    </div>
+
+                                    {
+                                        phoneNumbers.map((phoneNumber, index) =>
+                                            <CustomTextBox id={ `phoneNumber-${index+1}` }
+                                                key={ index }
+                                                labelText="Phone Number"
+                                                value={ phoneNumber.phoneNumber }
+                                                isInvalid={ dirtyState.phoneNumbers[index] && !validState.phoneNumbers[index].isValid }
+                                                invalidFeedback={ validState.phoneNumbers[index].invalidFeedback }
+                                                onChanged={ (value) => onPhoneNumberChanged(value, index) }
+                                            >
+                                                <CustomSelect
+                                                    options={ PHONE_NUMBER_TYPES }
+                                                    value={ phoneNumber.type }
+                                                    onChanged={ (value) => onPhoneNumberTypeChanged(value, index) }
+                                                />
+                                            
+                                                <RemoveButton 
+                                                    onClick={ () => onRemovePhoneNumberClicked(index) }
+                                                />
+                                            </CustomTextBox>
+                                        )
+                                    }
+                                </Form>
+                            </div>
+                        </div>
+                    </Tab>
+                    <Tab eventKey="contact" title="Email Addresses">
+                        <div className="contact-dialog-tab">
+                            <div className="contact-dialog-form">
+                                <Form noValidate>
+                                    <div className="contact-dialog-sticky">
+                                        <CustomTextBox id="emailAddress"
+                                            labelText="Email Address"
+                                            value={ emailAddress.emailAddress }
+                                            isInvalid={ dirtyState.emailAddress && !validState.emailAddress.isValid }
+                                            invalidFeedback={ validState.emailAddress.invalidFeedback }
+                                            onChanged={ onEmailAddressChanged }
+                                        >
+                                            <CustomSelect
+                                                options={ EMAIL_ADDRESS_TYPES }
+                                                value={ emailAddress.type }
+                                                onChanged={ onEmailAddressTypeChanged }
+                                            />
+                                            
+                                            <AddButton 
+                                                onClick={ onAddEmailAddressClicked }
+                                                disabled={ !validState.emailAddress.isValid }
+                                            />
+                                        </CustomTextBox>
+                                    </div>
+
+                                    {
+                                        emailAddresses.map((emailAddress, index) =>
+                                            <CustomTextBox id={ `emailAddress-${index+1}` }
+                                                key={ index }
+                                                labelText="Email Address"
+                                                value={ emailAddress.emailAddress }
+                                                isInvalid={ dirtyState.emailAddresses[index] && !validState.emailAddresses[index].isValid }
+                                                invalidFeedback={ validState.emailAddresses[index].invalidFeedback }
+                                                onChanged={ (value) => onEmailAddressChanged(value, index) }
+                                            >
+                                                <CustomSelect
+                                                    options={ EMAIL_ADDRESS_TYPES }
+                                                    value={ emailAddress.type }
+                                                    onChanged={ (value) => onEmailAddressTypeChanged(value, index) }
+                                                />
+                                            
+                                                <RemoveButton 
+                                                    onClick={ () => onRemoveEmailAddressClicked(index) }
+                                                />
+                                            </CustomTextBox>
+                                        )
+                                    }
+                                </Form>
+                            </div>
+                        </div>
+                    </Tab>
+                </Tabs>
             </Modal.Body>
 
             <DialogFooter />

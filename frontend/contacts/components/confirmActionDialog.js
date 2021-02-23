@@ -8,12 +8,10 @@ function Dialog(props)
         actionType,
         subjects,
         title,
-        body,
         bodyText,
         acceptText,
         cancelText,
         centered,
-        allowAccept,
         onAccepted,
         onCancelled
     } = props;
@@ -58,20 +56,10 @@ function Dialog(props)
 
             <Modal.Body>
                 <p>{ bodyText }</p>
-
-                {
-                    body !== null ?
-                        <div>
-                            {
-                                body
-                            }
-                        </div> :
-                        <></>
-                }
             </Modal.Body>
 
             <Modal.Footer>
-                <Button variant="primary" disabled={ !allowAccept } onClick={ onAcceptClicked }>{ acceptText }</Button>
+                <Button variant="primary" onClick={ onAcceptClicked }>{ acceptText }</Button>
                 <Button variant="secondary" onClick={ onCancelClicked }>{ cancelText }</Button>
             </Modal.Footer>
         </Modal> 
@@ -96,12 +84,10 @@ ConfirmActionDialog.defaultProps = {
     actionType: '',
     subjects: [],
     title: '',
-    body: null,
     bodyText: '',
     acceptText: 'OK',
     cancelText: 'Cancel',
     centered: false,
-    allowAccept: true,
     onAccepted: (actionType, subjects) => {},
     onCancelled: (actionType, subjects) => {}
 };
@@ -111,12 +97,10 @@ ConfirmActionDialog.propTypes = {
     actionType: PropTypes.string,
     subjects: PropTypes.array,
     title: PropTypes.string,
-    body: PropTypes.object,
     bodyText: PropTypes.string,
     acceptText: PropTypes.string,
     cancelText: PropTypes.string,
     centered: PropTypes.bool,
-    allowAccept: PropTypes.bool,
     onAccepted: PropTypes.func,
     onCancelled: PropTypes.func
 };

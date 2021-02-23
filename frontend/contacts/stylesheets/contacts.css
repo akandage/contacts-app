@@ -121,6 +121,7 @@ ol.contact-list li.contact-list-item-separator {
 div.contact-dialog-tab {
     width: 100%;
     height: fit-content;
+    margin-top: 1em;
     display: flex;
     flex-direction: row;
     flex-wrap: nowrap;

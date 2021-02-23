@@ -18,9 +18,11 @@ export default function CustomTextBox(props)
         labelText,
         isInvalid,
         invalidFeedback,
-        onChanged
+        onChanged,
+        onFocus,
+        onBlur
     } = props;
-    const [ valueState, setValueState ] = useState(value);
+    // const [ valueState, setValueState ] = useState(value);
 
     let numChildren = Array.isArray(props.children) ? props.children.length :
                         (props.children ? 1 : 0);
@@ -31,17 +33,18 @@ export default function CustomTextBox(props)
 
         if (newValue !== value)
         {
-            setValueState(newValue);
+            // setValueState(newValue);
+            onChanged(newValue);
         }
     }
 
-    function onBlur()
-    {
-        if (valueState !== value)
-        {
-            onChanged(valueState);
-        }
-    }
+    // function onBlur()
+    // {
+    //     if (valueState !== value)
+    //     {
+    //         onChanged(valueState);
+    //     }
+    // }
 
     return (
         <Form.Group>
@@ -54,8 +57,9 @@ export default function CustomTextBox(props)
                         name={ id }
                         disabled={ disabled }
                         isInvalid={ isInvalid }
-                        value={ valueState }
+                        value={ value }
                         onChange={ onChange }
+                        onFocus={ onFocus }
                         onBlur={ onBlur }
                     >
                     </Form.Control>
@@ -91,7 +95,9 @@ CustomTextBox.defaultProps = {
     labelText: '',
     isInvalid: false,
     invalidFeedback: null,
-    onChanged: (value) => {}
+    onChanged: (value) => {},
+    onFocus: (e) => {},
+    onBlur: (e) => {}
 };
 
 CustomTextBox.propTypes = {
@@ -101,7 +107,9 @@ CustomTextBox.propTypes = {
     labelText: PropTypes.string,
     isInvalid: PropTypes.bool,
     invalidFeedback: PropTypes.string,
-    onChanged: PropTypes.func
+    onChanged: PropTypes.func,
+    onFocus: PropTypes.func,
+    onBlur: PropTypes.func
 };
 
 export function AddButton(props)
