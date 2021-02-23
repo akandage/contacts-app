@@ -29,6 +29,7 @@ const REDUCER = combineReducers({
             case ACTION_TYPE.EDIT_CONTACT:
                 next = STATUS.EDIT_CONTACT;
                 break;
+            case ACTION_TYPE.ADD_GROUP:
             case ACTION_TYPE.CONFIRM_DELETE_CONTACT:
             case ACTION_TYPE.CONFIRM_DELETE_CONTACTS:
             case ACTION_TYPE.CONFIRM_FAVORITE_CONTACTS:
@@ -53,6 +54,7 @@ const REDUCER = combineReducers({
         {
             case ACTION_TYPE.ADD_CONTACT_ERROR_SAVING:
             case ACTION_TYPE.EDIT_CONTACT_ERROR_SAVING:
+            case ACTION_TYPE.ADD_GROUP_ERROR_SAVING:
             case ACTION_TYPE.ERROR_DELETING_CONTACT:
             case ACTION_TYPE.ERROR_DELETING_CONTACTS:
             case ACTION_TYPE.ERROR_FAVORITING_CONTACT:
@@ -129,6 +131,7 @@ const REDUCER = combineReducers({
                     return contact;
                 });
                 break;
+            case ACTION_TYPE.ADD_GROUP_SAVING:
             case ACTION_TYPE.DELETING_CONTACTS:
             case ACTION_TYPE.FAVORITING_CONTACTS:
                 contactIds = new Set(action.contacts.map(contact => contact._id));
@@ -142,6 +145,7 @@ const REDUCER = combineReducers({
                     return contact;
                 });
                 break;
+            case ACTION_TYPE.ADD_GROUP_ERROR_SAVING:
             case ACTION_TYPE.ERROR_DELETING_CONTACTS:
             case ACTION_TYPE.ERROR_FAVORITING_CONTACTS:
                 contactIds = new Set(action.contacts.map(contact => contact._id));
@@ -172,6 +176,19 @@ const REDUCER = combineReducers({
                     if (action.contact._id === contact.contact._id)
                     {
                         contact.contact = action.contact;
+                        contact.disabled = false;
+                        contact.selected = false;
+                    }
+
+                    return contact;
+                });
+                break;
+            case ACTION_TYPE.ADD_GROUP_SAVED:
+                contactIds = new Set(action.contacts.map(contact => contact._id));
+
+                next = state.map(contact => {
+                    if (contactIds.has(contact.contact._id))
+                    {
                         contact.disabled = false;
                         contact.selected = false;
                     }
@@ -244,6 +261,12 @@ const REDUCER = combineReducers({
 
         switch (action.type)
         {
+            case ACTION_TYPE.ADD_GROUP:
+                next = {
+                    type: CONFIRM_ACTION_TYPE.GROUP,
+                    subjects: action.contacts
+                }
+                break;
             case ACTION_TYPE.CONFIRM_DELETE_CONTACT:
                 next = {
                     type: CONFIRM_ACTION_TYPE.DELETE,

@@ -7,6 +7,7 @@ import { STATUS, CONFIRM_ACTION_TYPE } from './constants';
 import * as ContactAppActions from './actions/contactAppActions';
 import ContactsHeader from '../common/contactsHeader';
 import { ContactIcon, FavoriteIcon, SettingsIcon } from '../common/contactsImages';
+import AddGroupDialog from './components/addGroupDialog';
 import ContactDialog, { CONTACT_DIALOG_MODE } from './components/contactDialog';
 import ConfirmActionDialog from './components/confirmActionDialog';
 import ContactList from './components/contactList';
@@ -49,6 +50,24 @@ function startSessionHeartbeat()
         );
         
     }, SESSION_HEARTBEAT_INTERVAL);
+}
+
+function connectAddGroupDialog()
+{
+    return connect(
+        state => {
+            return {
+                show: state.status === STATUS.CONFIRM_ACTION && state.confirmAction.type === CONFIRM_ACTION_TYPE.GROUP,
+                contacts: state.confirmAction.subjects
+            };
+        },
+        dispatch => {
+            return {
+                onSaved: (group) => dispatch(ContactAppActions.addGroupSave(group)),
+                onCancelled: () => dispatch(ContactAppActions.addGroupCancel())
+            };
+        }
+    )(AddGroupDialog);
 }
 
 function connectContactList(isFavoritesList = false)
@@ -107,6 +126,7 @@ function connectContactList(isFavoritesList = false)
                         }
                     }
                 },
+                onGroupClicked: (contacts) => dispatch(ContactAppActions.addGroup(contacts)),
                 onSortChanged: (orderBy) => dispatch(ContactAppActions.sortContacts(orderBy))
             };
         }
@@ -247,6 +267,7 @@ function ContactsView(props)
 
     let AddContactDialog = connectAddContactDialog(isFavoritesList);
     let EditContactDialog = connectEditContactDialog();
+    let AddGroupDialog = connectAddGroupDialog();
     let ConfirmDeleteContactsDialog = connectConfirmDeleteContactsDialog();
     let ConfirmFavoriteContactsDialog = connectConfirmFavoriteContactsDialog();
     let ContactList = connectContactList(isFavoritesList);
@@ -255,6 +276,7 @@ function ContactsView(props)
         <>
             <AddContactDialog />
             <EditContactDialog />
+            <AddGroupDialog />
             <ConfirmDeleteContactsDialog />
             <ConfirmFavoriteContactsDialog />
             <ContactList />

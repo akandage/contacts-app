@@ -11,10 +11,12 @@ const INVALID_TITLE = 'Invalid title.';
 const INVALID_EMAIL_ADDRESS_TYPE = 'Invalid email address type.';
 const INVALID_PHONE_NUMBER_TYPE = 'Invalid phone number type.';
 const INVALID_CONTACT = 'Invalid contact.';
+const INVALID_GROUP = 'Invalid group.';
 const INVALID_USER = 'Invalid user.';
 const CONTACT_NOT_FOUND = 'Contact not found.';
 
 const CONTACT_COLLECTION = 'contacts';
+const GROUP_COLLECTION = 'groups';
 const DEFAULT_CONTACTS_ORDERBY = ['firstName', 'ASC', 'lastName', 'ASC'];
 // Names (first, middle, last) may only contain letters and must start with a capital letter.
 // Allow single letter names.
@@ -118,7 +120,30 @@ const ContactSchema = mongoose.Schema({
     favorite: {
         type: Boolean,
         required: true
-    }
+    },
+    groups: [
+        {
+            type: mongoose.Schema.Types.ObjectId,
+            ref: 'GroupModel'
+        }
+    ]
+});
+
+const GroupSchema = mongoose.Schema({
+    owner: {
+        type: mongoose.Schema.Types.ObjectId,
+        ref: 'UserModel'
+    },
+    name: {
+        type: String,
+        required: true
+    },
+    contacts: [
+        {
+            type: mongoose.Schema.Types.ObjectId,
+            ref: 'ContactModel'
+        }
+    ]
 });
 
 class ContactDb
@@ -126,7 +151,8 @@ class ContactDb
     constructor(db)
     {
         this._db = db ? db : null;
-        this._model = db ? db.model('ContactModel', ContactSchema, CONTACT_COLLECTION) : null;
+        this._contactModel = db ? db.model('ContactModel', ContactSchema, CONTACT_COLLECTION) : null;
+        this._groupModel = db ? db.model('GroupModel', GroupSchema, GROUP_COLLECTION) : null;
     }
 
     set connection(db)
@@ -137,7 +163,8 @@ class ContactDb
         }
 
         this._db = db;
-        this._model = db.model('ContactModel', ContactSchema, CONTACT_COLLECTION);
+        this._contactModel = db.model('ContactModel', ContactSchema, CONTACT_COLLECTION);
+        this._groupModel = db.model('GroupModel', GroupSchema, GROUP_COLLECTION);
     }
 
     get connection()
@@ -149,7 +176,8 @@ class ContactDb
     {
         debug('Starting ContactDb.');
 
-        await this._model.init();
+        await this._contactModel.init();
+        await this._groupModel.init();
 
         debug('Started ContactDb.');
     }
@@ -170,7 +198,7 @@ class ContactDb
 
         try
         {
-            await this._model.validate(contact);
+            await this._contactModel.validate(contact);
         }
         catch (error)
         {
@@ -191,9 +219,37 @@ class ContactDb
         await this.validateContact(contact);
 
         contact.owner = user._id;
-        contact = await this._model.create(contact);
+        contact = await this._contactModel.create(contact);
 
         return contact;
+    }
+
+    async createGroup(user, name, contactIds)
+    {
+        if (user === null || user === undefined || user._id === null || user._id === undefined)
+        {
+            throw new Error(INVALID_USER);
+        }
+
+        if (name === null || name === undefined || typeof name !== 'string' || name.length === 0)
+        {
+            throw new Error(INVALID_GROUP);
+        }
+
+        if (!Array.isArray(contactIds) || contactIds.length === 0)
+        {
+            throw new Error(INVALID_GROUP);
+        }
+
+        let group = await this._groupModel.create({
+            owner: user._id,
+            name,
+            contacts: contactIds
+        });
+
+        await group.execPopulate('contacts');
+
+        return group;
     }
 
     async putContact(user, contact)
@@ -208,7 +264,7 @@ class ContactDb
         contact.owner = user._id;
 
         // Since we're using replace, the version field won't be updated.
-        let prevContact = await this._model.findOneAndReplace({ _id: contact._id }, contact).exec();
+        let prevContact = await this._contactModel.findOneAndReplace({ _id: contact._id }, contact).exec();
 
         if (!prevContact)
         {
@@ -225,7 +281,7 @@ class ContactDb
             throw new Error(INVALID_USER);
         }
 
-        let contact = await this._model.findOne({ owner: user._id, _id: id }).exec();
+        let contact = await this._contactModel.findOne({ owner: user._id, _id: id }).exec();
 
         if (!contact)
         {
@@ -279,7 +335,7 @@ class ContactDb
             throw new Error('Invalid argument: offset');
         }
 
-        let query = this._model.find({ owner: user._id });
+        let query = this._contactModel.find({ owner: user._id });
         let contacts = [];
 
         if (Array.isArray(orderBy) && orderBy.length > 0)
@@ -359,6 +415,7 @@ module.exports = {
     CONTACT_COLLECTION,
     CONTACT_NOT_FOUND,
     INVALID_CONTACT,
+    INVALID_GROUP,
     INVALID_USER,
     ContactDb,
     ContactSchema,

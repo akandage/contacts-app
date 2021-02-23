@@ -11,6 +11,7 @@ export const STATUS = {
 export const CONFIRM_ACTION_TYPE = {
     DELETE: 'DELETE',
     FAVORITE: 'FAVORITE',
+    GROUP: 'GROUP',
     UNFAVORITE: 'UNFAVORITE'
 };
 

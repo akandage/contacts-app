@@ -2,7 +2,7 @@ const debug = require('debug')('contacts-api-router');
 const express = require('express');
 const httpError = require('http-errors');
 const { validateOrderBy } = require('./db');
-const { CONTACT_NOT_FOUND, INVALID_CONTACT, DEFAULT_CONTACTS_ORDERBY } = require('./contactDb');
+const { CONTACT_NOT_FOUND, DEFAULT_CONTACTS_ORDERBY, INVALID_CONTACT, INVALID_GROUP } = require('./contactDb');
 const { USER_NOT_FOUND } = require('./userDb');
 const contactsApiRouter = express.Router();
 
@@ -304,6 +304,60 @@ contactsApiRouter.delete('/api/contacts/:id', async (req, res, next) => {
         }
 
         res.status(200).send();
+    }
+    else
+    {
+        debug('Request does not have session.');
+        next(httpError(401));
+    }
+});
+
+contactsApiRouter.post('/api/groups', async (req, res, next) => {
+    let session = req.session;
+    let {
+        name,
+        contactIds
+    } = req.body;
+
+    if (session)
+    {
+        debug(`Request session ${session.sessionId}`);
+
+        let userDb = req.app.get('user-db');
+        let contactDb = req.app.get('contact-db');
+        let user = null;
+        let group = null;
+
+        try
+        {
+            user = await userDb.getUser(session.username);
+            debug(`Request user ${user.username}`);
+            group = await contactDb.createGroup(user, name, contactIds);
+            debug(`Created group ${group._id}`);
+        }
+        catch (error)
+        {
+            console.log(error);
+
+            if (error.message === USER_NOT_FOUND)
+            {
+                next(httpError(404, error.message));
+            }
+            else if (error.message === INVALID_GROUP)
+            {
+                next(httpError(400, error.message));
+            }
+            else
+            {
+                next(httpError(500, error.message));
+            }
+
+            return;
+        }
+
+        res.set('Location', `/api/groups/${group._id}`);
+        res.status(200)
+            .send(group);
     }
     else
     {

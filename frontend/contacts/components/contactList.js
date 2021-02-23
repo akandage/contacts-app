@@ -40,6 +40,7 @@ export default function ContactList(props)
         onDeleteMultipleClicked,
         onFavoriteClicked,
         onFavoriteMultipleClicked,
+        onGroupClicked,
         onSortChanged
     } = props;
 
@@ -98,6 +99,14 @@ export default function ContactList(props)
             }
         }
 
+        function onGroupButtonClicked()
+        {
+            if (isContactsSelected)
+            {
+                onGroupClicked(selectedContacts.map(contact => contact.contact));
+            }
+        }
+
         function onSortSelected(eventKey)
         {
             if (eventKey !== sortKey)
@@ -140,7 +149,7 @@ export default function ContactList(props)
                     <Button disabled={ !isContactsSelected } onClick={ onFavoriteButtonClicked }>
                         <StarIcon width={ FAVORITE_TOOLBAR_BUTTON_WIDTH } height={ FAVORITE_TOOLBAR_BUTTON_HEIGHT } />
                     </Button>
-                    <Button disabled={ !isContactsSelected }>
+                    <Button disabled={ !isContactsSelected } onClick={ onGroupButtonClicked }>
                         <GroupIcon width={ GROUP_TOOLBAR_BUTTON_WIDTH } height={ GROUP_TOOLBAR_BUTTON_HEIGHT } />
                     </Button>
                     <Button onClick={ onRefreshClicked } disabled={ status === STATUS.LOADING || status === STATUS.REFRESHING }>
@@ -309,6 +318,7 @@ ContactList.defaultProps = {
     onDeleteMultipleClicked: (contacts) => {},
     onFavoriteClicked: (contact) => {},
     onFavoriteMultipleClicked: (contacts) => {},
+    onGroupClicked: (contacts) => {},
     onSortChanged: (orderBy) => {}
 };
 
@@ -334,5 +344,6 @@ ContactList.propTypes = {
     onDeleteMultipleClicked: PropTypes.func,
     onFavoriteClicked: PropTypes.func,
     onFavoriteMultipleClicked: PropTypes.func,
+    onGroupClicked: PropTypes.func,
     onSortChanged: PropTypes.func
 }

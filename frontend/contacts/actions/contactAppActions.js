@@ -7,6 +7,11 @@ export const ACTION_TYPE = {
     ADD_CONTACT_SAVING: 'ADD_CONTACT_SAVING',
     ADD_CONTACT_SAVED: 'ADD_CONTACT_SAVED',
     ADD_CONTACT_ERROR_SAVING: 'ADD_CONTACT_ERROR_SAVING',
+    ADD_GROUP: 'ADD_GROUP',
+    ADD_GROUP_CANCEL: 'ADD_GROUP_CANCEL',
+    ADD_GROUP_SAVING: 'ADD_GROUP_SAVING',
+    ADD_GROUP_SAVED: 'ADD_GROUP_SAVED',
+    ADD_GROUP_ERROR_SAVING: 'ADD_GROUP_ERROR_SAVING',
     EDIT_CONTACT: 'EDIT_CONTACT',
     EDIT_CONTACT_CANCEL: 'EDIT_CONTACT_CANCEL',
     EDIT_CONTACT_SAVING: 'EDIT_CONTACT_SAVING',
@@ -120,6 +125,89 @@ export function addContactErrorSaving(contact, error)
     return {
         type: ACTION_TYPE.ADD_CONTACT_ERROR_SAVING,
         contact,
+        error
+    }
+}
+
+export function addGroup(contacts)
+{
+    return {
+        type: ACTION_TYPE.ADD_GROUP,
+        contacts
+    }
+}
+
+export function addGroupCancel()
+{
+    return {
+        type: ACTION_TYPE.ADD_GROUP_CANCEL
+    }
+}
+
+export function addGroupSave(group)
+{
+    return async (dispatch) => {
+        dispatch(addGroupSaving(group));
+
+        try
+        {
+            let requestBody = {
+                name: group.name,
+                contactIds: group.contacts.map(contact => contact._id)
+            };
+            let response = await fetch(`/api/groups`, {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json'
+                },
+                body: JSON.stringify(requestBody)
+            });
+
+            if (response.ok)
+            {
+                group = await response.json();
+
+                dispatch(addGroupSaved(group));
+            }
+            else
+            {
+                dispatch(addGroupErrorSaving(group, `Error adding group ${response.status} ${response.statusText}`));
+            }
+        }
+        catch (error)
+        {
+            dispatch(addGroupErrorSaving(group, `Error adding group: ${error.message}`));
+        }
+    }
+}
+
+export function addGroupSaving(group)
+{
+    return {
+        type: ACTION_TYPE.ADD_GROUP_SAVING,
+        name: group.name,
+        contacts: group.contacts,
+        group
+    };
+}
+
+export function addGroupSaved(group)
+{
+    return {
+        type: ACTION_TYPE.ADD_GROUP_SAVED,
+        name: group.name,
+        contacts: group.contacts,
+        group
+    };
+}
+
+export function addGroupErrorSaving(group, error)
+{
+    return {
+        type: ACTION_TYPE.ADD_GROUP_ERROR_SAVING,
+        name: group.name,
+        contacts: group.contacts,
+        group,
         error
     }
 }
