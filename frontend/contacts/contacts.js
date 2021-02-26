@@ -147,7 +147,12 @@ function connectGroupList()
         },
         dispatch => {
             return {
-
+                onSelected: (group) => dispatch(ContactAppActions.selectGroup(group)),
+                onSelectAll: () => dispatch(ContactAppActions.selectAllGroups()),
+                onDeselected: (group) => dispatch(ContactAppActions.deselectGroup(group)),
+                onDeselectAll: () => dispatch(ContactAppActions.deselectAllGroups()),
+                onRefreshClicked: () => dispatch(ContactAppActions.retrieveGroups()),
+                onSortChanged: (orderBy) => dispatch(ContactAppActions.sortGroups(orderBy))
             };
         }
     )(GroupList);

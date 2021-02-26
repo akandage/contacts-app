@@ -28,7 +28,8 @@ export default function GroupList(props)
         onEditGroupClicked,
         onDeleteClicked,
         onDeleteMultipleClicked,
-        onRefreshClicked
+        onRefreshClicked,
+        onSortChanged
     } = props;
 
     let selectedGroups = groups.filter(group => group.selected);
@@ -220,7 +221,8 @@ GroupList.defaultProps = {
     onEditGroupClicked: (group) => {},
     onDeleteClicked: (group) => {},
     onDeleteMultipleClicked: (groups) => {},
-    onRefreshClicked: () => {}
+    onRefreshClicked: () => {},
+    onSortChanged: (orderBy) => {}
 };
 
 GroupList.propTypes = {
@@ -242,5 +244,6 @@ GroupList.propTypes = {
     onEditGroupClicked: PropTypes.func,
     onDeleteClicked: PropTypes.func,
     onDeleteMultipleClicked: PropTypes.func,
-    onRefreshClicked: PropTypes.func
+    onRefreshClicked: PropTypes.func,
+    onSortChanged: PropTypes.func
 };

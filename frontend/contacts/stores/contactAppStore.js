@@ -235,6 +235,25 @@ const REDUCER = combineReducers({
 
         switch (action.type)
         {
+            case ACTION_TYPE.SELECT_GROUP:
+            case ACTION_TYPE.DESELECT_GROUP:
+                next = state.map(group => {
+                    if (action.group._id === group.group._id)
+                    {
+                        group.selected = action.type === ACTION_TYPE.SELECT_GROUP ? true : false;
+                    }
+                    
+                    return group;
+                });
+                break;
+            case ACTION_TYPE.SELECT_ALL_GROUPS:
+            case ACTION_TYPE.DESELECT_ALL_GROUPS:
+                next = state.map(group => {
+                    group.selected = action.type === ACTION_TYPE.SELECT_ALL_GROUPS ? true : false;
+                    
+                    return group;
+                });
+                break;
             case ACTION_TYPE.RETRIEVED_GROUPS:
                 next = action.groups.map(group => {
                     return {

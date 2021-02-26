@@ -21,6 +21,10 @@ export const ACTION_TYPE = {
     SELECT_ALL_CONTACTS: 'SELECT_ALL_CONTACTS',
     DESELECT_CONTACT: 'DESELECT_CONTACT',
     DESELECT_ALL_CONTACTS: 'DESELECT_ALL_CONTACTS',
+    SELECT_GROUP: 'SELECT_GROUP',
+    SELECT_ALL_GROUPS: 'SELECT_ALL_GROUPS',
+    DESELECT_GROUP: 'DESELECT_GROUP',
+    DESELECT_ALL_GROUPS: 'DESELECT_ALL_GROUPS',
     CONFIRM_DELETE_CONTACT: 'CONFIRM_DELETE_CONTACT',
     CONFIRM_DELETE_CONTACTS: 'CONFIRM_DELETE_CONTACTS',
     CONFIRM_FAVORITE_CONTACTS: 'CONFIRM_FAVORITE_CONTACTS',
@@ -49,7 +53,8 @@ export const ACTION_TYPE = {
     RETRIEVING_GROUPS: 'RETRIEVING_GROUPS',
     RETRIEVED_GROUPS: 'RETRIEVED_GROUPS',
     ERROR_RETRIEVING_GROUPS: 'ERROR_RETRIEVING_GROUPS',
-    SORT_CONTACTS: 'SORT_CONTACTS'
+    SORT_CONTACTS: 'SORT_CONTACTS',
+    SORT_GROUPS: 'SORT_GROUPS'
 };
 
 export function initContacts()
@@ -316,6 +321,36 @@ export function deselectAllContacts()
 {
     return {
         type: ACTION_TYPE.DESELECT_ALL_CONTACTS
+    }
+}
+
+export function selectGroup(group)
+{
+    return {
+        type: ACTION_TYPE.SELECT_GROUP,
+        group
+    }
+}
+
+export function selectAllGroups()
+{
+    return {
+        type: ACTION_TYPE.SELECT_ALL_GROUPS
+    }
+}
+
+export function deselectGroup(group)
+{
+    return {
+        type: ACTION_TYPE.DESELECT_GROUP,
+        group
+    }
+}
+
+export function deselectAllGroups()
+{
+    return {
+        type: ACTION_TYPE.DESELECT_ALL_GROUPS
     }
 }
 
@@ -770,5 +805,12 @@ export function sortContacts(orderBy = DEFAULT_CONTACTS_ORDERBY)
 {
     return async (dispatch) => {
         dispatch(retrieveContacts(null, 0, orderBy));
+    };
+}
+
+export function sortGroups(orderBy = DEFAULT_GROUPS_ORDERBY)
+{
+    return async (dispatch) => {
+        dispatch(retrieveGroups(null, 0, orderBy));
     };
 }
