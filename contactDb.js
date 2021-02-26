@@ -1,6 +1,6 @@
 const debug = require('debug')('contact-db');
 const mongoose = require('mongoose');
-const { validateOrderBy } = require('./db');
+const { orderByToString, validateOrderBy } = require('./db');
 const { INVALID_EMAIL_ADDRESS, EmailAddress } = require('./emailAddress');
 const { INVALID_PHONE_NUMBER, PhoneNumber } = require('./phoneNumber');
 
@@ -18,6 +18,7 @@ const CONTACT_NOT_FOUND = 'Contact not found.';
 const CONTACT_COLLECTION = 'contacts';
 const GROUP_COLLECTION = 'groups';
 const DEFAULT_CONTACTS_ORDERBY = ['firstName', 'ASC', 'lastName', 'ASC'];
+const DEFAULT_GROUPS_ORDERBY = ['name', 'ASC'];
 // Names (first, middle, last) may only contain letters and must start with a capital letter.
 // Allow single letter names.
 const NAME_REGEX = /^[A-Z][a-zA-Z-']*$/;
@@ -252,6 +253,54 @@ class ContactDb
         return group;
     }
 
+    async getGroupList(user, limit = null, offset = 0, orderBy = DEFAULT_GROUPS_ORDERBY)
+    {
+        if (user === null || user === undefined || user._id === null || user._id === undefined)
+        {
+            throw new Error(INVALID_USER);
+        }
+
+        if (limit !== null && (!Number.isInteger(limit) || limit < 0))
+        {
+            throw new Error('Invalid argument: limit');
+        }
+
+        if (!Number.isInteger(offset) || offset < 0)
+        {
+            throw new Error('Invalid argument: offset');
+        }
+
+        let query = this._groupModel.find({ owner: user._id });
+        let queryOptions = {};
+        let groups = [];
+
+        if (Array.isArray(orderBy) && orderBy.length > 0)
+        {
+            if (!validateOrderBy(orderBy))
+            {
+                throw new Error('Invalid argument: orderBy');
+            }
+
+            queryOptions.sort = orderByToString(orderBy);
+        }
+
+        if (limit !== null)
+        {
+            queryOptions.limit = limit;
+
+            if (offset !== 0)
+            {
+                queryOptions.skip = offset;
+            }
+        }
+
+        query.setOptions(queryOptions);
+        query.populate('contacts');
+        groups = await query.exec();
+
+        return groups;
+    }
+
     async putContact(user, contact)
     {
         if (user === null || user === undefined || user._id === null || user._id === undefined)
@@ -336,6 +385,7 @@ class ContactDb
         }
 
         let query = this._contactModel.find({ owner: user._id });
+        let queryOptions = {};
         let contacts = [];
 
         if (Array.isArray(orderBy) && orderBy.length > 0)
@@ -345,67 +395,21 @@ class ContactDb
                 throw new Error('Invalid argument: orderBy');
             }
 
-            let sort = '';
-
-            for (let i = 0; i < orderBy.length; i += 2)
-            {
-                let field = orderBy[i];
-                let direction = orderBy[i+1];
-
-                if (i > 0)
-                {
-                    sort += ' ';
-                }
-
-                sort += direction.toLowerCase() === 'desc' ? `-${field}` : field;
-            }
-
-            query.sort(sort);
+            queryOptions.sort = orderByToString(orderBy);
         }
 
         if (limit !== null)
         {
-            let cursor = null;
+            queryOptions.limit = limit;
 
-            try
+            if (offset !== 0)
             {
-                cursor = query.cursor();
-
-                for (let contact = await cursor.next(), i = 0, n = limit; (limit === null || n > 0) && contact !== null; contact = await cursor.next(), ++i)
-                {
-                    if (i >= offset && (limit === null || n > 0))
-                    {
-                        contacts.push(contact);
-
-                        if (n)
-                        {
-                            --n;
-                        }
-                    }
-                }
-            }
-            catch (error)
-            {
-                // Ensure the cursor is closed.
-                if (cursor)
-                {
-                    try
-                    {
-                        await cursor.close();
-                    }
-                    catch (error)
-                    {
-                        debug(`Error closing cursor: ${error}`);
-                    }
-                }
-
-                throw error;
+                queryOptions.skip = offset;
             }
         }
-        else
-        {
-            contacts = await query.exec();
-        }
+
+        query.setOptions(queryOptions);
+        contacts = await query.exec();
 
         return contacts;
     }

@@ -6,11 +6,12 @@ import { BrowserRouter as Router, Redirect, Route, Switch } from 'react-router-d
 import { STATUS, CONFIRM_ACTION_TYPE } from './constants';
 import * as ContactAppActions from './actions/contactAppActions';
 import ContactsHeader from '../common/contactsHeader';
-import { ContactIcon, FavoriteIcon, SettingsIcon } from '../common/contactsImages';
+import { ContactIcon, FavoriteIcon, GroupIcon, SettingsIcon } from '../common/contactsImages';
 import AddGroupDialog from './components/addGroupDialog';
 import ContactDialog, { CONTACT_DIALOG_MODE } from './components/contactDialog';
 import ConfirmActionDialog from './components/confirmActionDialog';
 import ContactList from './components/contactList';
+import GroupList from './components/groupList';
 import ContactsNav from './components/contactsNav';
 import ContactAppStore from './stores/contactAppStore';
 import './stylesheets/contacts.css';
@@ -78,7 +79,7 @@ function connectContactList(isFavoritesList = false)
                 status: state.status,
                 contacts: isFavoritesList ? state.contacts.filter(contact => contact.contact.favorite) : state.contacts,
                 disabled: state.disabled,
-                orderBy: state.orderBy
+                orderBy: state.orderContactsBy
             };
         },
         dispatch => {
@@ -131,6 +132,25 @@ function connectContactList(isFavoritesList = false)
             };
         }
     )(ContactList);
+}
+
+function connectGroupList()
+{
+    return connect(
+        state => {
+            return {
+                status: state.status,
+                disabled: state.disabled,
+                groups: state.groups,
+                orderBy: state.orderGroupsBy
+            };
+        },
+        dispatch => {
+            return {
+
+            };
+        }
+    )(GroupList);
 }
 
 function connectAddContactDialog(isFavoritesList = false)
@@ -299,6 +319,15 @@ function FavoritesView()
     );
 }
 
+function GroupsView()
+{
+    let GroupList = connectGroupList();
+
+    return (
+        <GroupList />
+    );
+}
+
 function renderContactsApp()
 {
     let authState = document.getElementById('auth-state');
@@ -314,6 +343,7 @@ function renderContactsApp()
                     <ContactsNav>
                         <ContactsNav.Link to="/contacts" icon={ <ContactIcon width={ APP_NAV_ICON_WIDTH } height={ APP_NAV_ICON_HEIGHT } /> } linkText="Contacts" />
                         <ContactsNav.Link to="/favorites" icon={ <FavoriteIcon width={ APP_NAV_ICON_WIDTH } height={ APP_NAV_ICON_HEIGHT } outline={ false } /> } linkText="Favorites" />
+                        <ContactsNav.Link to="/groups" icon={ <GroupIcon width={ APP_NAV_ICON_WIDTH } height={ APP_NAV_ICON_HEIGHT } /> } linkText="Groups" />
                         <ContactsNav.Divider />
                         <ContactsNav.Link to="/settings" icon={ <SettingsIcon width={ APP_NAV_ICON_WIDTH } height={ APP_NAV_ICON_HEIGHT } /> } linkText="Settings" />
                     </ContactsNav>
@@ -332,6 +362,11 @@ function renderContactsApp()
                                 <Route exact path="/favorites">
                                     <Provider store={ store }>
                                         <FavoritesView />
+                                    </Provider>
+                                </Route>
+                                <Route exact path="/groups">
+                                    <Provider store={ store }>
+                                        <GroupsView />
                                     </Provider>
                                 </Route>
                             </Switch>

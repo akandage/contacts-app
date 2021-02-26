@@ -2,15 +2,17 @@ import { applyMiddleware, combineReducers, createStore } from 'redux';
 import { createLogger } from 'redux-logger';
 import thunkMiddleware from 'redux-thunk';
 import { ACTION_TYPE } from '../actions/contactAppActions';
-import { STATUS, CONFIRM_ACTION_TYPE, DEFAULT_CONTACTS_ORDERBY } from '../constants';
+import { STATUS, CONFIRM_ACTION_TYPE, DEFAULT_CONTACTS_ORDERBY, DEFAULT_GROUPS_ORDERBY } from '../constants';
 
 const INITIAL_STATE = {
     status: STATUS.START,
     error: null,
     contact: null,
     contacts:[],
+    groups:[],
     disabled: false,
-    orderBy: DEFAULT_CONTACTS_ORDERBY,
+    orderContactsBy: DEFAULT_CONTACTS_ORDERBY,
+    orderGroupsBy: DEFAULT_GROUPS_ORDERBY,
     confirmAction: {
         type: null,
         subjects: []
@@ -38,6 +40,7 @@ const REDUCER = combineReducers({
                 next = STATUS.CONFIRM_ACTION;
                 break;
             case ACTION_TYPE.RETRIEVING_CONTACTS:
+            case ACTION_TYPE.RETRIEVING_GROUPS:
                 next = state !== STATUS.START ? STATUS.REFRESHING : STATUS.LOADING;
                 break;
             default:
@@ -60,6 +63,7 @@ const REDUCER = combineReducers({
             case ACTION_TYPE.ERROR_FAVORITING_CONTACT:
             case ACTION_TYPE.ERROR_FAVORITING_CONTACTS:
             case ACTION_TYPE.ERROR_RETRIEVING_CONTACTS:
+            case ACTION_TYPE.ERROR_RETRIEVING_GROUPS:
                 next = action.error;
                 break;
             default:
@@ -226,6 +230,26 @@ const REDUCER = combineReducers({
 
         return next;
     },
+    groups: (state = INITIAL_STATE.groups, action) => {
+        let next = state;
+
+        switch (action.type)
+        {
+            case ACTION_TYPE.RETRIEVED_GROUPS:
+                next = action.groups.map(group => {
+                    return {
+                        group,
+                        disabled: false,
+                        selected: false,
+                    }
+                });
+                break;
+            default:
+                break;
+        }
+
+        return next;
+    },
     disabled: (state = INITIAL_STATE.disabled, action) => {
         let next = state;
 
@@ -233,6 +257,7 @@ const REDUCER = combineReducers({
         {
             case ACTION_TYPE.CONFIRM_DELETE_CONTACT:
             case ACTION_TYPE.RETRIEVING_CONTACTS:
+            case ACTION_TYPE.RETRIEVING_GROUPS:
                 next = true;
                 break;
             default:
@@ -242,12 +267,26 @@ const REDUCER = combineReducers({
 
         return next;
     },
-    orderBy: (state = INITIAL_STATE.orderBy, action) => {
+    orderContactsBy: (state = INITIAL_STATE.orderContactsBy, action) => {
         let next = state;
 
         switch (action.type)
         {
             case ACTION_TYPE.RETRIEVED_CONTACTS:
+                next = action.orderBy;
+                break;
+            default:
+                break;
+        }
+
+        return next;
+    },
+    orderGroupsBy: (state = INITIAL_STATE.orderGroupsBy, action) => {
+        let next = state;
+
+        switch (action.type)
+        {
+            case ACTION_TYPE.RETRIEVED_GROUPS:
                 next = action.orderBy;
                 break;
             default:

@@ -104,7 +104,7 @@ app.use(async (req, res, next) => {
  */
 
 // GET /
-app.use(/^\/(contacts|favorites|settings)?$/, (req, res, next) => {
+app.use(/^\/(contacts|favorites|groups|settings)?$/, (req, res, next) => {
     let session = req.session;
     let page = session ? CONTACTS_APP_PAGE : CONTACTS_DEFAULT_PAGE;
 

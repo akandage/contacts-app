@@ -21,6 +21,10 @@ export const CONTACTS_ORDERBY_FIRSTNAME_DESC = ['firstName', 'DESC', 'lastName',
 export const CONTACTS_ORDERBY_LASTNAME_ASC = ['lastName', 'ASC', 'firstName', 'ASC'];
 export const CONTACTS_ORDERBY_LASTNAME_DESC = ['lastName', 'DESC', 'firstName', 'DESC'];
 
+export const GROUPS_ORDERBY_NAME_ASC = ['name', 'ASC'];
+export const GROUPS_ORDERBY_NAME_DESC = ['name', 'DESC'];
+export const DEFAULT_GROUPS_ORDERBY = GROUPS_ORDERBY_NAME_ASC;
+
 // Names (first, middle, last) may only contain letters and must start with a capital letter.
 // Allow single letter names.
 export const NAME_REGEX = /^[A-Z][a-zA-Z-']*$/;
@@ -42,3 +46,19 @@ export const PHONE_NUMBER_TYPES = [
     'Fax (Business)',
     'Other'
 ];
+
+export const DELETE_BUTTON_WIDTH = 24;
+export const DELETE_BUTTON_HEIGHT = 24;
+export const FAVORITE_BUTTON_WIDTH = 24;
+export const FAVORITE_BUTTON_HEIGHT = 24;
+
+export const ADD_TOOLBAR_BUTTON_WIDTH = 24;
+export const ADD_TOOLBAR_BUTTON_HEIGHT = 24;
+export const DELETE_TOOLBAR_BUTTON_WIDTH = 24;
+export const DELETE_TOOLBAR_BUTTON_HEIGHT = 24;
+export const FAVORITE_TOOLBAR_BUTTON_WIDTH = 24;
+export const FAVORITE_TOOLBAR_BUTTON_HEIGHT = 24;
+export const GROUP_TOOLBAR_BUTTON_WIDTH = 24;
+export const GROUP_TOOLBAR_BUTTON_HEIGHT = 24;
+export const REFRESH_TOOLBAR_BUTTON_WIDTH = 24;
+export const REFRESH_TOOLBAR_BUTTON_HEIGHT = 24;

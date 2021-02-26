@@ -1,5 +1,5 @@
 import queryString from 'query-string';
-import { DEFAULT_CONTACTS_ORDERBY } from '../constants';
+import { DEFAULT_CONTACTS_ORDERBY, DEFAULT_GROUPS_ORDERBY } from '../constants';
 
 export const ACTION_TYPE = {
     ADD_CONTACT: 'ADD_CONTACT',
@@ -46,6 +46,9 @@ export const ACTION_TYPE = {
     RETRIEVING_CONTACTS: 'RETRIEVING_CONTACTS',
     RETRIEVED_CONTACTS: 'RETRIEVED_CONTACTS',
     ERROR_RETRIEVING_CONTACTS: 'ERROR_RETRIEVING_CONTACTS',
+    RETRIEVING_GROUPS: 'RETRIEVING_GROUPS',
+    RETRIEVED_GROUPS: 'RETRIEVED_GROUPS',
+    ERROR_RETRIEVING_GROUPS: 'ERROR_RETRIEVING_GROUPS',
     SORT_CONTACTS: 'SORT_CONTACTS'
 };
 
@@ -53,6 +56,7 @@ export function initContacts()
 {
     return (dispatch) => {
         dispatch(retrieveContacts());
+        dispatch(retrieveGroups());
     }
 }
 
@@ -687,6 +691,77 @@ export function errorRetrievingContacts(error)
 {
     return {
         type: ACTION_TYPE.ERROR_RETRIEVING_CONTACTS,
+        error
+    }
+}
+
+export function retrieveGroups(limit = null, offset = 0, orderBy = DEFAULT_GROUPS_ORDERBY)
+{
+    return async (dispatch) => {
+        dispatch(retrievingGroups());
+
+        try
+        {
+            let url = '/api/groups';
+            let qs = {};
+
+            if (limit)
+            {
+                qs.limit = limit;
+            }
+
+            if (offset > 0)
+            {
+                qs.offset = offset;
+            }
+
+            if (orderBy != DEFAULT_GROUPS_ORDERBY)
+            {
+                qs.orderBy = orderBy;
+            }
+
+            let response = await fetch(`${url}?${queryString.stringify(qs)}`);
+            
+            if (response.ok)
+            {
+                let groups = await response.json();
+
+                dispatch(retrievedGroups(groups, limit, offset, orderBy));
+            }
+            else
+            {
+                dispatch(errorRetrievingGroups(`Error retrieving groups: ${response.status} ${response.statusText}`));
+            }
+        }
+        catch (error)
+        {
+            dispatch(errorRetrievingGroups(`Error retrieving groups: ${error.message}`));
+        }
+    };
+}
+
+export function retrievingGroups()
+{
+    return {
+        type: ACTION_TYPE.RETRIEVING_GROUPS
+    };
+}
+
+export function retrievedGroups(groups, limit, offset, orderBy)
+{
+    return {
+        type: ACTION_TYPE.RETRIEVED_GROUPS,
+        groups,
+        limit,
+        offset,
+        orderBy
+    }
+}
+
+export function errorRetrievingGroups(error)
+{
+    return {
+        type: ACTION_TYPE.ERROR_RETRIEVING_GROUPS,
         error
     }
 }

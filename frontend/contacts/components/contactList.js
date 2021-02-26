@@ -4,23 +4,22 @@ import { Button, ButtonGroup, Dropdown, DropdownButton, Form, InputGroup } from 
 import { AddIcon, DeleteIcon, FavoriteIcon, GroupIcon, RefreshIcon, StarIcon, UserIcon } from '../../common/contactsImages';
 import { STATUS, DEFAULT_CONTACTS_ORDERBY, CONTACTS_ORDERBY_FIRSTNAME_ASC,
     CONTACTS_ORDERBY_FIRSTNAME_DESC, CONTACTS_ORDERBY_LASTNAME_ASC, 
-    CONTACTS_ORDERBY_LASTNAME_DESC } from '../constants';
-
-const DELETE_BUTTON_WIDTH = 24;
-const DELETE_BUTTON_HEIGHT = 24;
-const FAVORITE_BUTTON_WIDTH = 24;
-const FAVORITE_BUTTON_HEIGHT = 24;
-
-const ADD_TOOLBAR_BUTTON_WIDTH = 24;
-const ADD_TOOLBAR_BUTTON_HEIGHT = 24;
-const DELETE_TOOLBAR_BUTTON_WIDTH = 24;
-const DELETE_TOOLBAR_BUTTON_HEIGHT = 24;
-const FAVORITE_TOOLBAR_BUTTON_WIDTH = 24;
-const FAVORITE_TOOLBAR_BUTTON_HEIGHT = 24;
-const GROUP_TOOLBAR_BUTTON_WIDTH = 24;
-const GROUP_TOOLBAR_BUTTON_HEIGHT = 24;
-const REFRESH_TOOLBAR_BUTTON_WIDTH = 24;
-const REFRESH_TOOLBAR_BUTTON_HEIGHT = 24;
+    CONTACTS_ORDERBY_LASTNAME_DESC,
+    DELETE_BUTTON_WIDTH,
+    DELETE_BUTTON_HEIGHT,
+    FAVORITE_BUTTON_WIDTH,
+    FAVORITE_BUTTON_HEIGHT,
+    ADD_TOOLBAR_BUTTON_WIDTH,
+    ADD_TOOLBAR_BUTTON_HEIGHT,
+    DELETE_TOOLBAR_BUTTON_WIDTH,
+    DELETE_TOOLBAR_BUTTON_HEIGHT,
+    FAVORITE_TOOLBAR_BUTTON_WIDTH,
+    FAVORITE_TOOLBAR_BUTTON_HEIGHT,
+    GROUP_TOOLBAR_BUTTON_WIDTH,
+    GROUP_TOOLBAR_BUTTON_HEIGHT,
+    REFRESH_TOOLBAR_BUTTON_WIDTH,
+    REFRESH_TOOLBAR_BUTTON_HEIGHT
+} from '../constants';
 
 export default function ContactList(props)
 {
@@ -286,9 +285,8 @@ export default function ContactList(props)
                             {
                                 listItems.push(<ListItemSeparator key={ listIndex }>{ separator }</ListItemSeparator>);
                                 currSeparator = separator;
+                                ++listIndex;
                             }
-
-                            ++listIndex;
                         }
 
                         listItems.push(<ListItem key={ listIndex } contact={ contact.contact } disabled={ disabled || contact.disabled } selected={ contact.selected } />);

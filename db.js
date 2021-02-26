@@ -92,6 +92,26 @@ async function teardownDb()
     await disconnectDb();
 }
 
+function orderByToString(orderBy)
+{
+    let sort = '';
+
+    for (let i = 0; i < orderBy.length; i += 2)
+    {
+        let field = orderBy[i];
+        let direction = orderBy[i+1];
+
+        if (i > 0)
+        {
+            sort += ' ';
+        }
+
+        sort += direction.toLowerCase() === 'desc' ? `-${field}` : field;
+    }
+
+    return sort;
+}
+
 //
 // Validate orderBy request parameter given to REST API method.
 // 
@@ -121,5 +141,6 @@ module.exports = {
     connectToDb,
     disconnectDb,
     teardownDb,
+    orderByToString,
     validateOrderBy
 }
