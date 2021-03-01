@@ -27,11 +27,15 @@ export const ACTION_TYPE = {
     DESELECT_ALL_GROUPS: 'DESELECT_ALL_GROUPS',
     CONFIRM_DELETE_CONTACT: 'CONFIRM_DELETE_CONTACT',
     CONFIRM_DELETE_CONTACTS: 'CONFIRM_DELETE_CONTACTS',
+    CONFIRM_DELETE_GROUP: 'CONFIRM_DELETE_GROUP',
+    CONFIRM_DELETE_GROUPS: 'CONFIRM_DELETE_GROUPS',
     CONFIRM_FAVORITE_CONTACTS: 'CONFIRM_FAVORITE_CONTACTS',
     CONFIRM_UNFAVORITE_CONTACT: 'CONFIRM_UNFAVORITE_CONTACT',
     CONFIRM_UNFAVORITE_CONTACTS: 'CONFIRM_UNFAVORITE_CONTACTS',
     CANCELLED_DELETE_CONTACT: 'CANCELLED_DELETE_CONTACT',
     CANCELLED_DELETE_CONTACTS: 'CANCELLED_DELETE_CONTACTS',
+    CANCELLED_DELETE_GROUP: 'CANCELLED_DELETE_GROUP',
+    CANCELLED_DELETE_GROUPS: 'CANCELLED_DELETE_GROUPS',
     CANCELLED_FAVORITE_CONTACTS: 'CANCELLED_FAVORITE_CONTACTS',
     CANCELLED_UNFAVORITE_CONTACT: 'CANCELLED_UNFAVORITE_CONTACT',
     CANCELLED_UNFAVORITE_CONTACTS: 'CANCELLED_UNFAVORITE_CONTACTS',
@@ -41,6 +45,12 @@ export const ACTION_TYPE = {
     DELETING_CONTACTS: 'DELETING_CONTACTS',
     ERROR_DELETING_CONTACTS: 'ERROR_DELETING_CONTACTS',
     DELETED_CONTACTS: 'DELETED_CONTACTS',
+    DELETING_GROUP: 'DELETING_GROUP',
+    ERROR_DELETING_GROUP: 'ERROR_DELETING_GROUP',
+    DELETED_GROUP: 'DELETED_GROUP',
+    DELETING_GROUPS: 'DELETING_GROUPS',
+    ERROR_DELETING_GROUPS: 'ERROR_DELETING_GROUPS',
+    DELETED_GROUPS: 'DELETED_GROUPS',
     FAVORITING_CONTACT: 'FAVORITING_CONTACT',
     ERROR_FAVORITING_CONTACT: 'ERROR_FAVORITING_CONTACT',
     FAVORITED_CONTACT: 'FAVORITED_CONTACT',
@@ -370,6 +380,22 @@ export function confirmDeleteContacts(contacts)
     }
 }
 
+export function confirmDeleteGroup(group)
+{
+    return {
+        type: ACTION_TYPE.CONFIRM_DELETE_GROUP,
+        group
+    }
+}
+
+export function confirmDeleteGroups(groups)
+{
+    return {
+        type: ACTION_TYPE.CONFIRM_DELETE_GROUPS,
+        groups
+    }
+}
+
 export function confirmFavoriteContacts(contacts)
 {
     return {
@@ -407,6 +433,22 @@ export function cancelledDeleteContacts(contacts)
     return {
         type: ACTION_TYPE.CANCELLED_DELETE_CONTACTS,
         contacts
+    }
+}
+
+export function cancelledDeleteGroup(group)
+{
+    return {
+        type: ACTION_TYPE.CANCELLED_DELETE_GROUP,
+        group
+    }
+}
+
+export function cancelledDeleteGroups(groups)
+{
+    return {
+        type: ACTION_TYPE.CANCELLED_DELETE_GROUPS,
+        groups
     }
 }
 
@@ -536,6 +578,112 @@ export function errorDeletingContacts(contacts, error)
     return {
         type: ACTION_TYPE.ERROR_DELETING_CONTACTS,
         contacts,
+        error
+    }
+}
+
+export function deleteGroup(group)
+{
+    return async (dispatch) => {
+        dispatch(deletingGroup(group));
+
+        try
+        {
+            let response = await fetch(`/api/groups/${group._id}`, {
+                method: 'DELETE'
+            });
+
+            if (response.ok)
+            {
+                dispatch(deletedGroup(group));
+            }
+            else
+            {
+                dispatch(errorDeletingGroup(group, `Error deleting group ${response.status} ${response.statusText}`));
+            }
+        }
+        catch (error)
+        {
+            dispatch(errorDeletingGroup(group, `Error deleting group: ${error.message}`));
+        }
+    }
+}
+
+export function deletingGroup(group)
+{
+    return {
+        type: ACTION_TYPE.DELETING_GROUP,
+        group
+    }
+}
+
+export function deletedGroup(group)
+{
+    return {
+        type: ACTION_TYPE.DELETED_GROUP,
+        group
+    }
+}
+
+export function errorDeletingGroup(group, error)
+{
+    return {
+        type: ACTION_TYPE.ERROR_DELETING_GROUP,
+        group,
+        error
+    }
+}
+
+export function deleteGroups(groups)
+{
+    return async (dispatch) => {
+        try
+        {
+            dispatch(deletingGroups(groups));
+
+            for (let group of groups)
+            {
+                let response = await fetch(`/api/groups/${group._id}`, {
+                    method: 'DELETE'
+                });
+
+                if (!response.ok)
+                {
+                    dispatch(errorDeletingGroups(groups, `Error deleting groups ${response.status} ${response.statusText}`));
+                    return;
+                }
+            }
+
+            dispatch(deletedGroups(groups));
+        }
+        catch (error)
+        {
+            dispatch(errorDeletingGroups(groups, `Error deleting groups: ${error.message}`));
+        }
+    }
+}
+
+export function deletingGroups(groups)
+{
+    return {
+        type: ACTION_TYPE.DELETING_GROUPS,
+        groups
+    }
+}
+
+export function deletedGroups(groups)
+{
+    return {
+        type: ACTION_TYPE.DELETED_GROUPS,
+        groups
+    }
+}
+
+export function errorDeletingGroups(groups, error)
+{
+    return {
+        type: ACTION_TYPE.ERROR_DELETING_GROUPS,
+        groups,
         error
     }
 }

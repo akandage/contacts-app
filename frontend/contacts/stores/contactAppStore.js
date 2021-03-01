@@ -34,6 +34,8 @@ const REDUCER = combineReducers({
             case ACTION_TYPE.ADD_GROUP:
             case ACTION_TYPE.CONFIRM_DELETE_CONTACT:
             case ACTION_TYPE.CONFIRM_DELETE_CONTACTS:
+            case ACTION_TYPE.CONFIRM_DELETE_GROUP:
+            case ACTION_TYPE.CONFIRM_DELETE_GROUPS:
             case ACTION_TYPE.CONFIRM_FAVORITE_CONTACTS:
             case ACTION_TYPE.CONFIRM_UNFAVORITE_CONTACT:
             case ACTION_TYPE.CONFIRM_UNFAVORITE_CONTACTS:
@@ -232,6 +234,8 @@ const REDUCER = combineReducers({
     },
     groups: (state = INITIAL_STATE.groups, action) => {
         let next = state;
+        let groupIds = null;
+        let groupsMap = null;
 
         switch (action.type)
         {
@@ -252,6 +256,62 @@ const REDUCER = combineReducers({
                     group.selected = action.type === ACTION_TYPE.SELECT_ALL_GROUPS ? true : false;
                     
                     return group;
+                });
+                break;
+            case ACTION_TYPE.DELETING_GROUP:
+                next = state.map(group => {
+                    if (action.group._id === group.group._id)
+                    {
+                        group.disabled = true;
+                    }
+
+                    return group;
+                });
+                break;
+            case ACTION_TYPE.ERROR_DELETING_GROUP:
+                next = state.map(group => {
+                    if (action.group._id === group.group._id)
+                    {
+                        group.disabled = false;
+                    }
+
+                    return group;
+                });
+                break;
+            case ACTION_TYPE.DELETING_GROUPS:
+                groupIds = new Set(action.groups.map(group => group._id));
+
+                next = state.map(group => {
+                    if (groupIds.has(group.group._id))
+                    {
+                        group.disabled = true;
+                    }
+
+                    return group;
+                });
+                break;
+            case ACTION_TYPE.ERROR_DELETING_GROUPS:
+                groupIds = new Set(action.groups.map(group => group._id));
+
+                next = state.map(group => {
+                    if (groupIds.has(group.group._id))
+                    {
+                        group.disabled = false;
+                    }
+
+                    return group;
+                });
+                break;
+            case ACTION_TYPE.DELETED_GROUP:
+                next = state.filter(group => {
+                    return group.group._id !== action.group._id;
+                });
+                break;
+            case ACTION_TYPE.DELETED_GROUPS:
+                groupIds = new Set(action.groups.map(group => group._id));
+
+                next = state.filter(group => {
+                    return !groupIds.has(group.group._id);
                 });
                 break;
             case ACTION_TYPE.RETRIEVED_GROUPS:
@@ -335,6 +395,18 @@ const REDUCER = combineReducers({
                 next = {
                     type: CONFIRM_ACTION_TYPE.DELETE,
                     subjects: action.contacts
+                };
+                break;
+            case ACTION_TYPE.CONFIRM_DELETE_GROUP:
+                next = {
+                    type: CONFIRM_ACTION_TYPE.DELETE,
+                    subjects: [ action.group ]
+                };
+                break;
+            case ACTION_TYPE.CONFIRM_DELETE_GROUPS:
+                next = {
+                    type: CONFIRM_ACTION_TYPE.DELETE,
+                    subjects: action.groups
                 };
                 break;
             case ACTION_TYPE.CONFIRM_FAVORITE_CONTACTS:

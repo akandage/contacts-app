@@ -151,6 +151,8 @@ function connectGroupList()
                 onSelectAll: () => dispatch(ContactAppActions.selectAllGroups()),
                 onDeselected: (group) => dispatch(ContactAppActions.deselectGroup(group)),
                 onDeselectAll: () => dispatch(ContactAppActions.deselectAllGroups()),
+                onDeleteClicked: (group) => dispatch(ContactAppActions.confirmDeleteGroup(group)),
+                onDeleteMultipleClicked: (groups) => dispatch(ContactAppActions.confirmDeleteGroups(groups)),
                 onRefreshClicked: () => dispatch(ContactAppActions.retrieveGroups()),
                 onSortChanged: (orderBy) => dispatch(ContactAppActions.sortGroups(orderBy))
             };
@@ -243,6 +245,53 @@ function connectConfirmDeleteContactsDialog()
     )(ConfirmActionDialog);
 }
 
+function connectConfirmDeleteGroupsDialog()
+{
+    return connect(
+        state => {
+            let status = state.status;
+            let confirmAction = state.confirmAction;
+            let groups = confirmAction.subjects;
+
+            return {
+                show: status === STATUS.CONFIRM_ACTION && confirmAction.type === CONFIRM_ACTION_TYPE.DELETE,
+                title: status === STATUS.CONFIRM_ACTION ? 
+                        (`Delete Group${groups.length > 1 ? 's' : ''}`) :
+                        '',
+                bodyText: status === STATUS.CONFIRM_ACTION ?
+                        (groups.length > 1 ? `Delete ${groups.length} groups?` : `Delete group ${groups[0].name}?`) :
+                        '',
+                actionType: status === STATUS.CONFIRM_ACTION ? confirmAction.type : '',
+                subjects: groups
+            };
+        },
+        dispatch => {
+            return {
+                onAccepted: (actionType, groups) => { 
+                    if (groups.length > 1)
+                    {
+                        dispatch(ContactAppActions.deleteGroups(groups));
+                    }
+                    else
+                    {
+                        dispatch(ContactAppActions.deleteGroup(groups[0]));
+                    }
+                },
+                onCancelled: (actionType, groups) => {
+                    if (groups.length > 1)
+                    {
+                        dispatch(ContactAppActions.cancelledDeleteGroups(groups));
+                    }
+                    else
+                    {
+                        dispatch(ContactAppActions.cancelledDeleteGroup(groups[0]));
+                    }
+                }
+            };
+        }
+    )(ConfirmActionDialog);
+}
+
 function connectConfirmFavoriteContactsDialog()
 {
     return connect(
@@ -326,10 +375,14 @@ function FavoritesView()
 
 function GroupsView()
 {
+    let ConfirmDeleteGroupsDialog = connectConfirmDeleteGroupsDialog();
     let GroupList = connectGroupList();
 
     return (
-        <GroupList />
+        <>
+            <ConfirmDeleteGroupsDialog />
+            <GroupList />
+        </>
     );
 }
 

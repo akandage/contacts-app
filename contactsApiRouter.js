@@ -459,6 +459,56 @@ contactsApiRouter.get('/api/groups', async (req, res, next) => {
     }
 });
 
+contactsApiRouter.delete('/api/groups/:id', async (req, res, next) => {
+    let session = req.session;
+    let groupId = req.params.id;
+
+    if (groupId === null || groupId === undefined || groupId.length === 0)
+    {
+        next(httpError(400, 'Group id is invalid.'));
+        return;
+    }
+
+    if (session)
+    {
+        debug(`Request session ${session.sessionId}`);
+
+        let userDb = req.app.get('user-db');
+        let contactDb = req.app.get('contact-db');
+        let user = null;
+
+        try
+        {
+            user = await userDb.getUser(session.username);
+            debug(`Request user ${user.username}`);
+            await contactDb.deleteGroup(user, groupId);
+            debug(`Successfully deleted group ${groupId}`);
+        }
+        catch (error)
+        {
+            console.log(error);
+
+            if (error.message === GROUP_NOT_FOUND || error.message === USER_NOT_FOUND)
+            {
+                next(httpError(404, error.message));
+            }
+            else
+            {
+                next(httpError(500, error.message));
+            }
+
+            return;
+        }
+
+        res.status(200).send();
+    }
+    else
+    {
+        debug('Request does not have session.');
+        next(httpError(401));
+    }
+});
+
 contactsApiRouter.use((err, req, res, next) => {
     console.log(`Contacts API error: ${err.status} ${err.message} ${err}`);
 

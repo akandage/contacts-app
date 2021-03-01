@@ -14,6 +14,7 @@ const INVALID_CONTACT = 'Invalid contact.';
 const INVALID_GROUP = 'Invalid group.';
 const INVALID_USER = 'Invalid user.';
 const CONTACT_NOT_FOUND = 'Contact not found.';
+const GROUP_NOT_FOUND = 'Group not found.';
 
 const CONTACT_COLLECTION = 'contacts';
 const GROUP_COLLECTION = 'groups';
@@ -253,6 +254,35 @@ class ContactDb
         return group;
     }
 
+    async getGroup(user, id)
+    {
+        if (user === null || user === undefined || user._id === null || user._id === undefined)
+        {
+            throw new Error(INVALID_USER);
+        }
+
+        let group = await this._groupModel.findOne({ owner: user._id, _id: id }).exec();
+
+        if (!group)
+        {
+            throw new Error(GROUP_NOT_FOUND);
+        }
+
+        return group;
+    }
+
+    async deleteGroup(user, id)
+    {
+        if (user === null || user === undefined || user._id === null || user._id === undefined)
+        {
+            throw new Error(INVALID_USER);
+        }
+
+        let group = await this.getGroup(user, id);
+
+        await group.remove();
+    }
+
     async getGroupList(user, limit = null, offset = 0, orderBy = DEFAULT_GROUPS_ORDERBY)
     {
         if (user === null || user === undefined || user._id === null || user._id === undefined)
@@ -418,6 +448,7 @@ class ContactDb
 module.exports = {
     CONTACT_COLLECTION,
     CONTACT_NOT_FOUND,
+    GROUP_NOT_FOUND,
     INVALID_CONTACT,
     INVALID_GROUP,
     INVALID_USER,
