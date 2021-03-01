@@ -187,6 +187,7 @@ export function addGroupSave(group)
                 group = await response.json();
 
                 dispatch(addGroupSaved(group));
+                dispatch(retrieveGroups());
             }
             else
             {
