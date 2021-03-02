@@ -2,7 +2,7 @@ const debug = require('debug')('contacts-api-router');
 const express = require('express');
 const httpError = require('http-errors');
 const { validateOrderBy } = require('./db');
-const { CONTACT_NOT_FOUND, DEFAULT_CONTACTS_ORDERBY, DEFAULT_GROUPS_ORDERBY, INVALID_CONTACT, INVALID_GROUP } = require('./contactDb');
+const { CONTACT_NOT_FOUND, DEFAULT_CONTACTS_ORDERBY, DEFAULT_GROUPS_ORDERBY, INVALID_CONTACT, INVALID_GROUP, INVALID_SEARCH_TERMS } = require('./contactDb');
 const { USER_NOT_FOUND } = require('./userDb');
 const contactsApiRouter = express.Router();
 
@@ -243,6 +243,88 @@ contactsApiRouter.get('/api/contacts', async (req, res, next) => {
             if (error.message === USER_NOT_FOUND)
             {
                 next(httpError(404, error.message));
+            }
+            else
+            {
+                next(httpError(500, error.message));
+            }
+
+            return;
+        }
+
+        res.status(200)
+            .send(contacts);
+    }
+    else
+    {
+        debug('Request does not have session.');
+        next(httpError(401));
+    }
+});
+
+contactsApiRouter.get('/api/contacts/search', async (req, res, next) => {
+    let session = req.session;
+    let {
+        searchTerms,
+        limit
+    } = req.query;
+
+    if (!Array.isArray(searchTerms))
+    {
+        if (searchTerms !== null && searchTerms !== undefined && searchTerms !== '')
+        {
+            searchTerms = [ searchTerms ];
+        }
+        else
+        {
+            searchTerms = [];
+        }
+    }
+
+    console.log(searchTerms);
+
+    if (limit !== null && limit !== undefined)
+    {
+        limit = Number.parseInt(limit);
+
+        if (!Number.isInteger(limit) || limit < 0)
+        {
+            next(httpError(400, 'Request parameter \'limit\' is invalid.'));
+            return;
+        }
+    }
+    else
+    {
+        limit = null;
+    }
+
+    if (session)
+    {
+        debug(`Request session ${session.sessionId}`);
+
+        let userDb = req.app.get('user-db');
+        let contactDb = req.app.get('contact-db');
+        let user = null;
+        let contacts = null;
+
+        try
+        {
+            user = await userDb.getUser(session.username);
+            debug(`Request user ${user.username}`);
+            contacts = await contactDb.searchContacts(user, searchTerms, limit);
+            debug(`Search found ${contacts.length} contacts`);
+        }
+        catch (error)
+        {
+            console.log(error);
+
+            if (error.message === USER_NOT_FOUND)
+            {
+                next(httpError(404, error.message));
+            }
+            else if (error.message === INVALID_SEARCH_TERMS)
+            {
+                next(httpError(400, error.message));
             }
             else
             {

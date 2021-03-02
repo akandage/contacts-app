@@ -11,6 +11,7 @@ import AddGroupDialog from './components/addGroupDialog';
 import ContactDialog, { CONTACT_DIALOG_MODE } from './components/contactDialog';
 import ConfirmActionDialog from './components/confirmActionDialog';
 import ContactList from './components/contactList';
+import GroupDialog from './components/groupDialog';
 import GroupList from './components/groupList';
 import ContactsNav from './components/contactsNav';
 import ContactAppStore from './stores/contactAppStore';

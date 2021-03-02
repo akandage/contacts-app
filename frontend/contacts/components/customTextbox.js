@@ -22,7 +22,6 @@ export default function CustomTextBox(props)
         onFocus,
         onBlur
     } = props;
-    // const [ valueState, setValueState ] = useState(value);
 
     let numChildren = Array.isArray(props.children) ? props.children.length :
                         (props.children ? 1 : 0);
@@ -33,25 +32,20 @@ export default function CustomTextBox(props)
 
         if (newValue !== value)
         {
-            // setValueState(newValue);
             onChanged(newValue);
         }
     }
 
-    // function onBlur()
-    // {
-    //     if (valueState !== value)
-    //     {
-    //         onChanged(valueState);
-    //     }
-    // }
-
     return (
         <Form.Group>
-            <Form.Label htmlFor={ id }>{ labelText }</Form.Label>
+            {
+                labelText !== '' ?
+                    <Form.Label htmlFor={ id }>{ labelText }</Form.Label> :
+                    <></>
+            }
 
             <Form.Row xl={ NUM_INPUT_COLS }>
-                <Col xl={ Math.max(1, NUM_INPUT_COLS - Math.max(1, numChildren)) }>
+                <Col xl={ Math.max(1, NUM_INPUT_COLS - Math.max(0, numChildren)) }>
                     <Form.Control as="input" type="text"
                         id={ id }
                         name={ id }
@@ -59,8 +53,6 @@ export default function CustomTextBox(props)
                         isInvalid={ isInvalid }
                         value={ value }
                         onChange={ onChange }
-                        onFocus={ onFocus }
-                        onBlur={ onBlur }
                     >
                     </Form.Control>
 

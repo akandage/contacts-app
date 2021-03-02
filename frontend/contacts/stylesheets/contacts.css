@@ -47,7 +47,7 @@ div.contacts-nav > .contacts-nav-link {
     color: #333333;
 }
 
-div.contacts-nav > .contacts-nav-link#hover {
+div.contacts-nav > .contacts-nav-link:hover {
     text-decoration: none;
     color: #333333;
 }
@@ -141,4 +141,82 @@ div.custom-textbox-container {
     column-gap: 0.5em;
     align-items: center;
     height: 3em;
+}
+
+div.auto-complete-result {
+    font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+    font-size: 1em;
+    color: black;
+    width: 100%;
+    padding: 0.5em;
+    background-color: #9cbad0ff;
+    border-radius: 10px;
+}
+
+div.auto-complete-suggestions {
+    width: 100%;
+    height: fit-content;
+    position: absolute;
+    margin-top: 0.5em;
+    display: flex;
+    flex-direction: column;
+    align-items: flex-start;
+    row-gap: 0;
+    background-color: white;
+    border: solid 1px #333333;
+}
+
+div.auto-complete-suggestions > a {
+    font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+    font-size: 1em;
+    color: black;
+    display: block;
+    width: 100%;
+    padding: 1em;
+    background-color: transparent;
+    border-bottom: solid 1px #ebeef0;
+}
+
+div.auto-complete-suggestions > a:hover {
+    text-decoration: none;
+    background-color: #9cbad0ff;
+}
+
+ul.group-dialog-contacts-list {
+    list-style-type: none;
+    display: block;
+    width: 100%;
+    min-height: 10em;
+    padding-left: 0;
+    font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+}
+
+ul.group-dialog-contacts-list > li {
+    width: 100%;
+    display: flex;
+    flex-direction: row;
+    align-items: center;
+    column-gap: 0.5em;
+    margin-bottom: 0.5em;
+}
+
+div.group-dialog-contacts-list-placeholder {
+    width: 100%;
+    height: 10em;
+    display: flex;
+    flex-direction: row;
+    align-items: center;
+}
+
+div.group-dialog-contacts-list-placeholder > span {
+    width: 100%;
+    text-align: center;
+    color: #333333;
+}
+
+ul.group-dialog-contacts-list > li > div.group-contact {
+    width: 100%;
+    padding: 1em;
+    background-color: #9cbad0ff;
+    border-radius: 10px;
 }

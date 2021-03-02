@@ -12,6 +12,7 @@ const INVALID_EMAIL_ADDRESS_TYPE = 'Invalid email address type.';
 const INVALID_PHONE_NUMBER_TYPE = 'Invalid phone number type.';
 const INVALID_CONTACT = 'Invalid contact.';
 const INVALID_GROUP = 'Invalid group.';
+const INVALID_SEARCH_TERMS = 'Invalid search terms.';
 const INVALID_USER = 'Invalid user.';
 const CONTACT_NOT_FOUND = 'Contact not found.';
 const GROUP_NOT_FOUND = 'Group not found.';
@@ -443,6 +444,71 @@ class ContactDb
 
         return contacts;
     }
+
+    async searchContacts(user, searchTerms, limit = null)
+    {
+        if (user === null || user === undefined || user._id === null || user._id === undefined)
+        {
+            throw new Error(INVALID_USER);
+        }
+
+        for (let searchTerm of searchTerms)
+        {
+            if (!NAME_REGEX.test(searchTerm))
+            {
+                throw new Error(INVALID_SEARCH_TERMS);
+            }
+        }
+
+        let contacts = [];
+
+        // TODO: Use the MongoDB text search.
+        if (searchTerms.length > 0 && searchTerms.length <= 2)
+        {
+            let query = null;
+            let queryOptions = {};
+
+            if (limit !== null)
+            {
+                queryOptions.limit = limit;
+            }
+
+            if (searchTerms.length === 2)
+            {
+                query = this._contactModel.find({ owner: user._id,
+                    firstName: searchTerms[0],
+                    lastName: new RegExp(searchTerms[1])
+                });
+                query.setOptions(queryOptions);
+                contacts = await query.exec();
+            }
+            else if (searchTerms.length === 1)
+            {
+                let results = [];
+
+                query = this._contactModel.find({ owner: user._id,
+                    firstName: new RegExp(searchTerms[0])
+                });
+                query.setOptions(queryOptions);
+                results = await query.exec();
+                results.map(result => contacts.push(result));
+
+                if (queryOptions.limit !== null)
+                {
+                    queryOptions.limit = Math.max(0, queryOptions.limit - results.length);
+                }
+
+                query = this._contactModel.find({ owner: user._id,
+                    lastName: new RegExp(searchTerms[0])
+                });
+                query.setOptions(queryOptions);
+                results = await query.exec();
+                results.map(result => contacts.push(result));
+            }
+        }
+
+        return contacts;
+    }
 }
 
 module.exports = {
@@ -451,6 +517,7 @@ module.exports = {
     GROUP_NOT_FOUND,
     INVALID_CONTACT,
     INVALID_GROUP,
+    INVALID_SEARCH_TERMS,
     INVALID_USER,
     ContactDb,
     ContactSchema,
