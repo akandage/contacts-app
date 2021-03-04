@@ -16,7 +16,6 @@ const MAX_CONTACT_SEARCH_RESULTS = 10;
 function Dialog(props)
 {
     let {
-        show,
         mode,
         centered,
         size,
@@ -32,6 +31,7 @@ function Dialog(props)
     const [ groupName, setGroupName ] = useState(group !== null ? group.name : '');
     const [ groupNameDirty, setGroupNameDirty ] = useState(false);
     const [ groupContacts, setGroupContacts ] = useState(group !== null ? group.contacts : []);
+    const [ groupContactsDirty, setGroupContactsDirty ] = useState(false);
     const [ saved, setSaved ] = useState(false);
     const [ showState, setShowState ] = useState(true);
 
@@ -55,7 +55,7 @@ function Dialog(props)
 
     function isGroupNameValid()
     {
-        return groupNameDirty && groupName === '';
+        return groupName !== '';
     }
 
     function onContactSearchChanged(value)
@@ -131,6 +131,11 @@ function Dialog(props)
             setGroupContacts(contacts);
             setContactSearchValue('');
             setContact(null);
+
+            if (!groupContactsDirty)
+            {
+                setGroupContactsDirty(true);
+            }
         }
     }
 
@@ -138,6 +143,11 @@ function Dialog(props)
     {
         setContactSearchValue('');
         setContact(null);
+
+        if (!groupContactsDirty)
+        {
+            setGroupContactsDirty(true);
+        }
     }
 
     function onGroupContactRemoved(index)
@@ -148,9 +158,22 @@ function Dialog(props)
         setGroupContacts(contacts);
     }
 
+    function allowSave()
+    {
+        if (mode === GROUP_DIALOG_MODE.ADD_GROUP)
+        {
+            return isGroupNameValid() && groupContacts.length > 0;
+        }
+        else
+        {
+            return isGroupNameValid() && groupNameDirty && groupContacts.length > 0 && groupContactsDirty;
+        }
+    }
+
     function onSaveClicked()
     {
         setSaved(true);
+        setShowState(false);
     }
 
     function onCancelClicked()
@@ -167,7 +190,10 @@ function Dialog(props)
     {
         if (saved)
         {
-            // TODO
+            onSaved({
+                name: groupName,
+                contacts: groupContacts
+            })
         }
         else
         {
@@ -193,7 +219,7 @@ function Dialog(props)
                     value={ groupName }
                     onChanged={ onGroupNameChanged }
                     onBlur={ onGroupNameBlur }
-                    isInvalid={ isGroupNameValid() }
+                    isInvalid={ groupNameDirty && !isGroupNameValid() }
                     invalidFeedback="Group name is required."
 
                 >
@@ -236,7 +262,7 @@ function Dialog(props)
             </Modal.Body>
 
             <Modal.Footer>
-                <Button variant="primary" onClick={ onSaveClicked }>Save</Button>
+                <Button variant="primary" disabled={ !allowSave() } onClick={ onSaveClicked }>Save</Button>
                 <Button variant="secondary" onClick={ onCancelClicked }>Cancel</Button>
             </Modal.Footer>
         </Modal> 

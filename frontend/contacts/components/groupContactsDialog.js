@@ -100,7 +100,7 @@ function Dialog(props)
     );
 }
 
-export default function AddGroupDialog(props)
+export default function GroupContactsDialog(props)
 {
     let {
         show
@@ -113,7 +113,7 @@ export default function AddGroupDialog(props)
     );
 }
 
-AddGroupDialog.defaultProps = {
+GroupContactsDialog.defaultProps = {
     show: false,
     centered: true,
     title: 'Add Group',
@@ -121,7 +121,7 @@ AddGroupDialog.defaultProps = {
     cancelText: 'Cancel'
 };
 
-AddGroupDialog.propTypes = {
+GroupContactsDialog.propTypes = {
     show: PropTypes.bool,
     centered: PropTypes.bool,
     title: PropTypes.string,

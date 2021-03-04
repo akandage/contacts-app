@@ -7,11 +7,11 @@ import { STATUS, CONFIRM_ACTION_TYPE } from './constants';
 import * as ContactAppActions from './actions/contactAppActions';
 import ContactsHeader from '../common/contactsHeader';
 import { ContactIcon, FavoriteIcon, GroupIcon, SettingsIcon } from '../common/contactsImages';
-import AddGroupDialog from './components/addGroupDialog';
 import ContactDialog, { CONTACT_DIALOG_MODE } from './components/contactDialog';
 import ConfirmActionDialog from './components/confirmActionDialog';
 import ContactList from './components/contactList';
-import GroupDialog from './components/groupDialog';
+import GroupDialog, { GROUP_DIALOG_MODE } from './components/groupDialog';
+import GroupContactsDialog from './components/groupContactsDialog';
 import GroupList from './components/groupList';
 import ContactsNav from './components/contactsNav';
 import ContactAppStore from './stores/contactAppStore';
@@ -54,7 +54,7 @@ function startSessionHeartbeat()
     }, SESSION_HEARTBEAT_INTERVAL);
 }
 
-function connectAddGroupDialog()
+function connectGroupContactsDialog()
 {
     return connect(
         state => {
@@ -69,7 +69,7 @@ function connectAddGroupDialog()
                 onCancelled: () => dispatch(ContactAppActions.addGroupCancel())
             };
         }
-    )(AddGroupDialog);
+    )(GroupContactsDialog);
 }
 
 function connectContactList(isFavoritesList = false)
@@ -152,6 +152,7 @@ function connectGroupList()
                 onSelectAll: () => dispatch(ContactAppActions.selectAllGroups()),
                 onDeselected: (group) => dispatch(ContactAppActions.deselectGroup(group)),
                 onDeselectAll: () => dispatch(ContactAppActions.deselectAllGroups()),
+                onAddGroupClicked: () => dispatch(ContactAppActions.addGroup([])),
                 onDeleteClicked: (group) => dispatch(ContactAppActions.confirmDeleteGroup(group)),
                 onDeleteMultipleClicked: (groups) => dispatch(ContactAppActions.confirmDeleteGroups(groups)),
                 onRefreshClicked: () => dispatch(ContactAppActions.retrieveGroups()),
@@ -199,6 +200,24 @@ function connectEditContactDialog()
     )(ContactDialog);
 }
 
+function connectAddGroupDialog()
+{
+    return connect(
+        state => {
+            return {
+                show: state.status === STATUS.CONFIRM_ACTION && state.confirmAction.type === CONFIRM_ACTION_TYPE.GROUP,
+                mode: GROUP_DIALOG_MODE.ADD_GROUP
+            };
+        },
+        dispatch => {
+            return {
+                onSaved: (group) => dispatch(ContactAppActions.addGroupSave(group)),
+                onCancelled: () => dispatch(ContactAppActions.addGroupCancel())
+            };
+        }
+    )(GroupDialog);
+}
+
 function connectConfirmDeleteContactsDialog()
 {
     return connect(
@@ -209,10 +228,10 @@ function connectConfirmDeleteContactsDialog()
 
             return {
                 show: status === STATUS.CONFIRM_ACTION && confirmAction.type === CONFIRM_ACTION_TYPE.DELETE,
-                title: status === STATUS.CONFIRM_ACTION ? 
+                title: status === STATUS.CONFIRM_ACTION && confirmAction.type === CONFIRM_ACTION_TYPE.DELETE ? 
                         (`Delete Contact${contacts.length > 1 ? 's' : ''}`) :
                         '',
-                bodyText: status === STATUS.CONFIRM_ACTION ?
+                bodyText: status === STATUS.CONFIRM_ACTION && confirmAction.type === CONFIRM_ACTION_TYPE.DELETE ?
                         (contacts.length > 1 ? `Delete ${contacts.length} contacts?` : `Delete contact ${contacts[0].firstName} ${contacts[0].lastName}?`) :
                         '',
                 actionType: status === STATUS.CONFIRM_ACTION ? confirmAction.type : '',
@@ -256,10 +275,10 @@ function connectConfirmDeleteGroupsDialog()
 
             return {
                 show: status === STATUS.CONFIRM_ACTION && confirmAction.type === CONFIRM_ACTION_TYPE.DELETE,
-                title: status === STATUS.CONFIRM_ACTION ? 
+                title: status === STATUS.CONFIRM_ACTION && confirmAction.type === CONFIRM_ACTION_TYPE.DELETE ? 
                         (`Delete Group${groups.length > 1 ? 's' : ''}`) :
                         '',
-                bodyText: status === STATUS.CONFIRM_ACTION ?
+                bodyText: status === STATUS.CONFIRM_ACTION && confirmAction.type === CONFIRM_ACTION_TYPE.DELETE ?
                         (groups.length > 1 ? `Delete ${groups.length} groups?` : `Delete group ${groups[0].name}?`) :
                         '',
                 actionType: status === STATUS.CONFIRM_ACTION ? confirmAction.type : '',
@@ -303,12 +322,12 @@ function connectConfirmFavoriteContactsDialog()
 
             return {
                 show: status === STATUS.CONFIRM_ACTION && (confirmAction.type === CONFIRM_ACTION_TYPE.FAVORITE || confirmAction.type === CONFIRM_ACTION_TYPE.UNFAVORITE),
-                title: status === STATUS.CONFIRM_ACTION ? 
+                title: status === STATUS.CONFIRM_ACTION && (confirmAction.type === CONFIRM_ACTION_TYPE.FAVORITE || confirmAction.type === CONFIRM_ACTION_TYPE.UNFAVORITE) ? 
                         (confirmAction.type === CONFIRM_ACTION_TYPE.FAVORITE ?
                             `Favorite Contact${contacts.length > 1 ? 's' : ''}` :
                             `Unfavorite Contact${contacts.length > 1 ? 's' : ''}`) :
                         '',
-                bodyText: status === STATUS.CONFIRM_ACTION ?
+                bodyText: status === STATUS.CONFIRM_ACTION && (confirmAction.type === CONFIRM_ACTION_TYPE.FAVORITE || confirmAction.type === CONFIRM_ACTION_TYPE.UNFAVORITE) ?
                         (confirmAction.type === CONFIRM_ACTION_TYPE.FAVORITE ?
                             `Favorite ${contacts.length} contacts?` :
                             (contacts.length > 1 ?
@@ -342,7 +361,7 @@ function ContactsView(props)
 
     let AddContactDialog = connectAddContactDialog(isFavoritesList);
     let EditContactDialog = connectEditContactDialog();
-    let AddGroupDialog = connectAddGroupDialog();
+    let GroupContactsDialog = connectGroupContactsDialog();
     let ConfirmDeleteContactsDialog = connectConfirmDeleteContactsDialog();
     let ConfirmFavoriteContactsDialog = connectConfirmFavoriteContactsDialog();
     let ContactList = connectContactList(isFavoritesList);
@@ -351,7 +370,7 @@ function ContactsView(props)
         <>
             <AddContactDialog />
             <EditContactDialog />
-            <AddGroupDialog />
+            <GroupContactsDialog />
             <ConfirmDeleteContactsDialog />
             <ConfirmFavoriteContactsDialog />
             <ContactList />
@@ -376,11 +395,13 @@ function FavoritesView()
 
 function GroupsView()
 {
+    let AddGroupDialog = connectAddGroupDialog();
     let ConfirmDeleteGroupsDialog = connectConfirmDeleteGroupsDialog();
     let GroupList = connectGroupList();
 
     return (
         <>
+            <AddGroupDialog />
             <ConfirmDeleteGroupsDialog />
             <GroupList />
         </>
