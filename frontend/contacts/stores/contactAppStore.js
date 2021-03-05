@@ -9,6 +9,7 @@ const INITIAL_STATE = {
     error: null,
     contact: null,
     contacts:[],
+    group: null,
     groups:[],
     disabled: false,
     orderContactsBy: DEFAULT_CONTACTS_ORDERBY,
@@ -30,6 +31,9 @@ const REDUCER = combineReducers({
                 break;
             case ACTION_TYPE.EDIT_CONTACT:
                 next = STATUS.EDIT_CONTACT;
+                break;
+            case ACTION_TYPE.EDIT_GROUP:
+                next = STATUS.EDIT_GROUP;
                 break;
             case ACTION_TYPE.ADD_GROUP:
             case ACTION_TYPE.CONFIRM_DELETE_CONTACT:
@@ -227,6 +231,21 @@ const REDUCER = combineReducers({
                 });
                 break;
             default:
+                break;
+        }
+
+        return next;
+    },
+    group: (state = INITIAL_STATE.group, action) => {
+        let next = state;
+
+        switch (action.type)
+        {
+            case ACTION_TYPE.EDIT_GROUP:
+                next = action.group;
+                break;
+            default:
+                next = null;
                 break;
         }
 

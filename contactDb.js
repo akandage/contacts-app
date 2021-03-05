@@ -255,6 +255,36 @@ class ContactDb
         return group;
     }
 
+    async putGroup(user, group)
+    {
+        if (user === null || user === undefined || user._id === null || user._id === undefined)
+        {
+            throw new Error(INVALID_USER);
+        }
+
+        if (group.name === null || group.name === undefined || typeof group.name !== 'string' || group.name.length === 0)
+        {
+            throw new Error(INVALID_GROUP);
+        }
+
+        if (!Array.isArray(group.contacts) || group.contacts.length === 0)
+        {
+            throw new Error(INVALID_GROUP);
+        }
+
+        group.owner = user._id;
+
+        // Since we're using replace, the version field won't be updated.
+        let prevGroup = await this._groupModel.findOneAndReplace({ _id: group._id }, group).exec();
+
+        if (!prevGroup)
+        {
+            throw new Error(GROUP_NOT_FOUND);
+        }
+
+        return prevGroup;
+    }
+
     async getGroup(user, id)
     {
         if (user === null || user === undefined || user._id === null || user._id === undefined)

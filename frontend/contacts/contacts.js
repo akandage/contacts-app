@@ -153,6 +153,7 @@ function connectGroupList()
                 onDeselected: (group) => dispatch(ContactAppActions.deselectGroup(group)),
                 onDeselectAll: () => dispatch(ContactAppActions.deselectAllGroups()),
                 onAddGroupClicked: () => dispatch(ContactAppActions.addGroup([])),
+                onEditGroupClicked: (group) => dispatch(ContactAppActions.editGroup(group)),
                 onDeleteClicked: (group) => dispatch(ContactAppActions.confirmDeleteGroup(group)),
                 onDeleteMultipleClicked: (groups) => dispatch(ContactAppActions.confirmDeleteGroups(groups)),
                 onRefreshClicked: () => dispatch(ContactAppActions.retrieveGroups()),
@@ -213,6 +214,25 @@ function connectAddGroupDialog()
             return {
                 onSaved: (group) => dispatch(ContactAppActions.addGroupSave(group)),
                 onCancelled: () => dispatch(ContactAppActions.addGroupCancel())
+            };
+        }
+    )(GroupDialog);
+}
+
+function connectEditGroupDialog()
+{
+    return connect(
+        state => {
+            return {
+                show: state.status === STATUS.EDIT_GROUP,
+                mode: GROUP_DIALOG_MODE.EDIT_GROUP,
+                group: state.group,
+            };
+        },
+        dispatch => {
+            return {
+                onSaved: (group) => dispatch(ContactAppActions.editGroupSave(group)),
+                onCancelled: () => dispatch(ContactAppActions.editGroupCancel())
             };
         }
     )(GroupDialog);
@@ -396,12 +416,14 @@ function FavoritesView()
 function GroupsView()
 {
     let AddGroupDialog = connectAddGroupDialog();
+    let EditGroupDialog = connectEditGroupDialog();
     let ConfirmDeleteGroupsDialog = connectConfirmDeleteGroupsDialog();
     let GroupList = connectGroupList();
 
     return (
         <>
             <AddGroupDialog />
+            <EditGroupDialog />
             <ConfirmDeleteGroupsDialog />
             <GroupList />
         </>

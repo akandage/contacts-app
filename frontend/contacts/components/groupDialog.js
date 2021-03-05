@@ -143,11 +143,6 @@ function Dialog(props)
     {
         setContactSearchValue('');
         setContact(null);
-
-        if (!groupContactsDirty)
-        {
-            setGroupContactsDirty(true);
-        }
     }
 
     function onGroupContactRemoved(index)
@@ -156,6 +151,11 @@ function Dialog(props)
 
         contacts.splice(index, 1);
         setGroupContacts(contacts);
+
+        if (!groupContactsDirty)
+        {
+            setGroupContactsDirty(true);
+        }
     }
 
     function allowSave()
@@ -166,7 +166,7 @@ function Dialog(props)
         }
         else
         {
-            return isGroupNameValid() && groupNameDirty && groupContacts.length > 0 && groupContactsDirty;
+            return (isGroupNameValid() && groupNameDirty) || (groupContacts.length > 0 && groupContactsDirty);
         }
     }
 
@@ -190,10 +190,17 @@ function Dialog(props)
     {
         if (saved)
         {
-            onSaved({
+            let g = {
                 name: groupName,
                 contacts: groupContacts
-            })
+            };
+
+            if (mode === GROUP_DIALOG_MODE.EDIT_GROUP)
+            {
+                g._id = group._id;
+            }
+
+            onSaved(g);
         }
         else
         {

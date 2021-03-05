@@ -17,6 +17,11 @@ export const ACTION_TYPE = {
     EDIT_CONTACT_SAVING: 'EDIT_CONTACT_SAVING',
     EDIT_CONTACT_SAVED: 'EDIT_CONTACT_SAVED',
     EDIT_CONTACT_ERROR_SAVING: 'EDIT_CONTACT_ERROR_SAVING',
+    EDIT_GROUP: 'EDIT_GROUP',
+    EDIT_GROUP_CANCEL: 'EDIT_GROUP_CANCEL',
+    EDIT_GROUP_SAVING: 'EDIT_GROUP_SAVING',
+    EDIT_GROUP_SAVED: 'EDIT_GROUP_SAVED',
+    EDIT_GROUP_ERROR_SAVING: 'EDIT_GROUP_ERROR_SAVING',
     SELECT_CONTACT: 'SELECT_CONTACT',
     SELECT_ALL_CONTACTS: 'SELECT_ALL_CONTACTS',
     DESELECT_CONTACT: 'DESELECT_CONTACT',
@@ -301,6 +306,82 @@ export function editContactErrorSaving(contact, error)
     return {
         type: ACTION_TYPE.EDIT_CONTACT_ERROR_SAVING,
         contact,
+        error
+    };
+}
+
+export function editGroup(group)
+{
+    return {
+        type: ACTION_TYPE.EDIT_GROUP,
+        group
+    };
+}
+
+export function editGroupCancel(group)
+{
+    return {
+        type: ACTION_TYPE.EDIT_GROUP_CANCEL,
+        group
+    };
+}
+
+export function editGroupSaving(group)
+{
+    return {
+        type: ACTION_TYPE.EDIT_GROUP_SAVING,
+        group
+    };
+}
+
+export function editGroupSave(group)
+{
+    return async (dispatch) => {
+        dispatch(editGroupSaving(group));
+
+        try
+        {
+            let response = await fetch(`/api/groups/${group._id}`, {
+                method: 'PUT',
+                headers: {
+                    'Content-Type': 'application/json'
+                },
+                body: JSON.stringify({
+                    name: group.name,
+                    contacts: group.contacts.map(contact => contact._id)
+                })
+            });
+
+            if (response.ok)
+            {
+                dispatch(editGroupSaved(group));
+                dispatch(retrieveGroups());
+            }
+            else
+            {
+                dispatch(editGroupErrorSaving(contact, `Error editing group ${response.status} ${response.statusText}`));
+            }
+        }
+        catch (error)
+        {
+            dispatch(editGroupErrorSaving(contact, `Error editing group: ${error.message}`));
+        }
+    }
+}
+
+export function editGroupSaved(group)
+{
+    return {
+        type: ACTION_TYPE.EDIT_GROUP_SAVED,
+        group
+    };
+}
+
+export function editGroupErrorSaving(group, error)
+{
+    return {
+        type: ACTION_TYPE.EDIT_GROUP_ERROR_SAVING,
+        group,
         error
     };
 }
