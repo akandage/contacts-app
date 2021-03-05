@@ -572,6 +572,7 @@ export function deleteContact(contact)
             if (response.ok)
             {
                 dispatch(deletedContact(contact));
+                dispatch(retrieveGroups());
             }
             else
             {
@@ -631,6 +632,7 @@ export function deleteContacts(contacts)
             }
 
             dispatch(deletedContacts(contacts));
+            dispatch(retrieveGroups());
         }
         catch (error)
         {

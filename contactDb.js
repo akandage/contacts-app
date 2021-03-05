@@ -123,13 +123,7 @@ const ContactSchema = mongoose.Schema({
     favorite: {
         type: Boolean,
         required: true
-    },
-    groups: [
-        {
-            type: mongoose.Schema.Types.ObjectId,
-            ref: 'GroupModel'
-        }
-    ]
+    }
 });
 
 const GroupSchema = mongoose.Schema({
@@ -424,6 +418,17 @@ class ContactDb
         }
 
         let contact = await this.getContact(user, id);
+        let contactGroups = await this._groupModel.find({
+            contacts: {
+                $elemMatch: { $eq: contact._id }
+            }
+        }).exec();
+
+        for (let group of contactGroups)
+        {
+            group.contacts = group.contacts.filter(contactId => contactId !== contact._id);
+            await group.save();
+        }
 
         await contact.remove();
     }
