@@ -508,6 +508,8 @@ class ContactDb
                 queryOptions.limit = limit;
             }
 
+            queryOptions.sort = orderByToString(DEFAULT_CONTACTS_ORDERBY);
+
             if (searchTerms.length === 2)
             {
                 query = this._contactModel.find({ owner: user._id,
