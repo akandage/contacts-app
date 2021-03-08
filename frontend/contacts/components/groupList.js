@@ -1,7 +1,7 @@
 import React from 'react';
 import PropTypes from 'prop-types';
-import { Button, ButtonGroup, Dropdown, DropdownButton, Form, InputGroup } from 'react-bootstrap';
-import { AddIcon, DeleteIcon, RefreshIcon } from '../../common/contactsImages';
+import { Button, ButtonGroup, Dropdown, DropdownButton, Form, Spinner } from 'react-bootstrap';
+import { AddIcon, DeleteIcon, GroupIcon, RefreshIcon } from '../../common/contactsImages';
 import { STATUS, DEFAULT_GROUPS_ORDERBY, GROUPS_ORDERBY_NAME_ASC, GROUPS_ORDERBY_NAME_DESC,
     DELETE_BUTTON_WIDTH,
     DELETE_BUTTON_HEIGHT,
@@ -12,6 +12,10 @@ import { STATUS, DEFAULT_GROUPS_ORDERBY, GROUPS_ORDERBY_NAME_ASC, GROUPS_ORDERBY
     REFRESH_TOOLBAR_BUTTON_WIDTH,
     REFRESH_TOOLBAR_BUTTON_HEIGHT
 } from '../constants';
+
+const NO_GROUPS_ICON_WIDTH = 24;
+const NO_GROUPS_ICON_HEIGHT = 24;
+const NO_GROUPS_TEXT = "No Groups";
 
 export default function GroupList(props)
 {
@@ -92,21 +96,21 @@ export default function GroupList(props)
 
         return (
             <>
-                <Form.Check checked={ isGroupsSelected } onChange={ onCheckClicked } />
+                <Form.Check checked={ isGroupsSelected } disabled={ disabled } onChange={ onCheckClicked } />
 
                 <ButtonGroup>
-                    <Button disabled={ isGroupsSelected } onClick={ onAddGroupClicked }>
+                    <Button disabled={ disabled || isGroupsSelected } onClick={ onAddGroupClicked }>
                         <AddIcon width={ ADD_TOOLBAR_BUTTON_WIDTH } height={ ADD_TOOLBAR_BUTTON_HEIGHT } />
                     </Button>
-                    <Button disabled={ !isGroupsSelected } onClick={ onDeleteButtonClicked }>
+                    <Button disabled={ disabled || !isGroupsSelected } onClick={ onDeleteButtonClicked }>
                         <DeleteIcon width={ DELETE_TOOLBAR_BUTTON_WIDTH } height={ DELETE_TOOLBAR_BUTTON_HEIGHT } />
                     </Button>
-                    <Button onClick={ onRefreshClicked } disabled={ status === STATUS.LOADING || status === STATUS.REFRESHING }>
+                    <Button onClick={ onRefreshClicked } disabled={ disabled || status === STATUS.LOADING || status === STATUS.REFRESHING }>
                         <RefreshIcon width={ REFRESH_TOOLBAR_BUTTON_WIDTH } height={ REFRESH_TOOLBAR_BUTTON_HEIGHT } />
                     </Button>
                 </ButtonGroup>
 
-                <DropdownButton title="Sort" onSelect={ onSortSelected } disabled={ status === STATUS.LOADING || status === STATUS.REFRESHING }>
+                <DropdownButton title="Sort" onSelect={ onSortSelected } disabled={ !Array.isArray(groups) || groups.length === 0 || disabled || status === STATUS.LOADING || status === STATUS.REFRESHING }>
                     <Dropdown.Item eventKey="nameASC" active={ sortKey === 'nameASC' }>Name Ascending</Dropdown.Item>
                     <Dropdown.Item eventKey="nameDESC" active={ sortKey === 'nameDESC' }>Name Descending</Dropdown.Item>
                 </DropdownButton>
@@ -182,28 +186,49 @@ export default function GroupList(props)
             <div className="contact-list-toolbar">
                 <ListToolbar />
             </div>
-            <ol className="contact-list">
-                {
-                    groups.flatMap(group => {
-                        let listItems = [];
-                        let separator = null;
+            {
+                status === STATUS.LOADING || status === STATUS.REFRESHING ?
+                <div className="contact-list-placeholder">
+                    <div>
+                        <Spinner animation="border" variant="primary" />
+                    </div>
+                </div> :
+                (
+                    Array.isArray(groups) && groups.length > 0 ?
+                        <ol className="contact-list">
+                            {
+                                groups.flatMap(group => {
+                                    let listItems = [];
+                                    let separator = null;
 
-                        separator = group.group.name[0].toUpperCase();
+                                    separator = group.group.name[0].toUpperCase();
 
-                        if (currSeparator !== separator)
-                        {
-                            listItems.push(<ListItemSeparator key={ listIndex }>{ separator }</ListItemSeparator>);
-                            currSeparator = separator;
-                            ++listIndex;
-                        }
+                                    if (currSeparator !== separator)
+                                    {
+                                        listItems.push(<ListItemSeparator key={ listIndex }>{ separator }</ListItemSeparator>);
+                                        currSeparator = separator;
+                                        ++listIndex;
+                                    }
 
-                        listItems.push(<ListItem key={ listIndex } group={ group.group } disabled={ disabled || group.disabled } selected={ group.selected } />);
-                        ++listIndex;
+                                    listItems.push(<ListItem key={ listIndex } group={ group.group } disabled={ disabled || group.disabled } selected={ group.selected } />);
+                                    ++listIndex;
 
-                        return listItems;
-                    })
-                }
-            </ol>
+                                    return listItems;
+                                })
+                            }
+                        </ol> :
+
+                        <div className="contact-list-placeholder">
+                            <div>
+                                <div>
+                                    <GroupIcon width={ NO_GROUPS_ICON_WIDTH } height={ NO_GROUPS_ICON_HEIGHT } />
+
+                                    <span>{ NO_GROUPS_TEXT }</span>
+                                </div>
+                            </div>
+                        </div>
+                )
+            }
         </>
     );
 }

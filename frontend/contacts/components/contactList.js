@@ -1,7 +1,7 @@
 import React, { useState } from 'react';
 import PropTypes from 'prop-types';
-import { Button, ButtonGroup, Dropdown, DropdownButton, Form, InputGroup } from 'react-bootstrap';
-import { AddIcon, DeleteIcon, FavoriteIcon, GroupIcon, RefreshIcon, StarIcon, UserIcon } from '../../common/contactsImages';
+import { Button, ButtonGroup, Dropdown, DropdownButton, Form, Spinner } from 'react-bootstrap';
+import { AddIcon, ContactIcon, DeleteIcon, FavoriteIcon, GroupIcon, RefreshIcon, StarIcon, UserIcon } from '../../common/contactsImages';
 import { STATUS, DEFAULT_CONTACTS_ORDERBY, CONTACTS_ORDERBY_FIRSTNAME_ASC,
     CONTACTS_ORDERBY_FIRSTNAME_DESC, CONTACTS_ORDERBY_LASTNAME_ASC, 
     CONTACTS_ORDERBY_LASTNAME_DESC,
@@ -20,6 +20,10 @@ import { STATUS, DEFAULT_CONTACTS_ORDERBY, CONTACTS_ORDERBY_FIRSTNAME_ASC,
     REFRESH_TOOLBAR_BUTTON_WIDTH,
     REFRESH_TOOLBAR_BUTTON_HEIGHT
 } from '../constants';
+
+const NO_CONTACTS_ICON_WIDTH = 24;
+const NO_CONTACTS_ICON_HEIGHT = 24;
+const NO_CONTACTS_TEXT = "No Contacts";
 
 export default function ContactList(props)
 {
@@ -136,27 +140,27 @@ export default function ContactList(props)
 
         return (
             <>
-                <Form.Check checked={ isContactsSelected } onChange={ onCheckClicked } />
+                <Form.Check checked={ isContactsSelected } disabled={ disabled } onChange={ onCheckClicked } />
 
                 <ButtonGroup>
-                    <Button disabled={ isContactsSelected } onClick={ onAddContactClicked }>
+                    <Button disabled={ disabled || isContactsSelected } onClick={ onAddContactClicked }>
                         <AddIcon width={ ADD_TOOLBAR_BUTTON_WIDTH } height={ ADD_TOOLBAR_BUTTON_HEIGHT } />
                     </Button>
-                    <Button disabled={ !isContactsSelected } onClick={ onDeleteButtonClicked }>
+                    <Button disabled={ disabled || !isContactsSelected } onClick={ onDeleteButtonClicked }>
                         <DeleteIcon width={ DELETE_TOOLBAR_BUTTON_WIDTH } height={ DELETE_TOOLBAR_BUTTON_HEIGHT } />
                     </Button>
-                    <Button disabled={ !isContactsSelected } onClick={ onFavoriteButtonClicked }>
+                    <Button disabled={ disabled || !isContactsSelected } onClick={ onFavoriteButtonClicked }>
                         <StarIcon width={ FAVORITE_TOOLBAR_BUTTON_WIDTH } height={ FAVORITE_TOOLBAR_BUTTON_HEIGHT } />
                     </Button>
-                    <Button disabled={ !isContactsSelected } onClick={ onGroupButtonClicked }>
+                    <Button disabled={ disabled || !isContactsSelected } onClick={ onGroupButtonClicked }>
                         <GroupIcon width={ GROUP_TOOLBAR_BUTTON_WIDTH } height={ GROUP_TOOLBAR_BUTTON_HEIGHT } />
                     </Button>
-                    <Button onClick={ onRefreshClicked } disabled={ status === STATUS.LOADING || status === STATUS.REFRESHING }>
+                    <Button onClick={ onRefreshClicked } disabled={ disabled || status === STATUS.LOADING || status === STATUS.REFRESHING }>
                         <RefreshIcon width={ REFRESH_TOOLBAR_BUTTON_WIDTH } height={ REFRESH_TOOLBAR_BUTTON_HEIGHT } />
                     </Button>
                 </ButtonGroup>
 
-                <DropdownButton title="Sort" onSelect={ onSortSelected } disabled={ status === STATUS.LOADING || status === STATUS.REFRESHING }>
+                <DropdownButton title="Sort" onSelect={ onSortSelected } disabled={ !Array.isArray(contacts) || contacts.length === 0 || disabled || status === STATUS.LOADING || status === STATUS.REFRESHING }>
                     <Dropdown.Item eventKey="firstNameASC" active={ sortKey === 'firstNameASC' }>First Name Ascending</Dropdown.Item>
                     <Dropdown.Item eventKey="firstNameDESC" active={ sortKey === 'firstNameDESC' }>First Name Descending</Dropdown.Item>
                     <Dropdown.Item eventKey="lastNameASC" active={ sortKey === 'lastNameASC' }>Last Name Ascending</Dropdown.Item>
@@ -263,39 +267,60 @@ export default function ContactList(props)
             <div className="contact-list-toolbar">
                 <ListToolbar />
             </div>
-            <ol className="contact-list">
-                {
-                    contacts.flatMap(contact => {
-                        let listItems = [];
-
-                        if (addSeparators)
-                        {
-                            let separator = null;
-
-                            if (sortField === 'firstName')
+            {
+                status === STATUS.LOADING || status === STATUS.REFRESHING ?
+                <div className="contact-list-placeholder">
+                    <div>
+                        <Spinner animation="border" variant="primary" />
+                    </div>
+                </div> :
+                (
+                    Array.isArray(contacts) && contacts.length > 0 ?
+                        <ol className="contact-list">
                             {
-                                separator = contact.contact.firstName[0].toUpperCase();
-                            }
-                            else
-                            {
-                                separator = contact.contact.lastName[0].toUpperCase();
-                            }
+                                contacts.flatMap(contact => {
+                                    let listItems = [];
 
-                            if (currSeparator !== separator)
-                            {
-                                listItems.push(<ListItemSeparator key={ listIndex }>{ separator }</ListItemSeparator>);
-                                currSeparator = separator;
-                                ++listIndex;
+                                    if (addSeparators)
+                                    {
+                                        let separator = null;
+
+                                        if (sortField === 'firstName')
+                                        {
+                                            separator = contact.contact.firstName[0].toUpperCase();
+                                        }
+                                        else
+                                        {
+                                            separator = contact.contact.lastName[0].toUpperCase();
+                                        }
+
+                                        if (currSeparator !== separator)
+                                        {
+                                            listItems.push(<ListItemSeparator key={ listIndex }>{ separator }</ListItemSeparator>);
+                                            currSeparator = separator;
+                                            ++listIndex;
+                                        }
+                                    }
+
+                                    listItems.push(<ListItem key={ listIndex } contact={ contact.contact } disabled={ disabled || contact.disabled } selected={ contact.selected } />);
+                                    ++listIndex;
+
+                                    return listItems;
+                                })
                             }
-                        }
+                        </ol> :
+                    
+                        <div className="contact-list-placeholder">
+                            <div>
+                                <div>
+                                    <ContactIcon width={ NO_CONTACTS_ICON_WIDTH } height={ NO_CONTACTS_ICON_HEIGHT } />
 
-                        listItems.push(<ListItem key={ listIndex } contact={ contact.contact } disabled={ disabled || contact.disabled } selected={ contact.selected } />);
-                        ++listIndex;
-
-                        return listItems;
-                    })
-                }
-            </ol>
+                                    <span>{ NO_CONTACTS_TEXT }</span>
+                                </div>
+                            </div>
+                        </div>
+                )
+            }
         </>
     );
 }
