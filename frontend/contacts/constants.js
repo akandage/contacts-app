@@ -29,6 +29,8 @@ export const DEFAULT_GROUPS_ORDERBY = GROUPS_ORDERBY_NAME_ASC;
 // Names (first, middle, last) may only contain letters and must start with a capital letter.
 // Allow single letter names.
 export const NAME_REGEX = /^[A-Z][a-zA-Z-']*$/;
+// Group name must begin with a capital letter.
+export const GROUP_NAME_REGEX = /^[A-Z].*$/;
 
 export const EMAIL_ADDRESS_TYPES = [
     'Personal',

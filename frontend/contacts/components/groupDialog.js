@@ -1,6 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import PropTypes from 'prop-types';
 import { Button, Modal } from 'react-bootstrap';
+import { GROUP_NAME_REGEX } from '../constants';
 import queryString from 'query-string';
 import AutoCompleteTextbox from './autoCompleteTextbox';
 import CustomTextBox, { RemoveButton } from './customTextbox';
@@ -55,7 +56,14 @@ function Dialog(props)
 
     function isGroupNameValid()
     {
-        return groupName !== '';
+        return groupName !== '' && GROUP_NAME_REGEX.test(groupName);
+    }
+
+    function getGroupNameInvalidFeedback()
+    {
+        return groupName !== '' ? 
+            'Group name is invalid. Must begin with a capital letter.' :
+            'Group name is required.';
     }
 
     function onContactSearchChanged(value)
@@ -227,7 +235,7 @@ function Dialog(props)
                     onChanged={ onGroupNameChanged }
                     onBlur={ onGroupNameBlur }
                     isInvalid={ groupNameDirty && !isGroupNameValid() }
-                    invalidFeedback="Group name is required."
+                    invalidFeedback={ getGroupNameInvalidFeedback() }
 
                 >
                 </CustomTextBox>

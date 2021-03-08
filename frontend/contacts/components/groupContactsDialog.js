@@ -1,6 +1,7 @@
 import React, { useState } from 'react';
 import PropTypes from 'prop-types';
 import { Button, Modal } from 'react-bootstrap';
+import { GROUP_NAME_REGEX } from '../constants';
 import ConfirmActionDialog from './confirmActionDialog';
 import CustomTextBox from './customTextbox';
 
@@ -38,6 +39,18 @@ function Dialog(props)
         {
             setGroupNameDirty(true);
         }
+    }
+
+    function isGroupNameValid()
+    {
+        return groupName !== '' && GROUP_NAME_REGEX.test(groupName);
+    }
+
+    function getGroupNameInvalidFeedback()
+    {
+        return groupName !== '' ? 
+            'Group name is invalid. Must begin with a capital letter.' :
+            'Group name is required.';
     }
 
     function onSaveClicked()
@@ -85,15 +98,15 @@ function Dialog(props)
                     value={ groupName }
                     onChanged={ onGroupNameChanged }
                     onBlur={ onGroupNameBlur }
-                    isInvalid={ groupNameDirty && groupName === '' }
-                    invalidFeedback="Group name is required."
+                    isInvalid={ groupNameDirty && !isGroupNameValid() }
+                    invalidFeedback={ getGroupNameInvalidFeedback() }
 
                 >
                 </CustomTextBox>
             </Modal.Body>
 
             <Modal.Footer>
-                <Button variant="primary" disabled={ groupName === '' } onClick={ onSaveClicked }>{ acceptText }</Button>
+                <Button variant="primary" disabled={ !isGroupNameValid() } onClick={ onSaveClicked }>{ acceptText }</Button>
                 <Button variant="secondary" onClick={ onCancelClicked }>{ cancelText }</Button>
             </Modal.Footer>
         </Modal> 
