@@ -105,3 +105,6 @@ dist
 
 # Front-end javascripts are generated
 public/javascripts/
+
+# Uploaded files
+uploads/

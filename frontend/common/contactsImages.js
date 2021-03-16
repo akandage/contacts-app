@@ -7,6 +7,7 @@ import DeleteIconImage from './images/delete-icon.svg';
 import FavoriteIconImage from './images/favorite-icon.svg';
 import FavoriteIconOutlineImage from './images/favorite-icon-outline.svg';
 import GroupIconImage from './images/group-icon.svg';
+import PencilIconImage from './images/pencil-icon.svg';
 import PlusIconImage from './images/plus-icon.svg';
 import RefreshIconImage from './images/refresh-icon.svg';
 import SearchIconImage from './images/search-icon.svg';
@@ -79,6 +80,15 @@ export function GroupIcon(props)
     );
 }
 
+export function PencilIcon(props)
+{
+    let { width, height } = props;
+
+    return (
+        <PencilIconImage width={ width } height={ height } viewBox="0 0 125 125" />
+    );
+}
+
 export function PlusIcon(props)
 {
     let { width, height } = props;
@@ -87,7 +97,6 @@ export function PlusIcon(props)
         <PlusIconImage width={ width } height={ height } viewBox="0 0 125 126" />
     );
 }
-
 
 export function RefreshIcon(props)
 {

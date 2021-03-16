@@ -1,0 +1,141 @@
+<?xml version="1.0" encoding="UTF-8" standalone="no"?>
+<svg
+   xmlns:dc="http://purl.org/dc/elements/1.1/"
+   xmlns:cc="http://creativecommons.org/ns#"
+   xmlns:rdf="http://www.w3.org/1999/02/22-rdf-syntax-ns#"
+   xmlns:svg="http://www.w3.org/2000/svg"
+   xmlns="http://www.w3.org/2000/svg"
+   xmlns:sodipodi="http://sodipodi.sourceforge.net/DTD/sodipodi-0.dtd"
+   xmlns:inkscape="http://www.inkscape.org/namespaces/inkscape"
+   id="svg6254"
+   sodipodi:docname="pencil-icon.svg"
+   viewBox="0 0 125.00002 125.0826"
+   version="1.1"
+   inkscape:version="1.0.1 (0767f8302a, 2020-10-17)"
+   width="125.00002"
+   height="125.0826">
+  <defs
+     id="defs14" />
+  <title
+     id="title7073">Pencil Pictogram</title>
+  <sodipodi:namedview
+     id="base"
+     bordercolor="#666666"
+     inkscape:pageshadow="2"
+     inkscape:window-y="27"
+     fit-margin-left="0"
+     pagecolor="#ffffff"
+     fit-margin-top="0"
+     inkscape:window-maximized="1"
+     inkscape:zoom="4.0745363"
+     inkscape:window-x="72"
+     inkscape:window-height="1376"
+     showgrid="false"
+     borderopacity="1.0"
+     inkscape:current-layer="g7066"
+     inkscape:cx="44.216795"
+     inkscape:cy="49.511253"
+     fit-margin-right="0"
+     fit-margin-bottom="0"
+     inkscape:window-width="2488"
+     inkscape:pageopacity="0.0"
+     inkscape:document-units="px"
+     inkscape:document-rotation="0" />
+  <g
+     id="layer1"
+     inkscape:label="レイヤー 1"
+     inkscape:groupmode="layer"
+     transform="translate(-224.12748,-630.45126)">
+    <g
+       id="g7066"
+       transform="matrix(1.7183,0,0,1.7068,-160,-536.05)"
+       style="stroke-width:1.00027;stroke-miterlimit:4;stroke-dasharray:none">
+      <path
+         id="path5336-6"
+         sodipodi:nodetypes="ccccc"
+         style="fill:none;stroke:#ffffff;stroke-width:0.988193;stroke-linecap:round;stroke-linejoin:round;stroke-miterlimit:4;stroke-dasharray:none;stroke-opacity:1"
+         inkscape:connector-curvature="0"
+         d="m 295.06601,710.57838 -36.3715,36.3715 -34.64955,9.28434 9.28147,-34.63868 36.74593,-36.74593" />
+      <rect
+         id="rect5338-48"
+         style="fill:#ffffff;fill-opacity:1;stroke-width:1.05994;stroke-miterlimit:4;stroke-dasharray:none"
+         transform="matrix(-0.2649903,-0.96425108,0.70710678,-0.70710678,0,0)"
+         rx="1.8136334"
+         ry="1.7967499"
+         height="52.387016"
+         width="9.464325"
+         y="60.050804"
+         x="-819.59015" />
+      <rect
+         id="rect5338-4-2"
+         ry="1.7967418"
+         style="fill:#ffffff;fill-opacity:1;stroke-width:0.988193;stroke-miterlimit:4;stroke-dasharray:none"
+         rx="1.3603747"
+         transform="rotate(-135)"
+         height="53.169216"
+         width="16.452927"
+         y="-340.25592"
+         x="-701.39606" />
+      <rect
+         id="rect5338-1-1"
+         style="fill:#ffffff;fill-opacity:1;stroke-width:1.06188;stroke-miterlimit:4;stroke-dasharray:none"
+         transform="matrix(0.96592587,0.25881889,0.70710678,-0.70710678,0,0)"
+         rx="1.8138407"
+         ry="1.7967499"
+         height="53.169456"
+         width="9.4991512"
+         y="-734.3186"
+         x="778.20325" />
+      <path
+         id="path5336-1-6"
+         style="fill:#ffffff;fill-opacity:1;stroke:#ffffff;stroke-width:0.988193;stroke-linecap:round;stroke-linejoin:round;stroke-miterlimit:4;stroke-dasharray:none;stroke-opacity:1"
+         inkscape:connector-curvature="0"
+         d="m 224.05385,756.23046 17.82022,-4.7617 -13.0594,-13.0594 -4.76171,17.82021 z" />
+    </g>
+  </g>
+  <metadata
+     id="metadata11">
+    <rdf:RDF>
+      <cc:Work>
+        <dc:format>image/svg+xml</dc:format>
+        <dc:type
+           rdf:resource="http://purl.org/dc/dcmitype/StillImage" />
+        <cc:license
+           rdf:resource="http://creativecommons.org/publicdomain/zero/1.0/" />
+        <dc:publisher>
+          <cc:Agent
+             rdf:about="http://openclipart.org/">
+            <dc:title>Openclipart</dc:title>
+          </cc:Agent>
+        </dc:publisher>
+        <dc:title>Pencil Pictogram</dc:title>
+        <dc:date>2013-11-16T20:22:22</dc:date>
+        <dc:description>black pencil pictogram.</dc:description>
+        <dc:source>https://openclipart.org/detail/188837/pencil-pictogram-by-libberry-188837</dc:source>
+        <dc:creator>
+          <cc:Agent>
+            <dc:title>libberry</dc:title>
+          </cc:Agent>
+        </dc:creator>
+        <dc:subject>
+          <rdf:Bag>
+            <rdf:li>learning</rdf:li>
+            <rdf:li>pencil</rdf:li>
+            <rdf:li>stationery</rdf:li>
+            <rdf:li>study</rdf:li>
+            <rdf:li>writing</rdf:li>
+          </rdf:Bag>
+        </dc:subject>
+      </cc:Work>
+      <cc:License
+         rdf:about="http://creativecommons.org/publicdomain/zero/1.0/">
+        <cc:permits
+           rdf:resource="http://creativecommons.org/ns#Reproduction" />
+        <cc:permits
+           rdf:resource="http://creativecommons.org/ns#Distribution" />
+        <cc:permits
+           rdf:resource="http://creativecommons.org/ns#DerivativeWorks" />
+      </cc:License>
+    </rdf:RDF>
+  </metadata>
+</svg>

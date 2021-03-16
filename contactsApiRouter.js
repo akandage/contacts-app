@@ -1,10 +1,23 @@
 const debug = require('debug')('contacts-api-router');
 const express = require('express');
+const fs = require('fs');
 const httpError = require('http-errors');
+const jimp = require('jimp');
+const path = require('path');
+const uuid = require('uuid');
 const { validateOrderBy } = require('./db');
 const { CONTACT_NOT_FOUND, DEFAULT_CONTACTS_ORDERBY, DEFAULT_GROUPS_ORDERBY, INVALID_CONTACT, INVALID_GROUP, INVALID_SEARCH_TERMS } = require('./contactDb');
 const { USER_NOT_FOUND } = require('./userDb');
 const contactsApiRouter = express.Router();
+
+const UPLOAD_IMAGE_TYPES = [
+    'image/x-png',
+    'image/jpeg'
+];
+const UPLOAD_IMAGE_EXTS = {
+    'image/x-png': 'png',
+    'image/jpeg': 'jpg'
+};
 
 contactsApiRouter.post('/api/contacts', async (req, res, next) => {
     let session = req.session;
@@ -280,7 +293,7 @@ contactsApiRouter.get('/api/contacts/search', async (req, res, next) => {
             searchTerms = [];
         }
     }
-    
+
     if (limit !== null && limit !== undefined)
     {
         limit = Number.parseInt(limit);
@@ -384,6 +397,179 @@ contactsApiRouter.delete('/api/contacts/:id', async (req, res, next) => {
         }
 
         res.status(200).send();
+    }
+    else
+    {
+        debug('Request does not have session.');
+        next(httpError(401));
+    }
+});
+
+contactsApiRouter.post('/api/contacts/profile-picture', async (req, res, next) => {
+    let session = req.session;
+    let uploadFiles = req.files;
+
+    if (!Array.isArray(uploadFiles) || uploadFiles.length === 0)
+    {
+        next(httpError(400, 'No images uploaded.'));
+        return;
+    }
+
+    if (uploadFiles.length !== 1 || !UPLOAD_IMAGE_TYPES.includes(uploadFiles[0].type))
+    {
+        next(httpError(400, 'Only a single jpeg or png image may be uploaded.'))
+        return;
+    }
+
+    let uploadFile = uploadFiles[0];
+
+    if (session)
+    {
+        debug(`Request session ${session.sessionId}`);
+
+        let userDb = req.app.get('user-db');
+        let user = null;
+
+        try
+        {
+            user = await userDb.getUser(session.username);
+            debug(`Request user ${user.username}`);
+
+            let uploadImageId = null;
+            let uploadImageDir = req.app.get('uploads-directory');
+            let uploadImagePath = null;
+            let uploadImageFile = null;
+            let ext = UPLOAD_IMAGE_EXTS[uploadFile.type];
+
+            while (true)
+            {
+                try
+                {
+                    uploadImageId = uuid.v4();
+                    uploadImagePath = path.join(__dirname, uploadImageDir, `${uploadImageId}.${ext}`);
+                    uploadImageFile = fs.openSync(uploadImagePath, 'wx');
+                    break;
+                }
+                catch (error)
+                {
+                    if (!error.message.includes('EEXISTS'))
+                    {
+                        throw error;
+                    }
+                }
+            }
+
+            try
+            {
+                for (let chunk of uploadFile.chunks)
+                {
+                    fs.writeSync(uploadImageFile, chunk);
+                }
+
+                fs.closeSync(uploadImageFile);
+            }
+            catch (error)
+            {
+                try
+                {
+                    fs.closeSync(uploadImageFile);
+                }
+                catch (error1)
+                {
+                    // Ignore.
+                }
+
+                throw error;
+            }
+
+            const cropWidth = req.app.get('contact-profile-picture-width');
+            const cropHeight = req.app.get('contact-profile-picture-height');
+            let processedImage = await jimp.read(uploadImagePath);
+            let origImageWidth = processedImage.bitmap.width;
+            let origImageHeight = processedImage.bitmap.height;
+
+            processedImage.cover(cropWidth, cropHeight);
+
+            await processedImage.writeAsync(uploadImagePath);
+
+            res.set('Location', `/api/contacts/profile-picture/${uploadImageId}.${ext}`);
+            res.status(200).send();
+        }
+        catch (error)
+        {
+            console.log(error);
+
+            if (error.message === USER_NOT_FOUND)
+            {
+                next(httpError(404, error.message));
+            }
+            else
+            {
+                next(httpError(500, error.message));
+            }
+
+            return;
+        }
+    }
+    else
+    {
+        debug('Request does not have session.');
+        next(httpError(401));
+    }
+});
+
+contactsApiRouter.get('/api/contacts/profile-picture/:fileName', async (req, res, next) => {
+    let session = req.session;
+    let fileName = req.params.fileName;
+
+    if (fileName === null || fileName === undefined || fileName.length === 0 || fileName.includes('/') || fileName.includes('../'))
+    {
+        next(httpError(400, 'Filename is invalid.'));
+        return;
+    }
+
+    if (session)
+    {
+        debug(`Request session ${session.sessionId}`);
+
+        let userDb = req.app.get('user-db');
+        let user = null;
+
+        try
+        {
+            user = await userDb.getUser(session.username);
+            debug(`Request user ${user.username}`);
+            
+            let filePath = path.join(__dirname, req.app.get('uploads-directory'), fileName);
+
+            if (!fs.existsSync(filePath))
+            {
+                next(httpError(404, 'File not found.'));
+                return;
+            }
+
+            res.sendFile(filePath, (err) => {
+                if (err)
+                {
+                    next(err);
+                }
+            });
+        }
+        catch (error)
+        {
+            console.log(error);
+
+            if (error.message === USER_NOT_FOUND)
+            {
+                next(httpError(404, error.message));
+            }
+            else
+            {
+                next(httpError(500, error.message));
+            }
+
+            return;
+        }
     }
     else
     {

@@ -31,6 +31,7 @@
     "@babel/preset-env": "^7.12.11",
     "@babel/preset-react": "^7.12.10",
     "babel-loader": "^8.2.2",
+    "busboy": "^0.3.1",
     "cookie-parser": "^1.4.5",
     "css-loader": "^5.0.1",
     "debug": "^4.3.1",
@@ -38,6 +39,7 @@
     "email-validator": "^2.0.4",
     "express": "^4.17.1",
     "http-errors": "^1.8.0",
+    "jimp": "^0.16.1",
     "mongoose": "^5.11.11",
     "morgan": "^1.10.0",
     "query-string": "^6.13.8",
@@ -52,6 +54,7 @@
     "redux-logger": "^3.0.6",
     "redux-thunk": "^2.3.0",
     "style-loader": "^2.0.0",
+    "uuid": "^8.3.2",
     "webpack": "^5.13.0",
     "webpack-cli": "^4.3.1"
   },

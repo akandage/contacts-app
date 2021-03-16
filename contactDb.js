@@ -123,6 +123,10 @@ const ContactSchema = mongoose.Schema({
     favorite: {
         type: Boolean,
         required: true
+    },
+    profilePicture: {
+        type: String,
+        required: false
     }
 });
 

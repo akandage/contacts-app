@@ -15,6 +15,8 @@ export const CONTACT_DIALOG_MODE = {
     VIEW_CONTACT: 'VIEW_CONTACT'
 };
 
+const UPLOAD_IMAGE_URL = '/api/contacts/profile-picture';
+
 function Dialog(props)
 {
     let {
@@ -633,7 +635,9 @@ function Dialog(props)
                 <Tabs id="contact-dialog-tabs" activeKey={ activeTab } onSelect={ onTabSelected }>
                     <Tab eventKey="contactTab" title="Contact">
                         <div className="contact-dialog-tab">
-                            <UploadImage />
+                            <UploadImage 
+                                uploadImageUrl={ UPLOAD_IMAGE_URL }
+                            />
                             
                             <div className="contact-dialog-form">
                                 <Form noValidate>

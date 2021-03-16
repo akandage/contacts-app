@@ -9,9 +9,11 @@ dotenv.config();
  * Module dependencies.
  */
 
+const busboy = require('busboy');
 const debug = require('debug')('contacts-app');
 const { connectToDb, disconnectDb } = require('./db');
 const express = require('express');
+const fs = require('fs');
 const cookieParser = require('cookie-parser');
 const httpError = require('http-errors');
 const mongoose = require('mongoose');
@@ -64,6 +66,71 @@ app.use(express.static('public'));
  */
 app.set('mongodb-url', process.env.MONGODB_URL || 'mongodb://localhost:27017');
 app.set('mongodb-name', process.env.MONGODB_DBNAME || 'contacts-db');
+
+/**
+ * Directory to store uploaded image files.
+ */
+app.set('uploads-directory', process.env.UPLOADS_DIRECTORY || './uploads');
+
+/**
+ * Dimensions of uploaded profile picture files.
+ */
+app.set('contact-profile-picture-width', Number.parseInt(process.env.CONTACT_PROFILE_PICTURE_WIDTH, 10) || 128);
+app.set('contact-profile-picture-height', Number.parseInt(process.env.CONTACT_PROFILE_PICTURE_HEIGHT, 10) || 128);
+
+/**
+ * Set up middleware to parse form data.
+ * 
+ */
+app.use((req, res, next) => {
+    if (req.method === 'POST')
+    {
+        let contentType = req.get('Content-Type');
+
+        if (contentType && contentType.startsWith('multipart/form-data'))
+        {
+            let parser = new busboy({ headers: req.headers });
+            let files = [];
+
+            parser.on('file', (name, f, filename, encoding, type) => {
+                let file = {
+                    filename,
+                    encoding,
+                    type,
+                    chunks: [],
+                    truncated: false
+                };
+                let fileLength = 0;
+
+                f.on('data', (chunk) => {
+                    file.chunks.push(chunk);
+                    fileLength += chunk.length;
+                });
+
+                f.on('end', () => {
+                    file.length = fileLength;
+                    file.truncated = f.truncated === true;
+                    files.push(file);
+                });
+            });
+
+            parser.on('finish', () => {
+                req.files = files;
+                next();
+            });
+
+            req.pipe(parser);
+        }
+        else
+        {
+            next();
+        }
+    }
+    else
+    {
+        next();
+    }
+});
 
 /**
  * Set up middleware to attach Session-Id cookie to the request object
@@ -121,6 +188,14 @@ app.use(sessionRouter);
 app.startup = async function()
 {
     let db = await connectToDb();
+    let uploadsDir = app.get('uploads-directory');
+
+    if (!fs.existsSync(uploadsDir))
+    {
+        fs.mkdirSync(uploadsDir, {
+            recursive: true
+        });
+    }
 
     contactDb.connection = db;
     await contactDb.start();
