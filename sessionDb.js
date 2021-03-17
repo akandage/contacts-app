@@ -54,9 +54,7 @@ class SessionDb
         debug('Starting SessionDb.');
 
         await this._model.init();
-        this._timer = setInterval(() => {
-            this.expireSessions();
-        }, SESSION_EXPIRY_INTERVAL_MILLIS);
+        this.setExpireSessionsTimeout();
 
         debug('Started SessionDb.');
     }
@@ -67,7 +65,7 @@ class SessionDb
 
         if (this._timer)
         {
-            clearInterval(this._timer);
+            clearTimeout(this._timer);
             this._timer = null;
         }
 
@@ -184,31 +182,48 @@ class SessionDb
         return session;
     }
 
+    setExpireSessionsTimeout()
+    {
+        this._timer = setTimeout(() => {
+            this.expireSessions();
+        }, SESSION_EXPIRY_INTERVAL_MILLIS);
+    }
+
     async expireSessions()
     {
-        let now = Date.now();
-        let count = 0;
-
-        //debug('Removing expired user sessions.');
-
-        let cursor = await this._model.find({ expires: { $lte: now } }).cursor();
-
-        for (let session = await cursor.next(); session !== null; session = await cursor.next())
+        try
         {
-            session = await this._model.findOneAndDelete({ sessionId: session.sessionId, expires: session.expires });
+            let now = Date.now();
+            let count = 0;
 
-            if (session)
+            debug('Removing expired user sessions.');
+
+            let cursor = await this._model.find({ expires: { $lte: now } }).cursor();
+
+            for (let session = await cursor.next(); session !== null; session = await cursor.next())
             {
-                ++count;
+                session = await this._model.findOneAndDelete({ sessionId: session.sessionId, expires: session.expires });
+
+                if (session)
+                {
+                    ++count;
+                }
+            }
+
+            await cursor.close();
+
+            if (count > 0)
+            {
+                debug(`Removed ${count} expired user sessions.`);
             }
         }
-
-        await cursor.close();
-
-        if (count > 0)
+        catch (error)
         {
-            debug(`Removed ${count} expired user sessions.`);
+            this.setExpireSessionsTimeout();
+            throw error;
         }
+
+        this.setExpireSessionsTimeout();
     }
 }
 
