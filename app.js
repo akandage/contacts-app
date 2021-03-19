@@ -22,6 +22,7 @@ const { ContactDb } = require('./contactDb');
 const { SessionDb } = require('./sessionDb');
 const contactsApiRouter = require('./contactsApiRouter');
 const sessionRouter = require('./sessionRouter');
+const { UploadedFilesDb } = require('./uploadedFilesDb');
 const { UserDb } = require('./userDb');
 
 const HTML_ROOT = path.resolve(__dirname, 'html');
@@ -33,6 +34,7 @@ const ERROR_PAGE = 'error.html';
 const app = express();
 const contactDb = new ContactDb();
 const sessionDb = new SessionDb();
+const uploadedFilesDb = new UploadedFilesDb();
 const userDb = new UserDb();
 
 /**
@@ -204,6 +206,10 @@ app.startup = async function()
     sessionDb.connection = db;
     await sessionDb.start();
     app.set('session-db', sessionDb);
+
+    uploadedFilesDb.connection = db;
+    await uploadedFilesDb.start();
+    app.set('uploaded-files-db', uploadedFilesDb);
 
     userDb.connection = db;
     await userDb.start();

@@ -7,6 +7,7 @@ const path = require('path');
 const uuid = require('uuid');
 const { validateOrderBy } = require('./db');
 const { CONTACT_NOT_FOUND, DEFAULT_CONTACTS_ORDERBY, DEFAULT_GROUPS_ORDERBY, INVALID_CONTACT, INVALID_GROUP, INVALID_SEARCH_TERMS } = require('./contactDb');
+const { FILE_NOT_FOUND, FILE_UUID_NOT_UNIQUE, INVALID_FILE_UUID, INVALID_FILE_EXTENSION, INVALID_USER } = require('./uploadedFilesDb');
 const { USER_NOT_FOUND } = require('./userDb');
 const contactsApiRouter = express.Router();
 
@@ -428,6 +429,7 @@ contactsApiRouter.post('/api/contacts/profile-picture', async (req, res, next) =
         debug(`Request session ${session.sessionId}`);
 
         let userDb = req.app.get('user-db');
+        let uploadedFilesDb = req.app.get('uploaded-files-db');
         let user = null;
 
         try
@@ -461,6 +463,26 @@ contactsApiRouter.post('/api/contacts/profile-picture', async (req, res, next) =
 
             try
             {
+                // Register the file before generating it to avoid it being deleted
+                // the background cleanup task.
+                await uploadedFilesDb.registerUploadedFile(user, uploadImageId, ext);
+            }
+            catch (error)
+            {
+                try
+                {
+                    fs.closeSync(uploadImageFile);
+                }
+                catch (error1)
+                {
+                    // Ignore.
+                }
+
+                throw error;
+            }
+
+            try
+            {
                 for (let chunk of uploadFile.chunks)
                 {
                     fs.writeSync(uploadImageFile, chunk);
@@ -485,21 +507,99 @@ contactsApiRouter.post('/api/contacts/profile-picture', async (req, res, next) =
             const cropWidth = req.app.get('contact-profile-picture-width');
             const cropHeight = req.app.get('contact-profile-picture-height');
             let processedImage = await jimp.read(uploadImagePath);
-            let origImageWidth = processedImage.bitmap.width;
-            let origImageHeight = processedImage.bitmap.height;
+            // let origImageWidth = processedImage.bitmap.width;
+            // let origImageHeight = processedImage.bitmap.height;
 
             processedImage.cover(cropWidth, cropHeight);
-
             await processedImage.writeAsync(uploadImagePath);
-
-            res.set('Location', `/api/contacts/profile-picture/${uploadImageId}.${ext}`);
+            
+            res.set('Location', `/api/contacts/profile-picture/${uploadImageId}`);
             res.status(200).send();
         }
         catch (error)
         {
             console.log(error);
 
-            if (error.message === USER_NOT_FOUND)
+            if (error.message === INVALID_FILE_UUID || error.message === INVALID_FILE_EXTENSION || error.message === INVALID_USER)
+            {
+                next(httpError(400, error.message));
+            }
+            else if (error.message === USER_NOT_FOUND)
+            {
+                next(httpError(404, error.message));
+            }
+            else if (error.message === FILE_UUID_NOT_UNIQUE)
+            {
+                next(httpError(409, error.message));
+            }
+            else
+            {
+                next(httpError(500, error.message));
+            }
+
+            return;
+        }
+    }
+    else
+    {
+        debug('Request does not have session.');
+        next(httpError(401));
+    }
+});
+
+contactsApiRouter.get('/api/contacts/profile-picture/:fileUuid', async (req, res, next) => {
+    let session = req.session;
+    let fileUuid = req.params.fileUuid;
+
+    if (fileUuid === null || fileUuid === undefined || !uuid.validate(fileUuid) || uuid.version(fileUuid) !== 4)
+    {
+        next(httpError(400, 'File UUID is invalid.'));
+        return;
+    }
+
+    if (session)
+    {
+        debug(`Request session ${session.sessionId}`);
+
+        let userDb = req.app.get('user-db');
+        let uploadedFilesDb = req.app.get('uploaded-files-db');
+        let user = null;
+
+        try
+        {
+            user = await userDb.getUser(session.username);
+            debug(`Request user ${user.username}`);
+            
+            let file = await uploadedFilesDb.getUploadedFile(user, fileUuid);
+            let filePath = path.join(__dirname, req.app.get('uploads-directory'), `${file.uuid}.${file.fileExtension}`);
+
+            if (!fs.existsSync(filePath))
+            {
+                try
+                {
+                    await uploadedFilesDb.unregisterUploadedFile(user, fileUuid);
+                }
+                catch (error)
+                {
+                    // Ignore.
+                }
+
+                next(httpError(404, 'File not found.'));
+                return;
+            }
+
+            res.sendFile(filePath, (err) => {
+                if (err)
+                {
+                    next(err);
+                }
+            });
+        }
+        catch (error)
+        {
+            console.log(error);
+
+            if (error.message === FILE_NOT_FOUND || error.message === USER_NOT_FOUND)
             {
                 next(httpError(404, error.message));
             }
@@ -518,13 +618,13 @@ contactsApiRouter.post('/api/contacts/profile-picture', async (req, res, next) =
     }
 });
 
-contactsApiRouter.get('/api/contacts/profile-picture/:fileName', async (req, res, next) => {
+contactsApiRouter.delete('/api/contacts/profile-picture/:fileUuid', async (req, res, next) => {
     let session = req.session;
-    let fileName = req.params.fileName;
+    let fileUuid = req.params.fileUuid;
 
-    if (fileName === null || fileName === undefined || fileName.length === 0 || fileName.includes('/') || fileName.includes('../'))
+    if (fileUuid === null || fileUuid === undefined || !uuid.validate(fileUuid) || uuid.version(fileUuid) !== 4)
     {
-        next(httpError(400, 'Filename is invalid.'));
+        next(httpError(400, 'File UUID is invalid.'));
         return;
     }
 
@@ -533,33 +633,20 @@ contactsApiRouter.get('/api/contacts/profile-picture/:fileName', async (req, res
         debug(`Request session ${session.sessionId}`);
 
         let userDb = req.app.get('user-db');
+        let uploadedFilesDb = req.app.get('uploaded-files-db');
         let user = null;
 
         try
         {
             user = await userDb.getUser(session.username);
             debug(`Request user ${user.username}`);
-            
-            let filePath = path.join(__dirname, req.app.get('uploads-directory'), fileName);
-
-            if (!fs.existsSync(filePath))
-            {
-                next(httpError(404, 'File not found.'));
-                return;
-            }
-
-            res.sendFile(filePath, (err) => {
-                if (err)
-                {
-                    next(err);
-                }
-            });
+            await uploadedFilesDb.unregisterUploadedFile(user, fileUuid);
         }
         catch (error)
         {
             console.log(error);
 
-            if (error.message === USER_NOT_FOUND)
+            if (error.message === FILE_NOT_FOUND || error.message === USER_NOT_FOUND)
             {
                 next(httpError(404, error.message));
             }

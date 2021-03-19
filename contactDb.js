@@ -42,7 +42,7 @@ const PHONE_NUMBER_TYPES = [
     'Other'
 ];
 
-const ContactSchema = mongoose.Schema({
+const ContactSchema = new mongoose.Schema({
     owner: {
         type: mongoose.Schema.Types.ObjectId,
         ref: 'UserModel'
@@ -130,7 +130,7 @@ const ContactSchema = mongoose.Schema({
     }
 });
 
-const GroupSchema = mongoose.Schema({
+const GroupSchema = new mongoose.Schema({
     owner: {
         type: mongoose.Schema.Types.ObjectId,
         ref: 'UserModel'

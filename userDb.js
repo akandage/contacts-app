@@ -114,7 +114,7 @@ class UserDb
             throw new Error(INVALID_USERNAME);
         }
 
-        let user = await this._model.findOne({ username });
+        let user = await this._model.findOne({ username }).exec();
 
         if (!user)
         {
@@ -126,7 +126,7 @@ class UserDb
 }
 
 // TODO: Common logic. Move this somewhere else.
-const UserSchema = mongoose.Schema({
+const UserSchema = new mongoose.Schema({
     username: {
         type: String,
         required: true,

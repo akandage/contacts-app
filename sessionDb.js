@@ -7,7 +7,7 @@ const SESSION_SALT = 'SESSION_SALT';
 const SESSION_ID_ENCODING = 'base64';
 const SESSION_EXPIRY_MILLIS = 30 * 60 * 1000; // Default to 30 minute session expiry.
 const SESSION_EXPIRY_INTERVAL_MILLIS = 5 * 1000; // Default to 5 second session expiry interval.
-const SessionSchema = mongoose.Schema({
+const SessionSchema = new mongoose.Schema({
     sessionId: {
         type: String,
         required: true,
