@@ -61,11 +61,7 @@ class UploadedFilesDb
         debug('Starting UploadedFilesDb.');
 
         await this._model.init();
-        this._cleanupTimer = setInterval(
-            () => {
-                this.cleanup();
-            }, CLEANUP_TIMER_INTERVAL
-        )
+        this.setCleanupTimeout();
 
         debug('Started UploadedFilesDb.');
     }
@@ -76,11 +72,20 @@ class UploadedFilesDb
 
         if (this._cleanupTimer)
         {
-            clearInterval(this._cleanupTimer);
+            clearTimeout(this._cleanupTimer);
             this._cleanupTimer = null;
         }
 
         debug('Stopped UploadedFilesDb.');
+    }
+
+    setCleanupTimeout()
+    {
+        this._cleanupTimer = setTimeout(
+            () => {
+                this.cleanup();
+            }, CLEANUP_TIMER_INTERVAL
+        );
     }
 
     async cleanup()
@@ -127,7 +132,11 @@ class UploadedFilesDb
         catch (error)
         {
             console.error(`Error trying to clean uploaded files: ${error}`);
+            this.setCleanupTimeout();
+            return;
         }
+
+        this.setCleanupTimeout();
     }
 
     async registerUploadedFile(user, fileUuid, fileExtension)

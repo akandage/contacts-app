@@ -219,8 +219,9 @@ class SessionDb
         }
         catch (error)
         {
+            console.log(`Error removing expired user sessions: ${error}`);
             this.setExpireSessionsTimeout();
-            throw error;
+            return;
         }
 
         this.setExpireSessionsTimeout();
