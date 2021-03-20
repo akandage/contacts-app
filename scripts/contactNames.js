@@ -1345,7 +1345,7 @@ const GIVEN_NAMES = [
      'Lamphere',
      'Lampkin',
      'Lane',
-     'Lane Fox',
+     'Lane-Fox',
      'Lang',
      'Langford',
      'Langton',
