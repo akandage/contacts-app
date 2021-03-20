@@ -41,6 +41,8 @@ function Dialog(props)
     const [ emailAddress, setEmailAddress ] = useState(getInitialValue('emailAddress'));
     const [ emailAddresses, setEmailAddresses ] = useState(getInitialValue('emailAddresses'));
     const [ emailAddressesDirty, setEmailAddressesDirty ] = useState(false);
+    const [ profilePictureUrl, setProfilePictureUrl ] = useState(getInitialValue('profilePictureUrl'));
+    const [ isUploadingProfilePicture, setIsUploadingProfilePicture ] = useState(false);
     const [ dirtyState, setDirtyState ] = useState(getInitialValue('dirtyState'));
     const [ validState, setValidState ] = useState(getInitialValue('validState'));
     const [ showState, setShowState ] = useState(true);
@@ -112,6 +114,12 @@ function Dialog(props)
                 [] :
                 contact.emailAddresses.map(emailAddress => Object.assign({}, emailAddress));
         }
+        else if (key === 'profilePictureUrl')
+        {
+            return mode === CONTACT_DIALOG_MODE.ADD_CONTACT ?
+                null :
+                contact.profilePictureUrl
+        }
         else if (key === 'dirtyState')
         {
             return getInitialDirtyState();
@@ -134,7 +142,8 @@ function Dialog(props)
             emailAddress: false,
             emailAddresses: mode === CONTACT_DIALOG_MODE.ADD_CONTACT ? [] : contact.emailAddresses.map(emailAddress => false),
             phoneNumber: false,
-            phoneNumbers: mode === CONTACT_DIALOG_MODE.ADD_CONTACT ? [] : contact.phoneNumbers.map(phoneNumber => false)
+            phoneNumbers: mode === CONTACT_DIALOG_MODE.ADD_CONTACT ? [] : contact.phoneNumbers.map(phoneNumber => false),
+            profilePictureUrl: false
         };
     }
 
@@ -169,7 +178,8 @@ function Dialog(props)
             lastName,
             emailAddresses,
             phoneNumbers,
-            favorite: isFavorite
+            favorite: isFavorite,
+            profilePictureUrl
         };
 
         if (mode === CONTACT_DIALOG_MODE.EDIT_CONTACT)
@@ -187,7 +197,7 @@ function Dialog(props)
             mode === CONTACT_DIALOG_MODE.ADD_CONTACT || mode === CONTACT_DIALOG_MODE.EDIT_CONTACT ?
                 <Modal.Footer>
                     <Button variant="primary" onClick={ onSaveClicked } disabled={ !allowSave() }>Save</Button>
-                    <Button variant="secondary" onClick={ hide }>Cancel</Button>
+                    <Button variant="secondary" onClick={ hide } disabled={ !allowHide() }>Cancel</Button>
                 </Modal.Footer> :
                 <Modal.Footer />
         );
@@ -543,6 +553,61 @@ function Dialog(props)
         setValidState(Object.assign({}, validState, { emailAddresses: v }));
     }
 
+    function onProfilePictureUploading()
+    {
+        setIsUploadingProfilePicture(true);
+    }
+
+    async function deleteProfilePicture(imageUrl)
+    {
+        if (imageUrl !== null)
+        {
+            try
+            {
+                let imageUrlParts = imageUrl.split('/');
+                let fileUuid = imageUrlParts[imageUrlParts.length - 1];
+
+                let response = await fetch(`${UPLOAD_IMAGE_URL}/${fileUuid}`, {
+                    method: 'DELETE'
+                });
+
+                if (response.ok)
+                {
+                    console.log(`Deleted profile picture: ${fileUuid}`);
+                }
+                else
+                {
+                    console.log(`Error deleting profile picture ${fileUuid}: ${response.status} ${response.statusText}`);
+                }
+            }
+            catch (error)
+            {
+                console.log(`Error deleting profile picture: ${error}`);
+            }
+        }
+    }
+
+    async function onProfilePictureUploaded(imageUrl)
+    {
+        if (mode === CONTACT_DIALOG_MODE.ADD_CONTACT || profilePictureUrl !== getInitialValue('profilePictureUrl'))
+        {
+            // When a new profile picture is uploaded, we need to cleanup the previous one.
+            await deleteProfilePicture(profilePictureUrl);
+        }
+
+        setProfilePictureUrl(imageUrl);
+        setDirtyState(Object.assign({}, dirtyState, {
+            profilePictureUrl: true
+        }));
+        setIsUploadingProfilePicture(false);
+    }
+
+    function onProfilePictureUploadError(error)
+    {
+        console.log(error);
+        setIsUploadingProfilePicture(false);
+    }
+
     function isDirty()
     {
         return dirtyState.firstName ||
@@ -552,7 +617,8 @@ function Dialog(props)
             dirtyState.phoneNumbers.some(dirty => dirty) ||
             phoneNumbersDirty ||
             dirtyState.emailAddresses.some(dirty => dirty) ||
-            emailAddressesDirty;
+            emailAddressesDirty ||
+            dirtyState.profilePictureUrl;
     }
 
     function isAllValid()
@@ -585,21 +651,29 @@ function Dialog(props)
         return true;
     }
 
+    function allowHide()
+    {
+        return !isUploadingProfilePicture;
+    }
+
     function allowSave()
     {
         if (mode === CONTACT_DIALOG_MODE.ADD_CONTACT)
         {
-            return isAllValid();
+            return isAllValid() && !isUploadingProfilePicture;
         }
         else if (mode === CONTACT_DIALOG_MODE.EDIT_CONTACT)
         {
-            return isDirty() && isAllValid();
+            return isDirty() && isAllValid() && !isUploadingProfilePicture;
         }
     }
 
     function hide()
     {
-        setShowState(false);
+        if (allowHide())
+        {
+            setShowState(false);
+        }
     }
 
     function onSaveClicked()
@@ -608,14 +682,26 @@ function Dialog(props)
         hide();
     }
 
-    function onClosed()
+    async function onClosed()
     {
         if (saveClicked)
         {
+            // In edit mode, if the profile picture is changed we need to cleanup the previous one.
+            if (mode === CONTACT_DIALOG_MODE.EDIT_CONTACT && dirtyState.profilePictureUrl)
+            {
+                await deleteProfilePicture(getInitialValue('profilePictureUrl'));
+            }
+
             onSaved(getContact());
         }
         else
         {
+            // If add/edit is cancelled and a new profile picture is uploaded, then clean it up.
+            if (dirtyState.profilePictureUrl)
+            {
+                await deleteProfilePicture(profilePictureUrl);
+            }
+
             onCancelled();
         }
     }
@@ -636,7 +722,11 @@ function Dialog(props)
                     <Tab eventKey="contactTab" title="Contact">
                         <div className="contact-dialog-tab">
                             <UploadImage 
+                                initialImageUrl={ profilePictureUrl }
                                 uploadImageUrl={ UPLOAD_IMAGE_URL }
+                                onImageUploading={ onProfilePictureUploading }
+                                onImageUploaded={ onProfilePictureUploaded }
+                                onImageUploadError={ onProfilePictureUploadError }
                             />
                             
                             <div className="contact-dialog-form">

@@ -11,12 +11,16 @@ const EDIT_ICON_HEIGHT = 24;
 export default function UploadImage(props)
 {
     let {
+        initialImageUrl,
         uploadImageUrl,
-        uploadImageKey
+        uploadImageKey,
+        onImageUploading,
+        onImageUploaded,
+        onImageUploadError
     } = props;
 
     const [ fileList, setFileList ] = useState([]);
-    const [ imageUrl, setImageUrl ] = useState(null);
+    const [ imageUrl, setImageUrl ] = useState(initialImageUrl);
     const [ isUploading, setIsUploading ] = useState(false);
 
     function uploadImage(file)
@@ -25,7 +29,10 @@ export default function UploadImage(props)
         try
         {
             formData.append(uploadImageKey, file, file.name);
+
             onImageUploading();
+            setIsUploading(true);
+
             fetch(uploadImageUrl, {
                 method: 'POST',
                 body: formData
@@ -34,25 +41,41 @@ export default function UploadImage(props)
                     response => {
                         if (response.ok)
                         {
-                            let url = response.headers.get('Location');
+                            let imageUrl = response.headers.get('Location');
 
-                            if (url)
+                            if (imageUrl)
                             {
-                                onImageUploaded(url);
+                                console.log(`Uploaded image: ${imageUrl}`);
+
+                                setImageUrl(imageUrl);
+                                setIsUploading(false);
+                                onImageUploaded(imageUrl);
                             }
                             else
                             {
-                                onImageUploadError(`Location header not provided in response.`);
+                                let error = new Error(`Location header not provided in response.`);
+
+                                console.error(error.message);
+                                setIsUploading(false);
+                                onImageUploadError(error);
                             }
                         }
                         else
                         {
-                            onImageUploadError(`${response.status} ${response.statusText}`);
+                            let error = new Error(`Error uploading image: ${response.status} ${response.statusText}`);
+
+                            console.error(error.message);
+                            setIsUploading(false);
+                            onImageUploadError(error);
                         }
                     }
                 )
                 .catch(
                     error => {
+                        let error1 = new Error(`Error uploading image: ${error}`);
+
+                        console.error(error1.message);
+                        setIsUploading(false);
                         onImageUploadError(error);
                     }
                 )
@@ -60,28 +83,12 @@ export default function UploadImage(props)
         }
         catch (error)
         {
+            let error1 = new Error(`Error uploading image: ${error}`);
+
+            console.error(error1.message);
+            setIsUploading(false);
             onImageUploadError(error);
         }
-    }
-
-    function onImageUploading()
-    {
-        setIsUploading(true);
-    }
-
-    function onImageUploaded(url)
-    {
-        console.log(`Uploaded image: ${url}`);
-
-        setImageUrl(url);
-        setIsUploading(false);
-    }
-
-    function onImageUploadError(error)
-    {
-        console.error(`Error uploading image: ${error}`);
-
-        setIsUploading(false);
     }
 
     function onFileChanged(e)
@@ -110,12 +117,20 @@ export default function UploadImage(props)
 }
 
 UploadImage.defaultProps = {
+    initialImageUrl: null,
     uploadImageUrl: '',
-    uploadImageKey: 'image'
+    uploadImageKey: 'image',
+    onImageUploading: () => {},
+    onImageUploaded: (imageUrl) => {},
+    onImageUploadError: (error) => {}
 };
 
 UploadImage.propTypes = {
+    initialImageUrl: PropTypes.string,
     uploadImageUrl: PropTypes.string,
-    uploadImageKey: PropTypes.string
+    uploadImageKey: PropTypes.string,
+    onImageUploading: PropTypes.func,
+    onImageUploaded: PropTypes.func,
+    onImageUploadError: PropTypes.func
 };
 

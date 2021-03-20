@@ -657,6 +657,8 @@ contactsApiRouter.delete('/api/contacts/profile-picture/:fileUuid', async (req, 
 
             return;
         }
+
+        res.status(200).send();
     }
     else
     {

@@ -1,6 +1,6 @@
 import React, { useState } from 'react';
 import PropTypes from 'prop-types';
-import { Button, ButtonGroup, Dropdown, DropdownButton, Form, Spinner } from 'react-bootstrap';
+import { Button, ButtonGroup, Dropdown, DropdownButton, Form, Image, Spinner } from 'react-bootstrap';
 import { AddIcon, ContactIcon, DeleteIcon, FavoriteIcon, GroupIcon, RefreshIcon, StarIcon, UserIcon } from '../../common/contactsImages';
 import { STATUS, DEFAULT_CONTACTS_ORDERBY, CONTACTS_ORDERBY_FIRSTNAME_ASC,
     CONTACTS_ORDERBY_FIRSTNAME_DESC, CONTACTS_ORDERBY_LASTNAME_ASC, 
@@ -21,6 +21,8 @@ import { STATUS, DEFAULT_CONTACTS_ORDERBY, CONTACTS_ORDERBY_FIRSTNAME_ASC,
     REFRESH_TOOLBAR_BUTTON_HEIGHT
 } from '../constants';
 
+const CONTACT_ICON_WIDTH = 32;
+const CONTACT_ICON_HEIGHT = 32;
 const NO_CONTACTS_ICON_WIDTH = 24;
 const NO_CONTACTS_ICON_HEIGHT = 24;
 const NO_CONTACTS_TEXT = "No Contacts";
@@ -230,7 +232,11 @@ export default function ContactList(props)
                     />
                 </div>
 
-                <UserIcon width="32" height="32" />
+                {
+                    contact.profilePictureUrl !== null ?
+                        <Image src={ contact.profilePictureUrl } width={ CONTACT_ICON_WIDTH } height={ CONTACT_ICON_HEIGHT } roundedCircle /> :
+                        <UserIcon width={ CONTACT_ICON_WIDTH } height={ CONTACT_ICON_HEIGHT } />
+                }
 
                 <a href="#" className="contact-name" onClick={ () => onEditContactClicked(contact) }>
                     <span>

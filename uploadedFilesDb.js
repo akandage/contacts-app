@@ -224,7 +224,7 @@ class UploadedFilesDb
             throw new Error(INVALID_FILE_UUID);
         }
 
-        let uploadedFile = this.getUploadedFile(user, fileUuid);
+        let uploadedFile = await this.getUploadedFile(user, fileUuid);
 
         await uploadedFile.remove();
     }
