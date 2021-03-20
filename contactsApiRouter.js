@@ -373,11 +373,32 @@ contactsApiRouter.delete('/api/contacts/:id', async (req, res, next) => {
         let userDb = req.app.get('user-db');
         let contactDb = req.app.get('contact-db');
         let user = null;
+        let contact = null;
 
         try
         {
             user = await userDb.getUser(session.username);
             debug(`Request user ${user.username}`);
+            contact = await contactDb.getContact(user, contactId);
+
+            if (contact.profilePictureUrl !== null)
+            {
+                let uploadedFilesDb = req.app.get('uploaded-files-db');
+
+                try
+                {
+                    let urlParts = contact.profilePictureUrl.split('/');
+                    let fileUuid = urlParts[urlParts.length - 1];
+
+                    await uploadedFilesDb.unregisterUploadedFile(user, fileUuid);
+                    debug(`Deleted contact ${contactId} profile picture: ${fileUuid}`);
+                }
+                catch (error)
+                {
+                    console.log(`Error deleting contact ${contactId} profile picture ${fileUuid}: ${error}`);
+                }
+            }
+
             await contactDb.deleteContact(user, contactId);
             debug(`Successfully deleted contact ${contactId}`);
         }
