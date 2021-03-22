@@ -87,7 +87,20 @@ function Dialog(props)
                         }
                     })
             }, 100)
-        )
+        );
+    }
+
+    function onContactSearchFocus(e)
+    {
+        onContactSearchChanged(contactSearchValue);
+    }
+
+    function onContactSearchBlur(e)
+    {
+        clearTimeout(contactSearchSuggestionsTimer);
+        setContactSearchSuggestionsTimer(null);
+        // Don't clear suggestions immediately in case suggestion was clicked.
+        setTimeout(() => setContactSearchSuggestions([]), 100);
     }
 
     async function fetchSuggestions(searchValue)
@@ -124,6 +137,8 @@ function Dialog(props)
     {
         let contact = contactSearchSuggestions[index];
 
+        clearTimeout(contactSearchSuggestionsTimer);
+        setContactSearchSuggestionsTimer(null);
         setContactSearchValue(`${contact.firstName} ${contact.lastName}`);
         setContact(contact);
         setContactSearchSuggestions([]);
@@ -149,7 +164,10 @@ function Dialog(props)
 
     function onRemoveSuggestionClicked()
     {
+        clearTimeout(contactSearchSuggestionsTimer);
+        setContactSearchSuggestionsTimer(null);
         setContactSearchValue('');
+        setContactSearchSuggestions([]);
         setContact(null);
     }
 
@@ -246,6 +264,8 @@ function Dialog(props)
                     autoCompleted={ contact !== null }
                     allowAdd={ contact !== null }
                     onChanged={ onContactSearchChanged }
+                    onFocus={ onContactSearchFocus }
+                    onBlur={ onContactSearchBlur }
                     onSuggestionClicked={ onSuggestionClicked }
                     onAddButtonClicked={ onAddSuggestionClicked }
                     onRemoveButtonClicked={ onRemoveSuggestionClicked }

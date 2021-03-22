@@ -15,6 +15,8 @@ export default function AutoCompleteTextbox(props)
         disabled,
         maxLength,
         onChanged,
+        onFocus,
+        onBlur,
         onSuggestionClicked,
         onAddButtonClicked,
         onRemoveButtonClicked
@@ -41,6 +43,8 @@ export default function AutoCompleteTextbox(props)
                                 value={ value }
                                 maxLength={ maxLength }
                                 onChange={ onChange }
+                                onFocus={ onFocus }
+                                onBlur={ onBlur }
                             >
                             </Form.Control> :
                             <div className="auto-complete-result">
@@ -89,6 +93,8 @@ AutoCompleteTextbox.defaultProps = {
     disabled: false,
     maxLength: 255,
     onChanged: (value) => {},
+    onFocus: (e) => {},
+    onBlur: (e) => {},
     onSuggestionClicked: (suggestion, index) => {},
     onAddButtonClicked: () => {},
     onRemoveButtonClicked: () => {}
@@ -102,6 +108,8 @@ AutoCompleteTextbox.propTypes = {
     disabled: PropTypes.bool,
     maxLength: PropTypes.number,
     onChanged: PropTypes.func,
+    onFocus: PropTypes.func,
+    onBlur: PropTypes.func,
     onSuggestionClicked: PropTypes.func,
     onAddButtonClicked: PropTypes.func,
     onRemoveButtonClicked: PropTypes.func
