@@ -50,14 +50,19 @@ export default function ContactsHeader(props)
             searchPlaceholderText
         } = props;
 
-        return (
-            <div className="search-form">
-                <Form.Control as="input" type="text" size="lg" placeholder={ searchPlaceholderText } />
-                <Button size="sm">
-                    <SearchIcon width="24" height="24" />
-                </Button>
-            </div>
-        );
+        if (loggedInUser)
+        {
+            return (
+                <div className="search-form">
+                    <Form.Control as="input" type="text" size="lg" placeholder={ searchPlaceholderText } />
+                    <Button size="sm">
+                        <SearchIcon width="24" height="24" />
+                    </Button>
+                </div>
+            );
+        }
+
+        return <></>;
     }
 
     function LoginSignUp(props)
