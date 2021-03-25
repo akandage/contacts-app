@@ -68,6 +68,11 @@ export const ACTION_TYPE = {
     RETRIEVING_GROUPS: 'RETRIEVING_GROUPS',
     RETRIEVED_GROUPS: 'RETRIEVED_GROUPS',
     ERROR_RETRIEVING_GROUPS: 'ERROR_RETRIEVING_GROUPS',
+    SEARCH_CONTACTS: 'SEARCH_CONTACTS',
+    CLEAR_SEARCH_CONTACTS: 'CLEAR_SEARCH_CONTACTS',
+    SEARCHING_CONTACTS: 'SEARCHING_CONTACTS',
+    ERROR_RETRIEVING_SEARCH_CONTACTS: 'ERROR_RETRIEVING_SEARCH_CONTACTS',
+    RETRIEVED_SEARCH_CONTACTS: 'RETRIEVED_SEARCH_CONTACTS',
     SORT_CONTACTS: 'SORT_CONTACTS',
     SORT_GROUPS: 'SORT_GROUPS'
 };
@@ -1022,7 +1027,7 @@ export function retrievedGroups(groups, limit, offset, orderBy)
         limit,
         offset,
         orderBy
-    }
+    };
 }
 
 export function errorRetrievingGroups(error)
@@ -1030,7 +1035,83 @@ export function errorRetrievingGroups(error)
     return {
         type: ACTION_TYPE.ERROR_RETRIEVING_GROUPS,
         error
-    }
+    };
+}
+
+export function clearSearchContacts()
+{
+    return {
+        type: ACTION_TYPE.CLEAR_SEARCH_CONTACTS
+    };
+}
+
+export function searchContacts(searchTerms, limit = null)
+{
+    return async (dispatch) => {
+        dispatch(searchingContacts());
+
+        try
+        {
+            let url = '/api/contacts/search';
+            let qs = {};
+
+            if (limit)
+            {
+                qs.limit = limit;
+            }
+
+            if (Array.isArray(searchTerms))
+            {
+                qs.searchTerms = searchTerms;
+            }
+            else
+            {
+                qs.searchTerms = [];
+            }
+
+            let response = await fetch(`${url}?${queryString.stringify(qs)}`);
+            
+            if (response.ok)
+            {
+                let contacts = await response.json();
+
+                dispatch(retrievedSearchContacts(contacts, searchTerms, limit));
+            }
+            else
+            {
+                dispatch(errorRetrievingSearchContacts(`Error retrieving contacts: ${response.status} ${response.statusText}`));
+            }
+        }
+        catch (error)
+        {
+            dispatch(errorRetrievingSearchContacts(`Error retrieving contacts: ${error.message}`));
+        }
+    };
+}
+
+export function searchingContacts()
+{
+    return {
+        type: ACTION_TYPE.SEARCHING_CONTACTS
+    };
+}
+
+export function errorRetrievingSearchContacts(error)
+{
+    return {
+        type: ACTION_TYPE.ERROR_RETRIEVING_SEARCH_CONTACTS,
+        error
+    };
+}
+
+export function retrievedSearchContacts(contacts, searchTerms, limit = null)
+{
+    return {
+        type: ACTION_TYPE.RETRIEVED_SEARCH_CONTACTS,
+        contacts,
+        searchTerms,
+        limit
+    };
 }
 
 export function sortContacts(orderBy = DEFAULT_CONTACTS_ORDERBY)

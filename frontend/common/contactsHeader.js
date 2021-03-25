@@ -1,4 +1,5 @@
 import React, { useRef, useState } from 'react';
+import PropTypes from 'prop-types';
 import { Button, Form, Nav, Overlay, OverlayTrigger, Popover, PopoverContent } from 'react-bootstrap';
 import { ContactsLogo, SearchIcon, UserIcon } from './contactsImages';
 import './stylesheets/contacts-header.css';
@@ -18,6 +19,16 @@ export function ContactsHeaderLogo()
 
 export default function ContactsHeader(props)
 {
+    let {
+        searchText,
+        searchButtonUrl,
+        searchPlaceholderText,
+        searchSuggestions,
+        onSearchTextChanged,
+        onSearchFocus,
+        onSearchBlur
+    } = props;
+
     const [ loggedInUser, setLoggedInUser ] = useState();
 
     fetch('/session/username')
@@ -46,23 +57,7 @@ export default function ContactsHeader(props)
 
     function SearchForm(props)
     {
-        let {
-            searchPlaceholderText
-        } = props;
 
-        if (loggedInUser)
-        {
-            return (
-                <div className="search-form">
-                    <Form.Control as="input" type="text" size="lg" placeholder={ searchPlaceholderText } />
-                    <Button size="sm">
-                        <SearchIcon width="24" height="24" />
-                    </Button>
-                </div>
-            );
-        }
-
-        return <></>;
     }
 
     function LoginSignUp(props)
@@ -116,9 +111,67 @@ export default function ContactsHeader(props)
     return (
         <div className="contacts-header">
             <ContactsHeaderLogo />
-            <SearchForm {...props} />
+
+            {
+                loggedInUser ?
+                    <div className="search-form">
+                        <Form.Control as="input"
+                            type="text"
+                            size="lg"
+                            placeholder={ searchPlaceholderText }
+                            value={ searchText }
+                            onChange={ (e) => onSearchTextChanged(e.target.value) }
+                            onFocus={ onSearchFocus }
+                            onBlur={ onSearchBlur }
+                        />
+
+                        <Button href={ searchButtonUrl } size="sm">
+                            <SearchIcon width="24" height="24" />
+                        </Button>
+
+                        {
+                            searchSuggestions.length > 0 ?
+                                <div className="search-suggestions">
+                                    {
+                                        searchSuggestions.map(
+                                            ({ suggestionText, suggestionUrl }, index) =>
+                                                <a href={ suggestionUrl } key={ index }>{ suggestionText }</a>
+                                        )
+                                    }
+                                </div> :
+                                <></>
+                        }
+                    </div> :
+                    <></>
+            }
+
             <LoginSignUp {...props} />
             <UserMenu {...props} />
         </div>
     );
 }
+
+ContactsHeader.defaultProps = {
+    searchText: '',
+    searchButtonUrl: '/',
+    searchPlaceholderText: '',
+    searchSuggestions: [],
+    onSearchTextChanged: (searchText) => {},
+    onSearchFocus: () => {},
+    onSearchBlur: () => {}
+};
+
+ContactsHeader.propTypes = {
+    searchText: PropTypes.string,
+    searchButtonUrl: PropTypes.string,
+    searchPlaceholderText: PropTypes.string,
+    searchSuggestions: PropTypes.arrayOf(
+        PropTypes.shape({
+            suggestionText: PropTypes.string.isRequired,
+            suggestionUrl: PropTypes.string.isRequired
+        })
+    ),
+    onSearchTextChanged: PropTypes.func,
+    onSearchFocus: PropTypes.func,
+    onSearchBlur: PropTypes.func
+};

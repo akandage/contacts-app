@@ -8,9 +8,11 @@ const INITIAL_STATE = {
     status: STATUS.START,
     error: null,
     contact: null,
-    contacts:[],
+    contacts: [],
+    searchContacts: null,
+    searchContactsSearchTerms: [],
     group: null,
-    groups:[],
+    groups: [],
     disabled: false,
     orderContactsBy: DEFAULT_CONTACTS_ORDERBY,
     orderGroupsBy: DEFAULT_GROUPS_ORDERBY,
@@ -230,6 +232,28 @@ const REDUCER = combineReducers({
                     }
                 });
                 break;
+            default:
+                break;
+        }
+
+        return next;
+    },
+    searchContacts: (state = INITIAL_STATE.searchContacts, action) => {
+        let next = state;
+
+        switch (action.type)
+        {
+            default:
+                break;
+        }
+
+        return next;
+    },
+    searchContactsSearchTerms: (state = INITIAL_STATE.searchContactsSearchTerms, action) => {
+        let next = state;
+
+        switch (action.type)
+        {
             default:
                 break;
         }

@@ -1,7 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import PropTypes from 'prop-types';
 import { Button, Modal } from 'react-bootstrap';
-import { GROUP_NAME_REGEX } from '../constants';
+import { CONTACTS_SEARCH_URL, MAX_CONTACT_SEARCH_RESULTS, GROUP_NAME_REGEX } from '../constants';
 import queryString from 'query-string';
 import AutoCompleteTextbox from './autoCompleteTextbox';
 import CustomTextBox, { RemoveButton } from './customTextbox';
@@ -10,9 +10,6 @@ export const GROUP_DIALOG_MODE = {
     ADD_GROUP: 'ADD_GROUP',
     EDIT_GROUP: 'EDIT_GROUP'
 };
-
-const CONTACT_SEARCH_URL = '/api/contacts/search';
-const MAX_CONTACT_SEARCH_RESULTS = 10;
 
 function Dialog(props)
 {
@@ -92,7 +89,10 @@ function Dialog(props)
 
     function onContactSearchFocus(e)
     {
-        onContactSearchChanged(contactSearchValue);
+        if (contactSearchValue !== '')
+        {
+            onContactSearchChanged(contactSearchValue);
+        }
     }
 
     function onContactSearchBlur(e)
@@ -105,11 +105,11 @@ function Dialog(props)
 
     async function fetchSuggestions(searchValue)
     {
-        let url = CONTACT_SEARCH_URL;
+        let url = CONTACTS_SEARCH_URL;
         let qs = {};
         let results = [];
 
-        qs.searchTerms = searchValue.split(' ');
+        qs.searchTerms = searchValue.trim().split(' ');
         qs.limit = MAX_CONTACT_SEARCH_RESULTS;
 
         try

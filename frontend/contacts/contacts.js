@@ -1,9 +1,10 @@
-import React from 'react';
+import React, { useState } from 'react';
 import PropTypes from 'prop-types';
 import ReactDOM from 'react-dom';
 import { connect, Provider } from 'react-redux';
 import { BrowserRouter as Router, Redirect, Route, Switch } from 'react-router-dom';
-import { STATUS, CONFIRM_ACTION_TYPE } from './constants';
+import queryString from 'query-string';
+import { CONTACTS_SEARCH_URL, MAX_CONTACT_SEARCH_RESULTS, STATUS, CONFIRM_ACTION_TYPE } from './constants';
 import * as ContactAppActions from './actions/contactAppActions';
 import ContactsHeader from '../common/contactsHeader';
 import { ContactIcon, FavoriteIcon, GroupIcon, SettingsIcon } from '../common/contactsImages';
@@ -17,6 +18,7 @@ import ContactsNav from './components/contactsNav';
 import ContactAppStore from './stores/contactAppStore';
 import './stylesheets/contacts.css';
 
+const CONTACTS_APP_SEARCH_URL = '/search';
 const SESSION_HEARTBEAT_INTERVAL = 30000;
 const APP_NAV_ICON_WIDTH = 24;
 const APP_NAV_ICON_HEIGHT = 24;
@@ -373,6 +375,113 @@ function connectConfirmFavoriteContactsDialog()
     )(ConfirmActionDialog);
 }
 
+function ContactsHeaderView(props)
+{
+    let {
+        currentSearchTerms
+    } = props;
+
+    const [ searchText, setSearchText ] = useState(currentSearchTerms.join(' '));
+    const [ searchTerms, setSearchTerms ] = useState(currentSearchTerms);
+    const [ searchSuggestions, setSearchSuggestions ] = useState([]);
+    const [ searchSuggestionsTimer, setSearchSuggestionsTimer ] = useState(null);
+
+    function getSearchButtonUrl()
+    {
+        return `${CONTACTS_APP_SEARCH_URL}?${queryString.stringify({ searchTerms })}`;
+    }
+
+    async function fetchSuggestions(searchTerms)
+    {
+        let qs = { searchTerms };
+        let results = [];
+
+        qs.limit = MAX_CONTACT_SEARCH_RESULTS;
+
+        try
+        {
+            let response = await fetch(`${CONTACTS_SEARCH_URL}?${queryString.stringify(qs)}`);
+
+            if (response.ok)
+            {
+                results = await response.json();
+            }
+            else
+            {
+                console.error(`Error while trying to retrieve contact suggestions: ${response.status} ${response.statusText}`);
+            }
+        }
+        catch (error)
+        {
+            console.error(`Error while trying to retrieve contact suggestions: ${error}`);
+        }
+
+        return results;
+    }
+
+    function onSearchTextChanged(searchText)
+    {
+        setSearchText(searchText);
+
+        let searchTerms = searchText.trim().split(' ');
+        setSearchTerms(searchTerms);
+        clearTimeout(searchSuggestionsTimer);
+        setSearchSuggestionsTimer(
+            setTimeout(() => {
+                fetchSuggestions(searchTerms)
+                    .then(contacts => {
+                        setSearchSuggestions(contacts.map(contact => {
+                            let searchTerms = [ contact.firstName, contact.lastName ];
+
+                            return {
+                                suggestionText: `${contact.firstName} ${contact.lastName}`,
+                                suggestionUrl: `${CONTACTS_APP_SEARCH_URL}?${queryString.stringify({ searchTerms })}`
+                            };
+                        }));
+                    })
+            }, 100)
+        );
+    }
+
+    function onSearchFocus()
+    {
+        if (searchText !== '')
+        {
+            onSearchTextChanged(searchText);
+        }
+    }
+
+    function onSearchBlur()
+    {
+        clearTimeout(searchSuggestionsTimer);
+        setSearchSuggestionsTimer(null);
+        // Don't clear suggestions immediately in case suggestion was clicked.
+        setTimeout(() => setSearchSuggestions([]), 100);
+    }
+
+    return (
+        <ContactsHeader
+            searchText={ searchText }
+            searchButtonUrl={ getSearchButtonUrl() }
+            searchSuggestions={ searchSuggestions }
+            searchPlaceholderText="Search Contacts"
+            onSearchTextChanged={ onSearchTextChanged }
+            onSearchFocus={ onSearchFocus }
+            onSearchBlur={ onSearchBlur }
+        />
+    );
+}
+
+ContactsHeaderView.defaultProps = {
+    currentSearchTerms: []
+};
+
+ContactsHeaderView.propTypes = {
+    currentSearchTerms: PropTypes.arrayOf(
+        PropTypes.string
+    )
+};
+
 function ContactsView(props)
 {
     let {
@@ -438,7 +547,7 @@ function renderContactsApp()
     {
         let store = ContactAppStore();
 
-        ReactDOM.render(<ContactsHeader /> , document.getElementById('contacts-header'));
+        ReactDOM.render(<ContactsHeaderView /> , document.getElementById('contacts-header'));
         ReactDOM.render(
             <div className="app-container">
                 <Router>

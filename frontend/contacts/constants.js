@@ -65,3 +65,6 @@ export const GROUP_TOOLBAR_BUTTON_WIDTH = 24;
 export const GROUP_TOOLBAR_BUTTON_HEIGHT = 24;
 export const REFRESH_TOOLBAR_BUTTON_WIDTH = 24;
 export const REFRESH_TOOLBAR_BUTTON_HEIGHT = 24;
+
+export const CONTACTS_SEARCH_URL = '/api/contacts/search';
+export const MAX_CONTACT_SEARCH_RESULTS = 10;
