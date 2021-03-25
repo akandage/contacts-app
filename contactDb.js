@@ -530,19 +530,10 @@ class ContactDb
                 let results = [];
 
                 query = this._contactModel.find({ owner: user._id,
-                    firstName: new RegExp(searchTerms[0])
-                });
-                query.setOptions(queryOptions);
-                results = await query.exec();
-                results.map(result => contacts.push(result));
-
-                if (queryOptions.limit !== null)
-                {
-                    queryOptions.limit = Math.max(0, queryOptions.limit - results.length);
-                }
-
-                query = this._contactModel.find({ owner: user._id,
-                    lastName: new RegExp(searchTerms[0])
+                    $or: [
+                        { firstName: new RegExp(searchTerms[0]) },
+                        { lastName: new RegExp(searchTerms[0]) }
+                    ]
                 });
                 query.setOptions(queryOptions);
                 results = await query.exec();
