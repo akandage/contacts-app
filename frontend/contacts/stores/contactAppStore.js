@@ -9,7 +9,7 @@ const INITIAL_STATE = {
     error: null,
     contact: null,
     contacts: [],
-    searchContacts: null,
+    searchContacts: [],
     searchContactsSearchTerms: [],
     group: null,
     groups: [],
@@ -48,8 +48,9 @@ const REDUCER = combineReducers({
                 next = STATUS.CONFIRM_ACTION;
                 break;
             case ACTION_TYPE.RETRIEVING_CONTACTS:
+            case ACTION_TYPE.SEARCHING_CONTACTS:
             case ACTION_TYPE.RETRIEVING_GROUPS:
-                next = state !== STATUS.START ? STATUS.REFRESHING : STATUS.LOADING;
+                next = state !== STATUS.START && state !== STATUS.LOADING ? STATUS.REFRESHING : STATUS.LOADING;
                 break;
             default:
                 next = state !== STATUS.START ? STATUS.IDLE : STATUS.START;
@@ -71,6 +72,7 @@ const REDUCER = combineReducers({
             case ACTION_TYPE.ERROR_FAVORITING_CONTACT:
             case ACTION_TYPE.ERROR_FAVORITING_CONTACTS:
             case ACTION_TYPE.ERROR_RETRIEVING_CONTACTS:
+            case ACTION_TYPE.ERROR_RETRIEVING_SEARCH_CONTACTS:
             case ACTION_TYPE.ERROR_RETRIEVING_GROUPS:
                 next = action.error;
                 break;
@@ -243,6 +245,13 @@ const REDUCER = combineReducers({
 
         switch (action.type)
         {
+            case ACTION_TYPE.RETRIEVED_SEARCH_CONTACTS:
+                next = action.contacts;
+                break;
+            case ACTION_TYPE.CLEAR_SEARCH_CONTACTS:
+            case ACTION_TYPE.ERROR_RETRIEVING_SEARCH_CONTACTS:
+                next = [];
+                break;
             default:
                 break;
         }
@@ -254,6 +263,12 @@ const REDUCER = combineReducers({
 
         switch (action.type)
         {
+            case ACTION_TYPE.SEARCHING_CONTACTS:
+                next = action.searchTerms;
+                break;
+            case ACTION_TYPE.CLEAR_SEARCH_CONTACTS:
+                next = [];
+                break;
             default:
                 break;
         }
@@ -379,6 +394,7 @@ const REDUCER = combineReducers({
         {
             case ACTION_TYPE.CONFIRM_DELETE_CONTACT:
             case ACTION_TYPE.RETRIEVING_CONTACTS:
+            case ACTION_TYPE.SEARCHING_CONTACTS:
             case ACTION_TYPE.RETRIEVING_GROUPS:
                 next = true;
                 break;

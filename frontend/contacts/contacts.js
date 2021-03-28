@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useEffect, useState } from 'react';
 import PropTypes from 'prop-types';
 import ReactDOM from 'react-dom';
 import { connect, Provider } from 'react-redux';
@@ -7,7 +7,7 @@ import queryString from 'query-string';
 import { CONTACTS_SEARCH_URL, MAX_CONTACT_SEARCH_RESULTS, STATUS, CONFIRM_ACTION_TYPE } from './constants';
 import * as ContactAppActions from './actions/contactAppActions';
 import ContactsHeader from '../common/contactsHeader';
-import { ContactIcon, FavoriteIcon, GroupIcon, SettingsIcon } from '../common/contactsImages';
+import { ContactIcon, FavoriteIcon, GroupIcon, SearchIcon, SettingsIcon } from '../common/contactsImages';
 import ContactDialog, { CONTACT_DIALOG_MODE } from './components/contactDialog';
 import ConfirmActionDialog from './components/confirmActionDialog';
 import ContactList from './components/contactList';
@@ -74,6 +74,57 @@ function connectGroupContactsDialog()
     )(GroupContactsDialog);
 }
 
+function getContactListDispatchActions(dispatch, isFavoritesList = false)
+{
+    return {
+        onAddContactClicked: () => dispatch(ContactAppActions.addContact()),
+        onEditContactClicked: (contact) => dispatch(ContactAppActions.editContact(contact)),
+        onRefreshClicked: () => dispatch(ContactAppActions.retrieveContacts()),
+        onSelected: (contact) => dispatch(ContactAppActions.selectContact(contact)),
+        onSelectAll: () => dispatch(ContactAppActions.selectAllContacts()),
+        onDeselected: (contact) => dispatch(ContactAppActions.deselectContact(contact)),
+        onDeselectAll: () => dispatch(ContactAppActions.deselectAllContacts()),
+        onDeleteClicked: (contact) => dispatch(ContactAppActions.confirmDeleteContact(contact)),
+        onDeleteMultipleClicked: (contacts) => dispatch(ContactAppActions.confirmDeleteContacts(contacts)),
+        onFavoriteClicked: (contact) => {
+            if (isFavoritesList)
+            {
+                dispatch(ContactAppActions.confirmUnfavoriteContact(contact));
+            }
+            else
+            {
+                dispatch(ContactAppActions.favoriteContact(contact));
+            }
+        },
+        onFavoriteMultipleClicked: (contacts) => {
+            if (isFavoritesList)
+            {
+                if (contacts.length > 1)
+                {
+                    dispatch(ContactAppActions.confirmUnfavoriteContacts(contacts));
+                }
+                else
+                {
+                    dispatch(ContactAppActions.confirmUnfavoriteContact(contacts[0]));
+                }
+            }
+            else
+            {
+                if (contacts.length > 1)
+                {
+                    dispatch(ContactAppActions.confirmFavoriteContacts(contacts));
+                }
+                else
+                {
+                    dispatch(ContactAppActions.favoriteContact(contacts[0]));
+                }
+            }
+        },
+        onGroupClicked: (contacts) => dispatch(ContactAppActions.addGroup(contacts)),
+        onSortChanged: (orderBy) => dispatch(ContactAppActions.sortContacts(orderBy))
+    };
+}
+
 function connectContactList(isFavoritesList = false)
 {
     return connect(
@@ -86,53 +137,7 @@ function connectContactList(isFavoritesList = false)
             };
         },
         dispatch => {
-            return {
-                onAddContactClicked: () => dispatch(ContactAppActions.addContact()),
-                onEditContactClicked: (contact) => dispatch(ContactAppActions.editContact(contact)),
-                onRefreshClicked: () => dispatch(ContactAppActions.retrieveContacts()),
-                onSelected: (contact) => dispatch(ContactAppActions.selectContact(contact)),
-                onSelectAll: () => dispatch(ContactAppActions.selectAllContacts()),
-                onDeselected: (contact) => dispatch(ContactAppActions.deselectContact(contact)),
-                onDeselectAll: () => dispatch(ContactAppActions.deselectAllContacts()),
-                onDeleteClicked: (contact) => dispatch(ContactAppActions.confirmDeleteContact(contact)),
-                onDeleteMultipleClicked: (contacts) => dispatch(ContactAppActions.confirmDeleteContacts(contacts)),
-                onFavoriteClicked: (contact) => {
-                    if (isFavoritesList)
-                    {
-                        dispatch(ContactAppActions.confirmUnfavoriteContact(contact));
-                    }
-                    else
-                    {
-                        dispatch(ContactAppActions.favoriteContact(contact));
-                    }
-                },
-                onFavoriteMultipleClicked: (contacts) => {
-                    if (isFavoritesList)
-                    {
-                        if (contacts.length > 1)
-                        {
-                            dispatch(ContactAppActions.confirmUnfavoriteContacts(contacts));
-                        }
-                        else
-                        {
-                            dispatch(ContactAppActions.confirmUnfavoriteContact(contacts[0]));
-                        }
-                    }
-                    else
-                    {
-                        if (contacts.length > 1)
-                        {
-                            dispatch(ContactAppActions.confirmFavoriteContacts(contacts));
-                        }
-                        else
-                        {
-                            dispatch(ContactAppActions.favoriteContact(contacts[0]));
-                        }
-                    }
-                },
-                onGroupClicked: (contacts) => dispatch(ContactAppActions.addGroup(contacts)),
-                onSortChanged: (orderBy) => dispatch(ContactAppActions.sortContacts(orderBy))
-            };
+            return getContactListDispatchActions(dispatch, isFavoritesList);
         }
     )(ContactList);
 }
@@ -381,10 +386,18 @@ function ContactsHeaderView(props)
         currentSearchTerms
     } = props;
 
-    const [ searchText, setSearchText ] = useState(currentSearchTerms.join(' '));
-    const [ searchTerms, setSearchTerms ] = useState(currentSearchTerms);
+    const [ searchText, setSearchText ] = useState();
+    const [ searchTerms, setSearchTerms ] = useState();
     const [ searchSuggestions, setSearchSuggestions ] = useState([]);
     const [ searchSuggestionsTimer, setSearchSuggestionsTimer ] = useState(null);
+
+    useEffect(() => {
+        setSearchText(currentSearchTerms.join(' '));
+        setSearchTerms(currentSearchTerms);
+        setSearchSuggestions([]);
+        clearTimeout(searchSuggestionsTimer);
+        setSearchSuggestionsTimer(null);
+    }, [ currentSearchTerms ]);
 
     function getSearchButtonUrl()
     {
@@ -482,6 +495,39 @@ ContactsHeaderView.propTypes = {
     )
 };
 
+function connectContactsHeaderView()
+{
+    return connect(
+        state => {
+            return {
+                currentSearchTerms: state.searchContactsSearchTerms
+            };
+        }
+    )(ContactsHeaderView);
+}
+
+function connectSearchContactList()
+{
+    return connect(
+        state => {
+            let searchContactIds = new Set(state.searchContacts.map(contact => contact._id));
+            let contacts = state.contacts.filter(contact => searchContactIds.has(contact.contact._id));
+
+            return {
+                status: state.status,
+                contacts,
+                disabled: state.disabled,
+                addContactDisabled: true,
+                refreshContactsDisabled: true,
+                sortContactsDisabled: true
+            };
+        },
+        dispatch => {
+            return getContactListDispatchActions(dispatch);
+        }
+    )(ContactList);
+}
+
 function ContactsView(props)
 {
     let {
@@ -539,6 +585,108 @@ function GroupsView()
     );
 }
 
+function SearchContactsView()
+{
+    let EditContactDialog = connectEditContactDialog();
+    let GroupContactsDialog = connectGroupContactsDialog();
+    let ConfirmDeleteContactsDialog = connectConfirmDeleteContactsDialog();
+    let ConfirmFavoriteContactsDialog = connectConfirmFavoriteContactsDialog();
+    let SearchContactList = connectSearchContactList();
+
+    return (
+        <>
+            <EditContactDialog />
+            <GroupContactsDialog />
+            <ConfirmDeleteContactsDialog />
+            <ConfirmFavoriteContactsDialog />
+            <SearchContactList />
+        </>
+    );
+}
+
+function renderContactsRoute(props, store)
+{
+    setTimeout(() => {
+        store.dispatch(ContactAppActions.clearSearchContacts());
+        store.dispatch(ContactAppActions.deselectAllContacts());
+    }, 0);
+
+    return (
+        <Provider store={ store }>
+            <ContactsView />
+        </Provider>
+    );
+}
+
+function renderFavoritesRoute(props, store)
+{
+    setTimeout(() => {
+        store.dispatch(ContactAppActions.clearSearchContacts());
+        store.dispatch(ContactAppActions.deselectAllContacts());
+    }, 0);
+
+    return (
+        <Provider store={ store }>
+            <FavoritesView />
+        </Provider>
+    );
+}
+
+function renderGroupsRoute(props, store)
+{
+    setTimeout(() => {
+        store.dispatch(ContactAppActions.clearSearchContacts());
+        store.dispatch(ContactAppActions.deselectAllContacts());
+    }, 0);
+
+    return (
+        <Provider store={ store }>
+            <GroupsView />
+        </Provider>
+    );
+}
+
+function renderSearchRoute(props, store)
+{
+    let {
+        location
+    } = props;
+    let searchTerms = null;
+
+    if (location.search)
+    {
+        let qs = queryString.parse(location.search);
+
+        if (Array.isArray(qs.searchTerms))
+        {
+            searchTerms = qs.searchTerms;
+        }
+        else if (typeof qs.searchTerms === 'string')
+        {
+            searchTerms = [ qs.searchTerms ];
+        }
+        else
+        {
+            searchTerms = [];
+        }
+    }
+    else
+    {
+        searchTerms = [];
+    }
+
+    setTimeout(() => {
+        store.dispatch(ContactAppActions.deselectAllContacts());
+        store.dispatch(ContactAppActions.searchContacts(searchTerms));
+    }, 0);
+
+    return (
+        <Provider store={ store }>
+            <SearchContactsView />
+        </Provider>
+    );
+}
+
 function renderContactsApp()
 {
     let authState = document.getElementById('auth-state');
@@ -547,11 +695,18 @@ function renderContactsApp()
     {
         let store = ContactAppStore();
 
-        ReactDOM.render(<ContactsHeaderView /> , document.getElementById('contacts-header'));
+        let ContactsHeaderView = connectContactsHeaderView();
+        ReactDOM.render(
+            <Provider store={ store }>
+                <ContactsHeaderView />
+            </Provider>,
+            document.getElementById('contacts-header'));
+
         ReactDOM.render(
             <div className="app-container">
                 <Router>
                     <ContactsNav>
+                        <ContactsNav.Link to="/search" icon={ <SearchIcon width={ APP_NAV_ICON_WIDTH } height={ APP_NAV_ICON_HEIGHT } /> } linkText="Search" />
                         <ContactsNav.Link to="/contacts" icon={ <ContactIcon width={ APP_NAV_ICON_WIDTH } height={ APP_NAV_ICON_HEIGHT } /> } linkText="Contacts" />
                         <ContactsNav.Link to="/favorites" icon={ <FavoriteIcon width={ APP_NAV_ICON_WIDTH } height={ APP_NAV_ICON_HEIGHT } outline={ false } /> } linkText="Favorites" />
                         <ContactsNav.Link to="/groups" icon={ <GroupIcon width={ APP_NAV_ICON_WIDTH } height={ APP_NAV_ICON_HEIGHT } /> } linkText="Groups" />
@@ -560,26 +715,14 @@ function renderContactsApp()
                     </ContactsNav>
 
                     <div className="app-list-container">
-                        
                             <Switch>
                                 <Route exact path="/">
                                     <Redirect to="/contacts" />
                                 </Route>
-                                <Route exact path="/contacts">
-                                    <Provider store={ store }>
-                                        <ContactsView />
-                                    </Provider>
-                                </Route>
-                                <Route exact path="/favorites">
-                                    <Provider store={ store }>
-                                        <FavoritesView />
-                                    </Provider>
-                                </Route>
-                                <Route exact path="/groups">
-                                    <Provider store={ store }>
-                                        <GroupsView />
-                                    </Provider>
-                                </Route>
+                                <Route exact path="/contacts" render={ (props) => renderContactsRoute(props, store) } />
+                                <Route exact path="/favorites" render={ (props) => renderFavoritesRoute(props, store) } />
+                                <Route exact path="/groups" render={ (props) => renderGroupsRoute(props, store) } />
+                                <Route exact path="/search" render={ (props) => renderSearchRoute(props, store) } />
                             </Switch>
                     </div>
                 </Router>

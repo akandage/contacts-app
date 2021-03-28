@@ -126,7 +126,9 @@ export default function ContactsHeader(props)
                         />
 
                         <Button href={ searchButtonUrl } size="sm">
-                            <SearchIcon width="24" height="24" />
+                            <div className="search-icon-container">
+                                <SearchIcon width="24" height="24" />
+                            </div>
                         </Button>
 
                         {

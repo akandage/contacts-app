@@ -250,6 +250,14 @@ div.search-suggestions > a {
     border-bottom: solid 1px #ebeef0;
 }
 
+div.search-icon-container {
+    width: 100%;
+    height: 100%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+
 div.auto-complete-suggestions > a:hover {
     text-decoration: none;
     background-color: #9cbad0ff;

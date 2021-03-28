@@ -128,7 +128,13 @@ export default function GroupList(props)
         return (
             !disabled ?
                 <a href="#"
-                    onClick={ onClick }
+                    onClick={
+                        (e) => {
+                            e.preventDefault();
+                            e.stopPropagation();
+                            onClick();
+                        }
+                    }
                 >
                     <DeleteIcon width={ DELETE_BUTTON_WIDTH } height={ DELETE_BUTTON_HEIGHT } />
                 </a> :
@@ -154,7 +160,16 @@ export default function GroupList(props)
                     />
                 </div>
 
-                <a href="#" className="contact-name" onClick={ () => onEditGroupClicked(group) }>
+                <a href="#"
+                    className="contact-name"
+                    onClick={
+                        (e) => {
+                            e.preventDefault();
+                            e.stopPropagation();
+                            onEditGroupClicked(group);
+                        }
+                    }
+                >
                     <span>
                         {`${group.name}`}
                     </span>

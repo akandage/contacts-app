@@ -1048,7 +1048,7 @@ export function clearSearchContacts()
 export function searchContacts(searchTerms, limit = null)
 {
     return async (dispatch) => {
-        dispatch(searchingContacts());
+        dispatch(searchingContacts(searchTerms));
 
         try
         {
@@ -1066,7 +1066,8 @@ export function searchContacts(searchTerms, limit = null)
             }
             else
             {
-                qs.searchTerms = [];
+                dispatch(retrievedSearchContacts([], searchTerms, limit));
+                return;
             }
 
             let response = await fetch(`${url}?${queryString.stringify(qs)}`);
@@ -1089,10 +1090,11 @@ export function searchContacts(searchTerms, limit = null)
     };
 }
 
-export function searchingContacts()
+export function searchingContacts(searchTerms)
 {
     return {
-        type: ACTION_TYPE.SEARCHING_CONTACTS
+        type: ACTION_TYPE.SEARCHING_CONTACTS,
+        searchTerms
     };
 }
 

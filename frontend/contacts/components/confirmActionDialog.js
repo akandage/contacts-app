@@ -87,7 +87,7 @@ ConfirmActionDialog.defaultProps = {
     bodyText: '',
     acceptText: 'OK',
     cancelText: 'Cancel',
-    centered: false,
+    centered: true,
     onAccepted: (actionType, subjects) => {},
     onCancelled: (actionType, subjects) => {}
 };

@@ -33,6 +33,9 @@ export default function ContactList(props)
         status,
         contacts,
         disabled,
+        addContactDisabled,
+        refreshContactsDisabled,
+        sortContactsDisabled,
         orderBy,
         onAddContactClicked,
         onEditContactClicked,
@@ -145,7 +148,7 @@ export default function ContactList(props)
                 <Form.Check checked={ isContactsSelected } disabled={ disabled } onChange={ onCheckClicked } />
 
                 <ButtonGroup>
-                    <Button disabled={ disabled || isContactsSelected } onClick={ onAddContactClicked }>
+                    <Button disabled={ disabled || addContactDisabled || isContactsSelected } onClick={ onAddContactClicked }>
                         <AddIcon width={ ADD_TOOLBAR_BUTTON_WIDTH } height={ ADD_TOOLBAR_BUTTON_HEIGHT } />
                     </Button>
                     <Button disabled={ disabled || !isContactsSelected } onClick={ onDeleteButtonClicked }>
@@ -157,12 +160,12 @@ export default function ContactList(props)
                     <Button disabled={ disabled || !isContactsSelected } onClick={ onGroupButtonClicked }>
                         <GroupIcon width={ GROUP_TOOLBAR_BUTTON_WIDTH } height={ GROUP_TOOLBAR_BUTTON_HEIGHT } />
                     </Button>
-                    <Button onClick={ onRefreshClicked } disabled={ disabled || status === STATUS.LOADING || status === STATUS.REFRESHING }>
+                    <Button onClick={ onRefreshClicked } disabled={ disabled || refreshContactsDisabled || status === STATUS.LOADING || status === STATUS.REFRESHING }>
                         <RefreshIcon width={ REFRESH_TOOLBAR_BUTTON_WIDTH } height={ REFRESH_TOOLBAR_BUTTON_HEIGHT } />
                     </Button>
                 </ButtonGroup>
 
-                <DropdownButton title="Sort" onSelect={ onSortSelected } disabled={ !Array.isArray(contacts) || contacts.length === 0 || disabled || status === STATUS.LOADING || status === STATUS.REFRESHING }>
+                <DropdownButton title="Sort" onSelect={ onSortSelected } disabled={ !Array.isArray(contacts) || contacts.length === 0 || disabled || sortContactsDisabled || status === STATUS.LOADING || status === STATUS.REFRESHING }>
                     <Dropdown.Item eventKey="firstNameASC" active={ sortKey === 'firstNameASC' }>First Name Ascending</Dropdown.Item>
                     <Dropdown.Item eventKey="firstNameDESC" active={ sortKey === 'firstNameDESC' }>First Name Descending</Dropdown.Item>
                     <Dropdown.Item eventKey="lastNameASC" active={ sortKey === 'lastNameASC' }>Last Name Ascending</Dropdown.Item>
@@ -182,7 +185,13 @@ export default function ContactList(props)
         return (
             !disabled ?
                 <a href="#"
-                    onClick={ onClick }
+                    onClick={ 
+                        (e) => {
+                            e.preventDefault();
+                            e.stopPropagation();
+                            onClick();
+                        }
+                    }
                 >
                     <DeleteIcon width={ DELETE_BUTTON_WIDTH } height={ DELETE_BUTTON_HEIGHT } />
                 </a> :
@@ -204,7 +213,13 @@ export default function ContactList(props)
                 <a href="#"
                     onMouseEnter={ () => setHover(true) }
                     onMouseLeave={ () => setHover(false) }
-                    onClick={ onClick }
+                    onClick={ 
+                        (e) => {
+                            e.preventDefault();
+                            e.stopPropagation();
+                            onClick();
+                        }
+                    }
                 >
                     <FavoriteIcon width={ FAVORITE_BUTTON_WIDTH } height={ FAVORITE_BUTTON_HEIGHT }
                         outline={ !favorite && !hover }
@@ -238,7 +253,16 @@ export default function ContactList(props)
                         <UserIcon width={ CONTACT_ICON_WIDTH } height={ CONTACT_ICON_HEIGHT } />
                 }
 
-                <a href="#" className="contact-name" onClick={ () => onEditContactClicked(contact) }>
+                <a href="#"
+                    className="contact-name"
+                    onClick={
+                        (e) => {
+                            e.preventDefault();
+                            e.stopPropagation();
+                            onEditContactClicked(contact);
+                        }
+                    }
+                >
                     <span>
                         {`${contact.firstName} ${contact.lastName}`}
                     </span>
@@ -335,6 +359,9 @@ ContactList.defaultProps = {
     status: '',
     contacts: [],
     disabled: false,
+    addContactDisabled: false,
+    refreshContactsDisabled: false,
+    sortContactsDisabled: false,
     orderBy: DEFAULT_CONTACTS_ORDERBY,
     onAddContactClicked: () => {},
     onEditContactClicked: (contact) => {},
@@ -361,6 +388,9 @@ ContactList.propTypes = {
         })
     ).isRequired,
     disabled: PropTypes.bool,
+    addContactDisabled: PropTypes.bool,
+    refreshContactsDisabled: PropTypes.bool,
+    sortContactsDisabled: PropTypes.bool,
     orderBy: PropTypes.array,
     onAddContactClicked: PropTypes.func,
     onEditContactClicked: PropTypes.func,
