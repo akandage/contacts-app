@@ -30,6 +30,7 @@ export default function ContactsHeader(props)
     } = props;
 
     const [ loggedInUser, setLoggedInUser ] = useState();
+    const searchButtonRef = useRef(null);
 
     fetch('/session/username')
         .then(
@@ -54,11 +55,6 @@ export default function ContactsHeader(props)
                 console.error(`Error while trying to retrieve logged in user info: ${error}`);
             }
         );
-
-    function SearchForm(props)
-    {
-
-    }
 
     function LoginSignUp(props)
     {
@@ -108,6 +104,20 @@ export default function ContactsHeader(props)
         return <></>;
     }
 
+    function onSearchKeyPress(e)
+    {
+        if (e.code === 'Enter')
+        {
+            e.preventDefault();
+            e.stopPropagation();
+
+            if (searchButtonRef.current !== null  && searchText.length > 0)
+            {
+                searchButtonRef.current.click();
+            }
+        }
+    }
+
     return (
         <div className="contacts-header">
             <ContactsHeaderLogo />
@@ -120,12 +130,13 @@ export default function ContactsHeader(props)
                             size="lg"
                             placeholder={ searchPlaceholderText }
                             value={ searchText }
+                            onKeyPress={ onSearchKeyPress }
                             onChange={ (e) => onSearchTextChanged(e.target.value) }
                             onFocus={ onSearchFocus }
                             onBlur={ onSearchBlur }
                         />
 
-                        <Button href={ searchButtonUrl } size="sm">
+                        <Button href={ searchButtonUrl } size="sm" ref={ searchButtonRef }>
                             <div className="search-icon-container">
                                 <SearchIcon width="24" height="24" />
                             </div>
