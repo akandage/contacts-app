@@ -30,6 +30,7 @@ export default function ContactsHeader(props)
     } = props;
 
     const [ loggedInUser, setLoggedInUser ] = useState();
+    const headerRef = useRef(null);
     const searchButtonRef = useRef(null);
 
     fetch('/session/username')
@@ -79,7 +80,7 @@ export default function ContactsHeader(props)
                 <PopoverContent>
                     <Nav className="flex-column">
                         <Nav.Item>
-                            <Nav.Link href="#">User Settings</Nav.Link>
+                            <Nav.Link href="/settings">User Settings</Nav.Link>
                         </Nav.Item>
                         <Nav.Item>
                             <Nav.Link href="/logout">Logout</Nav.Link>
@@ -93,8 +94,15 @@ export default function ContactsHeader(props)
         {
             // TODO: Retrieve user profile photo from server.
             return (
-                <OverlayTrigger trigger='focus' overlay={ UserMenuPopover } placement='bottom'>
-                    <a id="user-icon-button" href="#">
+                <OverlayTrigger container={ headerRef.current } trigger='focus' overlay={ UserMenuPopover } placement='bottom'>
+                    <a id="user-icon-button" href="#"
+                        onClick={
+                            (e) => {
+                                e.preventDefault();
+                                e.stopPropagation();
+                            }
+                        }
+                    >
                         <UserIcon width="48" height="48" />
                     </a>
                 </OverlayTrigger>
@@ -119,7 +127,7 @@ export default function ContactsHeader(props)
     }
 
     return (
-        <div className="contacts-header">
+        <div className="contacts-header" ref={ headerRef }>
             <ContactsHeaderLogo />
 
             {
