@@ -6,7 +6,8 @@ export const STATUS = {
     EDIT_CONTACT: 'EDIT_CONTACT',
     EDIT_GROUP: 'EDIT_GROUP',
     CONFIRM_ACTION: 'CONFIRM_ACTION',
-    IDLE: 'IDLE'
+    IDLE: 'IDLE',
+    ERROR: 'ERROR'
 }
 
 export const CONFIRM_ACTION_TYPE = {

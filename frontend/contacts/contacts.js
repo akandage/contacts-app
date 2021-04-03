@@ -15,6 +15,7 @@ import GroupDialog, { GROUP_DIALOG_MODE } from './components/groupDialog';
 import GroupContactsDialog from './components/groupContactsDialog';
 import GroupList from './components/groupList';
 import ContactsNav from './components/contactsNav';
+import UserSettings from './components/userSettings';
 import ContactAppStore from './stores/contactAppStore';
 import './stylesheets/contacts.css';
 
@@ -687,6 +688,20 @@ function renderSearchRoute(props, store)
     );
 }
 
+function renderSettingsRoute(props, store)
+{
+    setTimeout(() => {
+        store.dispatch(ContactAppActions.clearSearchContacts());
+        store.dispatch(ContactAppActions.deselectAllContacts());
+    }, 0);
+
+    return (
+        <Provider store={ store }>
+            <UserSettings />
+        </Provider>
+    );
+}
+
 function renderContactsApp()
 {
     let authState = document.getElementById('auth-state');
@@ -723,6 +738,7 @@ function renderContactsApp()
                                 <Route exact path="/favorites" render={ (props) => renderFavoritesRoute(props, store) } />
                                 <Route exact path="/groups" render={ (props) => renderGroupsRoute(props, store) } />
                                 <Route exact path="/search" render={ (props) => renderSearchRoute(props, store) } />
+                                <Route path="/settings" render={ (props) => renderSettingsRoute(props, store) } />
                             </Switch>
                     </div>
                 </Router>

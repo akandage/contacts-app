@@ -301,3 +301,89 @@ ul.group-dialog-contacts-list > li > div.group-contact {
     background-color: #9cbad0ff;
     border-radius: 10px;
 }
+
+div.user-settings-placeholder {
+    width: 100%;
+    height: 90vh;
+    display: flex;
+    flex-direction: row;
+    align-items: center;
+}
+
+div.user-settings-placeholder > div {
+    width: 100%;
+    height: fit-content;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+}
+
+div.user-settings-container {
+    width: fit-content;
+}
+
+div.user-settings-container > hr {
+    border-top: 1px solid #333333;
+    width: 90%;
+    margin-top: 1em;
+    margin-bottom: 1em;
+}
+
+div.user-settings-user {
+    width: 100%;
+    display: flex;
+    flex-direction: row;
+    align-items: center;
+    justify-content: flex-start;
+    column-gap: 1em;
+}
+
+div.user-settings-user > span {
+    font-size: 2em;
+    font-weight: bold;
+}
+
+div.user-settings-actions {
+    width: 100%;
+    display: flex;
+    flex-direction: column;
+    align-items: flex-start;
+    justify-content: flex-start;
+    row-gap: 1em;
+}
+
+div.user-settings-actions > ul {
+    display: block;
+    width: 100%;
+    list-style-type: none;
+    padding-left: 0;
+}
+
+div.user-settings-actions > ul li {
+    margin-bottom: 0.5em;
+}
+
+div.user-settings-form-container {
+    width: 50%;
+}
+
+div.user-settings-container > hr {
+    border-top: 1px solid #333333;
+    width: 90%;
+    margin-top: 1em;
+    margin-bottom: 1em;
+}
+
+div.user-settings-form {
+    width: 100%;
+    min-height: 50vh;
+}
+
+div.user-settings-action-buttons {
+    width: 100%;
+    display: flex;
+    flex-direction: row;
+    align-items: center;
+    justify-content: flex-end;
+    column-gap: 0.5em;
+}

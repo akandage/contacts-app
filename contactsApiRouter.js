@@ -8,7 +8,7 @@ const uuid = require('uuid');
 const { validateOrderBy } = require('./db');
 const { CONTACT_NOT_FOUND, DEFAULT_CONTACTS_ORDERBY, DEFAULT_GROUPS_ORDERBY, INVALID_CONTACT, INVALID_GROUP, INVALID_SEARCH_TERMS } = require('./contactDb');
 const { FILE_NOT_FOUND, FILE_UUID_NOT_UNIQUE, INVALID_FILE_UUID, INVALID_FILE_EXTENSION, INVALID_USER } = require('./uploadedFilesDb');
-const { USER_NOT_FOUND } = require('./userDb');
+const { INVALID_EMAIL_ADDRESS, INVALID_OLD_PASSWORD, INVALID_PASSWORD, INVALID_PHONE_NUMBER, INVALID_USERNAME, USER_EXISTS_WITH_EMAIL_ADDRESS, USER_EXISTS_WITH_PHONE_NUMBER, USER_NOT_FOUND } = require('./userDb');
 const contactsApiRouter = express.Router();
 
 const UPLOAD_IMAGE_TYPES = [
@@ -427,7 +427,7 @@ contactsApiRouter.delete('/api/contacts/:id', async (req, res, next) => {
     }
 });
 
-contactsApiRouter.post('/api/contacts/profile-picture', async (req, res, next) => {
+contactsApiRouter.post(/^\/api\/(contacts|user)\/profile-picture$/, async (req, res, next) => {
     let session = req.session;
     let uploadFiles = req.files;
 
@@ -534,7 +534,7 @@ contactsApiRouter.post('/api/contacts/profile-picture', async (req, res, next) =
             processedImage.cover(cropWidth, cropHeight);
             await processedImage.writeAsync(uploadImagePath);
             
-            res.set('Location', `/api/contacts/profile-picture/${uploadImageId}`);
+            res.set('Location', `${req.path}/${uploadImageId}`);
             res.status(200).send();
         }
         catch (error)
@@ -568,9 +568,9 @@ contactsApiRouter.post('/api/contacts/profile-picture', async (req, res, next) =
     }
 });
 
-contactsApiRouter.get('/api/contacts/profile-picture/:fileUuid', async (req, res, next) => {
+contactsApiRouter.get(/^\/api\/(contacts|user)\/profile-picture\/([\w-]+)$/, async (req, res, next) => {
     let session = req.session;
-    let fileUuid = req.params.fileUuid;
+    let fileUuid = req.params[1];
 
     if (fileUuid === null || fileUuid === undefined || !uuid.validate(fileUuid) || uuid.version(fileUuid) !== 4)
     {
@@ -639,9 +639,9 @@ contactsApiRouter.get('/api/contacts/profile-picture/:fileUuid', async (req, res
     }
 });
 
-contactsApiRouter.delete('/api/contacts/profile-picture/:fileUuid', async (req, res, next) => {
+contactsApiRouter.delete(/^\/api\/(contacts|user)\/profile-picture\/([\w-]+)$/, async (req, res, next) => {
     let session = req.session;
-    let fileUuid = req.params.fileUuid;
+    let fileUuid = req.params[1];
 
     if (fileUuid === null || fileUuid === undefined || !uuid.validate(fileUuid) || uuid.version(fileUuid) !== 4)
     {
@@ -919,6 +919,277 @@ contactsApiRouter.delete('/api/groups/:id', async (req, res, next) => {
             if (error.message === GROUP_NOT_FOUND || error.message === USER_NOT_FOUND)
             {
                 next(httpError(404, error.message));
+            }
+            else
+            {
+                next(httpError(500, error.message));
+            }
+
+            return;
+        }
+
+        res.status(200).send();
+    }
+    else
+    {
+        debug('Request does not have session.');
+        next(httpError(401));
+    }
+});
+
+contactsApiRouter.get('/api/user', async (req, res, next) => {
+    let session = req.session;
+
+    if (session)
+    {
+        debug(`Request session ${session.sessionId}`);
+
+        let userDb = req.app.get('user-db');
+        let user = null;
+
+        try
+        {
+            user = await userDb.getUser(session.username);
+            debug(`Request user ${user.username}`);
+
+            // Remove the password field.
+            delete user.password;
+        }
+        catch (error)
+        {
+            console.log(error);
+
+            if (error.message === USER_NOT_FOUND)
+            {
+                next(httpError(404, error.message));
+            }
+            else
+            {
+                next(httpError(500, error.message));
+            }
+
+            return;
+        }
+
+        res.status(200)
+            .send(user);
+    }
+    else
+    {
+        debug('Request does not have session.');
+        next(httpError(401));
+    }
+});
+
+contactsApiRouter.put('/api/user/profile-picture', async (req, res, next) => {
+    let session = req.session;
+    let {
+        value
+    } = req.query;
+
+    if (value === null || value === undefined || typeof value !== 'string' || value.length === 0)
+    {
+        next(httpError(400, 'Request parameter \'value\' is invalid.'));
+        return;
+    }
+
+    if (session)
+    {
+        debug(`Request session ${session.sessionId}`);
+
+        let userDb = req.app.get('user-db');
+
+        try
+        {
+            debug(`Request user ${session.username}`);
+            await userDb.changeUserProfilePicture(session.username, `/api/user/profile-picture/${value}`);
+            debug(`Successfully changed user ${session.username} profile picture.`);
+        }
+        catch (error)
+        {
+            console.log(error);
+
+            if (error.message === USER_NOT_FOUND)
+            {
+                next(httpError(404, error.message));
+            }
+            else
+            {
+                next(httpError(500, error.message));
+            }
+
+            return;
+        }
+
+        res.status(200).send();
+    }
+    else
+    {
+        debug('Request does not have session.');
+        next(httpError(401));
+    }
+});
+
+contactsApiRouter.put('/api/user/email-address', async (req, res, next) => {
+    let session = req.session;
+    let {
+        value
+    } = req.query;
+
+    if (value === null || value === undefined || typeof value !== 'string' || value.length === 0)
+    {
+        next(httpError(400, 'Request parameter \'value\' is invalid.'));
+        return;
+    }
+
+    if (session)
+    {
+        debug(`Request session ${session.sessionId}`);
+
+        let userDb = req.app.get('user-db');
+
+        try
+        {
+            debug(`Request user ${session.username}`);
+            await userDb.changeUserEmailAddress(session.username, value);
+            debug(`Successfully changed user ${session.username} email address.`);
+        }
+        catch (error)
+        {
+            console.log(error);
+
+            if (error.message === INVALID_EMAIL_ADDRESS)
+            {
+                next(httpError(400, error.message));
+            }
+            else if (error.message === USER_NOT_FOUND)
+            {
+                next(httpError(404, error.message));
+            }
+            else if (error.message === USER_EXISTS_WITH_EMAIL_ADDRESS)
+            {
+                next(httpError(409, error.message));
+            }
+            else
+            {
+                next(httpError(500, error.message));
+            }
+
+            return;
+        }
+
+        res.status(200).send();
+    }
+    else
+    {
+        debug('Request does not have session.');
+        next(httpError(401));
+    }
+});
+
+contactsApiRouter.put('/api/user/phone-number', async (req, res, next) => {
+    let session = req.session;
+    let {
+        value
+    } = req.query;
+
+    if (value === null || value === undefined || typeof value !== 'string' || value.length === 0)
+    {
+        next(httpError(400, 'Request parameter \'value\' is invalid.'));
+        return;
+    }
+
+    if (session)
+    {
+        debug(`Request session ${session.sessionId}`);
+
+        let userDb = req.app.get('user-db');
+
+        try
+        {
+            debug(`Request user ${session.username}`);
+            await userDb.changeUserPhoneNumber(session.username, value);
+            debug(`Successfully changed user ${session.username} phone number.`);
+        }
+        catch (error)
+        {
+            console.log(error);
+
+            if (error.message === INVALID_PHONE_NUMBER)
+            {
+                next(httpError(400, error.message));
+            }
+            else if (error.message === USER_NOT_FOUND)
+            {
+                next(httpError(404, error.message));
+            }
+            else if (error.message === USER_EXISTS_WITH_PHONE_NUMBER)
+            {
+                next(httpError(409, error.message));
+            }
+            else
+            {
+                next(httpError(500, error.message));
+            }
+
+            return;
+        }
+
+        res.status(200).send();
+    }
+    else
+    {
+        debug('Request does not have session.');
+        next(httpError(401));
+    }
+});
+
+contactsApiRouter.put('/api/user/password', async (req, res, next) => {
+    let session = req.session;
+    let {
+        oldPassword,
+        newPassword
+    } = req.query;
+
+    if (oldPassword === null || oldPassword === undefined || typeof oldPassword !== 'string' || oldPassword.length === 0)
+    {
+        next(httpError(400, 'Request parameter \'oldPassword\' is invalid.'));
+        return;
+    }
+
+    if (newPassword === null || newPassword === undefined || typeof newPassword !== 'string' || newPassword.length === 0)
+    {
+        next(httpError(400, 'Request parameter \'newPassword\' is invalid.'));
+        return;
+    }
+
+    if (session)
+    {
+        debug(`Request session ${session.sessionId}`);
+
+        let userDb = req.app.get('user-db');
+
+        try
+        {
+            debug(`Request user ${session.username}`);
+            await userDb.changeUserPassword(session.username, oldPassword, newPassword);
+            debug(`Successfully changed user ${session.username} password.`);
+        }
+        catch (error)
+        {
+            console.log(error);
+
+            if (error.message === INVALID_PASSWORD)
+            {
+                next(httpError(400, error.message));
+            }
+            else if (error.message === USER_NOT_FOUND)
+            {
+                next(httpError(404, error.message));
+            }
+            else if (error.message === INVALID_OLD_PASSWORD)
+            {
+                next(httpError(409, error.message));
             }
             else
             {

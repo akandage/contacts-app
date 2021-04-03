@@ -5,6 +5,11 @@ const { PhoneNumber, INVALID_USA_CANADA_PHONE_NUMBER } = require('./phoneNumber'
 const { Password, Username, INVALID_PASSWORD, INVALID_USERNAME } = require('./userCreds');
 
 const USER_COLLECTION = 'users';
+const INVALID_USER = 'Invalid user.';
+const INVALID_OLD_PASSWORD = 'Old password does not match.';
+const USER_EXISTS_WITH_USERNAME = 'User already exists with this username.';
+const USER_EXISTS_WITH_EMAIL_ADDRESS = 'User already exists with this email address.';
+const USER_EXISTS_WITH_PHONE_NUMBER = 'User already exists with this phone number.';
 const USER_NOT_FOUND = 'User not found.';
 
 class UserDb
@@ -45,6 +50,28 @@ class UserDb
         debug('Stopping UserDb.');
 
         debug('Stopped UserDb.');
+    }
+
+    async validateUser(user)
+    {
+        if (user === null || user === undefined)
+        {
+            throw new Error(INVALID_USER);
+        }
+
+        try
+        {
+            await this._model.validate(user);
+        }
+        catch (error)
+        {
+            console.log(error);
+
+            if (error instanceof mongoose.Error.ValidationError)
+            {
+                throw new Error(INVALID_USER);
+            }
+        }
     }
 
     async registerUser(username, password, emailAddress, phoneNumber)
@@ -123,6 +150,74 @@ class UserDb
 
         return user;
     }
+
+    async putUser(user)
+    {
+        await this.validateUser(user);
+        
+        // Since we're using replace, the version field won't be updated.
+        let prevUser = await this._model.findOneAndReplace({ _id: user._id }, user).exec();
+
+        if (!prevUser)
+        {
+            throw new Error(USER_NOT_FOUND);
+        }
+
+        return prevUser;
+    }
+
+    async changeUserPassword(username, oldPassword, newPassword)
+    {
+        let user = await this.getUser(username);
+
+        if (Password.isValid(oldPassword))
+        {
+            let oldPasswordHash = Password.hash(oldPassword);
+
+            if (user.password.hash !== oldPasswordHash)
+            {
+                throw new Error(INVALID_OLD_PASSWORD);
+            }
+        }
+        else
+        {
+            throw new Error(INVALID_OLD_PASSWORD);
+        }
+
+        if (!Password.isValid(newPassword))
+        {
+            throw new Error(INVALID_PASSWORD);
+        }
+
+        let passwordHash = Password.hash(newPassword);
+
+        user.password.hash = passwordHash;
+        await user.save();
+    }
+
+    async changeUserPhoneNumber(username, phoneNumber)
+    {
+        let user = await this.getUser(username);
+
+        user.phoneNumber = phoneNumber;
+        await user.save();
+    }
+
+    async changeUserEmailAddress(username, emailAddress)
+    {
+        let user = await this.getUser(username);
+
+        user.emailAddress = emailAddress;
+        await user.save();
+    }
+
+    async changeUserProfilePicture(username, profilePictureUrl)
+    {
+        let user = await this.getUser(username);
+
+        user.profilePictureUrl = profilePictureUrl;
+        await user.save();
+    }
 }
 
 // TODO: Common logic. Move this somewhere else.
@@ -130,7 +225,7 @@ const UserSchema = new mongoose.Schema({
     username: {
         type: String,
         required: true,
-        unique: [ true, 'User already exists with this username.' ],
+        unique: [ true, USER_EXISTS_WITH_USERNAME ],
         validate: {
             validator: Username.isValid,
             message: INVALID_USERNAME
@@ -145,7 +240,7 @@ const UserSchema = new mongoose.Schema({
     emailAddress: {
         type: String,
         required: true,
-        unique: [ true, 'User already exists with this email address.' ],
+        unique: [ true, USER_EXISTS_WITH_EMAIL_ADDRESS ],
         validate: {
             validator: EmailAddress.isValid,
             message: INVALID_EMAIL_ADDRESS
@@ -154,7 +249,7 @@ const UserSchema = new mongoose.Schema({
     phoneNumber: {
         type: String,
         required: true,
-        unique: [ true, 'User already exists with this phone number.' ],
+        unique: [ true, USER_EXISTS_WITH_PHONE_NUMBER ],
         validate: {
             validator: PhoneNumber.isValidUSAOrCanada,
             message: INVALID_USA_CANADA_PHONE_NUMBER
@@ -165,12 +260,23 @@ const UserSchema = new mongoose.Schema({
             type: mongoose.Schema.Types.ObjectId,
             ref: 'ContactModel'
         }
-    ]
+    ],
+    profilePictureUrl: {
+        type: String
+    }
 });
 
 module.exports = {
     UserDb,
     UserSchema,
     USER_COLLECTION,
+    INVALID_EMAIL_ADDRESS,
+    INVALID_USA_CANADA_PHONE_NUMBER,
+    INVALID_OLD_PASSWORD,
+    INVALID_USER,
+    INVALID_USERNAME,
+    USER_EXISTS_WITH_USERNAME,
+    USER_EXISTS_WITH_EMAIL_ADDRESS,
+    USER_EXISTS_WITH_PHONE_NUMBER,
     USER_NOT_FOUND
 };
