@@ -14,6 +14,7 @@ import { STATUS } from '../constants';
 import UploadImage from './uploadImage';
 
 const { EmailAddress } = require('../../../emailAddress');
+const { PhoneNumber } = require('../../../phoneNumber');
 
 const ACTION_BUTTON_CLASS = 'btn btn-primary btn-block';
 const GET_USER_URL = '/api/user';
@@ -200,6 +201,14 @@ export default function UserSettings(props)
                                 onErrorSaving={ onErrorSavingUser }
                             />
                         </Route>
+                        <Route path={ `${url}/change-phone-number` }>
+                            <UserSettings.ChangePhoneNumber
+                                user={ user }
+                                backUrl={ url }
+                                onUserChanged={ onUserChanged }
+                                onErrorSaving={ onErrorSavingUser }
+                            />
+                        </Route>
                     </Switch>
             }
         </>
@@ -371,6 +380,170 @@ UserSettings.ChangeEmailAddress.defaultProps = {
 };
 
 UserSettings.ChangeEmailAddress.propTypes = {
+    user: PropTypes.object,
+    backUrl: PropTypes.string,
+    onUserChanged: PropTypes.func,
+    onErrorSaving: PropTypes.func,
+    onCancelled: PropTypes.func
+};
+
+UserSettings.ChangePhoneNumber = function(props)
+{
+    let {
+        user,
+        backUrl,
+        onUserChanged,
+        onErrorSaving,
+        onCancelled
+    } = props;
+    const history = useHistory();
+    const [ phoneNumber, setPhoneNumber ] = useState();
+    const [ isPhoneNumberDirty, setIsPhoneNumberDirty ] = useState();
+    const [ isPhoneNumberValid, setIsPhoneNumberValid ] = useState();
+    const [ invalidFeedback, setInvalidFeedback ] = useState();
+
+    useEffect(() => {
+        setPhoneNumber(user.phoneNumber);
+        setIsPhoneNumberDirty(false);
+        setIsPhoneNumberValid(true);
+        setInvalidFeedback('');
+    }, [ user ]);
+
+    function onPhoneNumberChanged(pn)
+    {
+        if (pn !== phoneNumber)
+        {
+            let valid = PhoneNumber.isValidUSAOrCanada(pn);
+
+            setPhoneNumber(pn);
+
+            if (!isPhoneNumberDirty)
+            {
+                setIsPhoneNumberDirty(true);
+            }
+
+            setIsPhoneNumberValid(valid);
+
+            if (!valid)
+            {
+                if (pn !== '')
+                {
+                    setInvalidFeedback('Phone number is not valid.');
+                }
+                else
+                {
+                    setInvalidFeedback('Phone number is required.');
+                }
+            }
+            else
+            {
+                setInvalidFeedback('');
+            }
+        }
+    }
+
+    async function saveChanges()
+    {
+        let u = Object.assign({}, user, { phoneNumber });
+
+        try
+        {
+            let qs = queryString.stringify({ value: phoneNumber });
+            let response = await fetch(`${CHANGE_PHONE_NUMBER_URL}?${qs}`, {
+                method: 'PUT'
+            });
+
+            if (!response.ok)
+            {
+                let e = await response.json();
+
+                onErrorSaving(`Error saving user phone number: ${response.status} ${response.statusText} ${e.message}`);
+                return;
+            }
+        }
+        catch (error)
+        {
+            onErrorSaving(`Error saving user phone number: ${error}`);
+            return;
+        }
+
+        return u;
+    }
+
+    async function onSaveClicked()
+    {
+        let user = await saveChanges();
+        hide();
+
+        if (user)
+        {
+            onUserChanged(user);
+        }
+    }
+
+    function reset()
+    {
+        setPhoneNumber(user.phoneNumber);
+        setIsPhoneNumberDirty(false);
+        setIsPhoneNumberValid(true);
+        setInvalidFeedback('');
+    }
+
+    function hide()
+    {
+        history.push(backUrl);
+    }
+
+    function onCancelClicked()
+    {
+        reset();
+        hide();
+        onCancelled();
+    }
+
+    function allowSave()
+    {
+        return isPhoneNumberDirty && isPhoneNumberValid;
+    }
+
+    function allowCancel()
+    {
+        return true;
+    }
+
+    return (
+        <div className="user-settings-form-container">
+            <div className="user-settings-form">
+                <Form noValidate>
+                    <CustomTextBox id="phoneNumber"
+                        labelText="Phone Number"
+                        value={ phoneNumber }
+                        isInvalid={ isPhoneNumberDirty && !isPhoneNumberValid }
+                        invalidFeedback={ invalidFeedback }
+                        onChanged={ onPhoneNumberChanged }
+                    />
+                </Form>
+            </div>
+
+            <hr />
+
+            <div className="user-settings-action-buttons">
+                <Button variant="primary" onClick={ onSaveClicked } disabled={ !allowSave() }>Save</Button>
+                <Button variant="secondary" onClick={ onCancelClicked } disabled={ !allowCancel() }>Cancel</Button>
+            </div>
+        </div>
+    );
+}
+
+UserSettings.ChangePhoneNumber.defaultProps = {
+    user: null,
+    backUrl: '',
+    onUserChanged: (user) => {},
+    onErrorSaving: (error) => {},
+    onCancelled: () => {}
+};
+
+UserSettings.ChangePhoneNumber.propTypes = {
     user: PropTypes.object,
     backUrl: PropTypes.string,
     onUserChanged: PropTypes.func,
