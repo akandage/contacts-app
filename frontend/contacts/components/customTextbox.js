@@ -16,6 +16,7 @@ export default function CustomTextBox(props)
         disabled,
         value,
         labelText,
+        inputType,
         isInvalid,
         invalidFeedback,
         onChanged,
@@ -46,13 +47,15 @@ export default function CustomTextBox(props)
 
             <Form.Row xl={ NUM_INPUT_COLS }>
                 <Col xl={ Math.max(1, NUM_INPUT_COLS - Math.max(0, numChildren)) }>
-                    <Form.Control as="input" type="text"
+                    <Form.Control as="input" type={ inputType }
                         id={ id }
                         name={ id }
                         disabled={ disabled }
                         isInvalid={ isInvalid }
                         value={ value }
                         onChange={ onChange }
+                        onFocus={ onFocus }
+                        onBlur={ onBlur }
                     >
                     </Form.Control>
 
@@ -85,6 +88,7 @@ CustomTextBox.defaultProps = {
     disabled: false,
     value: '',
     labelText: '',
+    inputType: 'text',
     isInvalid: false,
     invalidFeedback: null,
     onChanged: (value) => {},
@@ -97,6 +101,7 @@ CustomTextBox.propTypes = {
     disabled: PropTypes.bool,
     value: PropTypes.string,
     labelText: PropTypes.string,
+    inputType: PropTypes.string,
     isInvalid: PropTypes.bool,
     invalidFeedback: PropTypes.string,
     onChanged: PropTypes.func,

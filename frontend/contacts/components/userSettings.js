@@ -1,5 +1,5 @@
 import React, { useEffect, useState } from 'react';
-import { Button, Form, Spinner } from 'react-bootstrap';
+import { Alert, Button, Form, Spinner } from 'react-bootstrap';
 import {
     Switch,
     Route,
@@ -13,6 +13,7 @@ import CustomTextBox from './customTextbox';
 import { STATUS } from '../constants';
 import UploadImage from './uploadImage';
 
+const { isPasswordValid } = require('../../../userCredsValid');
 const { EmailAddress } = require('../../../emailAddress');
 const { PhoneNumber } = require('../../../phoneNumber');
 
@@ -21,6 +22,7 @@ const GET_USER_URL = '/api/user';
 const CHANGE_EMAIL_ADDRESS_URL = '/api/user/email-address';
 const CHANGE_PHONE_NUMBER_URL = '/api/user/phone-number';
 const CHANGE_PROFILE_PICTURE_URL = '/api/user/profile-picture';
+const CHANGE_PASSWORD_URL = '/api/user/password';
 const UPLOAD_IMAGE_URL = '/api/user/profile-picture';
 
 export default function UserSettings(props)
@@ -203,6 +205,14 @@ export default function UserSettings(props)
                         </Route>
                         <Route path={ `${url}/change-phone-number` }>
                             <UserSettings.ChangePhoneNumber
+                                user={ user }
+                                backUrl={ url }
+                                onUserChanged={ onUserChanged }
+                                onErrorSaving={ onErrorSavingUser }
+                            />
+                        </Route>
+                        <Route path={ `${url}/change-password` }>
+                            <UserSettings.ChangePassword
                                 user={ user }
                                 backUrl={ url }
                                 onUserChanged={ onUserChanged }
@@ -544,6 +554,294 @@ UserSettings.ChangePhoneNumber.defaultProps = {
 };
 
 UserSettings.ChangePhoneNumber.propTypes = {
+    user: PropTypes.object,
+    backUrl: PropTypes.string,
+    onUserChanged: PropTypes.func,
+    onErrorSaving: PropTypes.func,
+    onCancelled: PropTypes.func
+};
+
+UserSettings.ChangePassword = function(props)
+{
+    let {
+        user,
+        backUrl,
+        onUserChanged,
+        onErrorSaving,
+        onCancelled
+    } = props;
+    const history = useHistory();
+    const [ oldPassword, setOldPassword ] = useState();
+    const [ isOldPasswordDirty, setIsOldPasswordDirty ] = useState();
+    const [ isOldPasswordValid, setIsOldPasswordValid ] = useState();
+    const [ oldPasswordInvalidFeedback, setOldPasswordInvalidFeedback ] = useState();
+    const [ newPassword, setNewPassword ] = useState();
+    const [ isNewPasswordDirty, setIsNewPasswordDirty ] = useState();
+    const [ isNewPasswordValid, setIsNewPasswordValid ] = useState();
+    const [ newPasswordInvalidFeedback, setNewPasswordInvalidFeedback ] = useState();
+    const [ newPasswordConfirm, setNewPasswordConfirm ] = useState();
+    const [ isNewPasswordConfirmDirty, setIsNewPasswordConfirmDirty ] = useState();
+    const [ isNewPasswordConfirmValid, setIsNewPasswordConfirmValid ] = useState();
+    const [ newPasswordConfirmInvalidFeedback, setNewPasswordConfirmInvalidFeedback ] = useState();
+    const [ saveError, setSaveError ] = useState();
+
+    useEffect(() => {
+        reset();
+    }, [ user ]);
+
+    function onOldPasswordChanged(p)
+    {
+        let valid = isPasswordValid(p);
+
+        setOldPassword(p);
+
+        if (!isOldPasswordDirty)
+        {
+            setIsOldPasswordDirty(true);
+        }
+
+        setIsOldPasswordValid(valid);
+
+        if (!valid)
+        {
+            if (p !== '')
+            {
+                setOldPasswordInvalidFeedback('Old password is not valid.');
+            }
+            else
+            {
+                setOldPasswordInvalidFeedback('Old password is required.');
+            }
+        }
+        else
+        {
+            setOldPasswordInvalidFeedback('');
+        }
+    }
+
+    function onNewPasswordChanged(p)
+    {
+        let valid = isPasswordValid(p);
+
+        setNewPassword(p);
+
+        if (!isNewPasswordDirty)
+        {
+            setIsNewPasswordDirty(true);
+        }
+
+        setIsNewPasswordValid(valid);
+
+        if (!valid)
+        {
+            if (p !== '')
+            {
+                setNewPasswordInvalidFeedback('New password is not valid.');
+            }
+            else
+            {
+                setNewPasswordInvalidFeedback('New password is required.');
+            }
+        }
+        else
+        {
+            setNewPasswordInvalidFeedback('');
+        }
+    }
+
+    function onNewPasswordConfirmChanged(p)
+    {
+        let valid = isPasswordValid(p);
+
+        setNewPasswordConfirm(p);
+
+        if (!isNewPasswordConfirmDirty)
+        {
+            setIsNewPasswordConfirmDirty(true);
+        }
+
+        setIsNewPasswordConfirmValid(valid);
+
+        if (!valid)
+        {
+            if (p !== '')
+            {
+                setNewPasswordConfirmInvalidFeedback('Confirm new password is not valid.');
+            }
+            else
+            {
+                setNewPasswordConfirmInvalidFeedback('Confirm new password is required.');
+            }
+        }
+        else if (isNewPasswordValid && newPassword !== p)
+        {
+            setNewPasswordConfirmInvalidFeedback('Passwords do not match.');
+            setIsNewPasswordConfirmValid(false);
+        }
+        else
+        {
+            setNewPasswordConfirmInvalidFeedback('');
+        }
+    }
+
+    async function saveChanges()
+    {
+        setSaveError(null);
+
+        try
+        {
+            let qs = queryString.stringify({ oldPassword, newPassword });
+            let response = await fetch(`${CHANGE_PASSWORD_URL}?${qs}`, {
+                method: 'PUT'
+            });
+
+            if (!response.ok)
+            {
+                if (response.status === 409)
+                {
+                    setSaveError('Old password provided does not match.');
+                    setIsOldPasswordValid(false);
+                    setOldPasswordInvalidFeedback('');
+                }
+                else
+                {
+                    let e = await response.json();
+
+                    onErrorSaving(`Error saving user phone number: ${response.status} ${response.statusText} ${e.message}`);
+                }
+                
+                return;
+            }
+        }
+        catch (error)
+        {
+            onErrorSaving(`Error saving user phone number: ${error}`);
+            return;
+        }
+
+        return user;
+    }
+
+    async function onSaveClicked()
+    {
+        let user = await saveChanges();
+
+        if (saveError !== null)
+        {
+            hide();
+        }
+
+        if (user)
+        {
+            onUserChanged(user);
+        }
+    }
+
+    function reset()
+    {
+        setOldPassword('');
+        setIsOldPasswordDirty(false);
+        setIsOldPasswordValid(false);
+        setOldPasswordInvalidFeedback('');
+        setNewPassword('');
+        setIsNewPasswordDirty(false);
+        setIsNewPasswordValid(false);
+        setNewPasswordConfirmInvalidFeedback('');
+        setNewPasswordConfirm('');
+        setIsNewPasswordConfirmDirty(false);
+        setIsNewPasswordConfirmValid(false);
+        setNewPasswordConfirmInvalidFeedback('');
+        setSaveError(null);
+    }
+
+    function hide()
+    {
+        history.push(backUrl);
+    }
+
+    function onCancelClicked()
+    {
+        reset();
+        hide();
+        onCancelled();
+    }
+
+    function allowSave()
+    {
+        return isOldPasswordValid && isNewPasswordValid && isNewPasswordConfirmValid &&
+                newPassword === newPasswordConfirm;
+    }
+
+    function allowCancel()
+    {
+        return true;
+    }
+
+    return (
+        <div className="user-settings-form-container">
+            <div className="user-settings-form">
+                {
+                    saveError ?
+                        <Alert variant="danger">{ saveError }</Alert> :
+                        <></>
+                }
+
+                <Form noValidate>
+                    <CustomTextBox id="oldPassword"
+                        labelText="Old Password"
+                        inputType="password"
+                        value={ oldPassword }
+                        isInvalid={ isOldPasswordDirty && !isOldPasswordValid }
+                        invalidFeedback={ oldPasswordInvalidFeedback }
+                        onChanged={ onOldPasswordChanged }
+                        onBlur={ () => onOldPasswordChanged(oldPassword) }
+                    />
+                </Form>
+
+                <Form noValidate>
+                    <CustomTextBox id="newPassword"
+                        labelText="New Password"
+                        inputType="password"
+                        value={ newPassword }
+                        isInvalid={ isNewPasswordDirty && !isNewPasswordValid }
+                        invalidFeedback={ newPasswordInvalidFeedback }
+                        onChanged={ onNewPasswordChanged }
+                        onBlur={ () => onNewPasswordChanged(newPassword) }
+                    />
+                </Form>
+
+                <Form noValidate>
+                    <CustomTextBox id="newPasswordConfirm"
+                        labelText="Confirm New Password"
+                        inputType="password"
+                        value={ newPasswordConfirm }
+                        isInvalid={ isNewPasswordConfirmDirty && !isNewPasswordConfirmValid }
+                        invalidFeedback={ newPasswordConfirmInvalidFeedback }
+                        onChanged={ onNewPasswordConfirmChanged }
+                        onBlur={ () => onNewPasswordConfirmChanged(newPasswordConfirm) }
+                    />
+                </Form>
+            </div>
+
+            <hr />
+
+            <div className="user-settings-action-buttons">
+                <Button variant="primary" onClick={ onSaveClicked } disabled={ !allowSave() }>Save</Button>
+                <Button variant="secondary" onClick={ onCancelClicked } disabled={ !allowCancel() }>Cancel</Button>
+            </div>
+        </div>
+    );
+}
+
+UserSettings.ChangePassword.defaultProps = {
+    user: null,
+    backUrl: '',
+    onUserChanged: (user) => {},
+    onErrorSaving: (error) => {},
+    onCancelled: () => {}
+};
+
+UserSettings.ChangePassword.propTypes = {
     user: PropTypes.object,
     backUrl: PropTypes.string,
     onUserChanged: PropTypes.func,
