@@ -73,6 +73,9 @@ export const ACTION_TYPE = {
     SEARCHING_CONTACTS: 'SEARCHING_CONTACTS',
     ERROR_RETRIEVING_SEARCH_CONTACTS: 'ERROR_RETRIEVING_SEARCH_CONTACTS',
     RETRIEVED_SEARCH_CONTACTS: 'RETRIEVED_SEARCH_CONTACTS',
+    RETRIEVING_USER: 'RETRIEVING_USER',
+    RETRIEVED_USER: 'RETRIEVED_USER',
+    ERROR_RETRIEVING_USER: 'ERROR_RETRIEVING_USER',
     SORT_CONTACTS: 'SORT_CONTACTS',
     SORT_GROUPS: 'SORT_GROUPS'
 };
@@ -80,6 +83,7 @@ export const ACTION_TYPE = {
 export function initContacts()
 {
     return (dispatch) => {
+        dispatch(retrieveUser());
         dispatch(retrieveContacts());
         dispatch(retrieveGroups());
     }
@@ -1113,6 +1117,57 @@ export function retrievedSearchContacts(contacts, searchTerms, limit = null)
         contacts,
         searchTerms,
         limit
+    };
+}
+
+export function retrieveUser()
+{
+    return async (dispatch) => {
+        dispatch(retrievingUser());
+
+        try
+        {
+            let url = '/api/user';
+            let response = await fetch(url);
+            
+            if (response.ok)
+            {
+                let user = await response.json();
+
+                dispatch(retrievedUser(user));
+            }
+            else
+            {
+                dispatch(errorRetrievingUser(`Error retrieving user: ${response.status} ${response.statusText}`));
+            }
+        }
+        catch (error)
+        {
+            dispatch(errorRetrievingUser(`Error retrieving user: ${error.message}`));
+        }
+    };
+}
+
+export function retrievingUser()
+{
+    return {
+        type: ACTION_TYPE.RETRIEVING_USER
+    };
+}
+
+export function retrievedUser(user)
+{
+    return {
+        type: ACTION_TYPE.RETRIEVED_USER,
+        user
+    };
+}
+
+export function errorRetrievingUser(error)
+{
+    return {
+        type: ACTION_TYPE.ERROR_RETRIEVING_USER,
+        error
     };
 }
 

@@ -1,8 +1,11 @@
 import React, { useRef, useState } from 'react';
 import PropTypes from 'prop-types';
-import { Button, Form, Nav, Overlay, OverlayTrigger, Popover, PopoverContent } from 'react-bootstrap';
+import { Button, Form, Image, Nav, Overlay, OverlayTrigger, Popover, PopoverContent } from 'react-bootstrap';
 import { ContactsLogo, SearchIcon, UserIcon } from './contactsImages';
 import './stylesheets/contacts-header.css';
+
+const USER_PROFILE_PICTURE_WIDTH = 48;
+const USER_PROFILE_PICTURE_HEIGHT = 48;
 
 export function ContactsHeaderLogo()
 {
@@ -24,6 +27,7 @@ export default function ContactsHeader(props)
         searchButtonUrl,
         searchPlaceholderText,
         searchSuggestions,
+        userProfilePictureUrl,
         onSearchTextChanged,
         onSearchFocus,
         onSearchBlur
@@ -103,7 +107,11 @@ export default function ContactsHeader(props)
                             }
                         }
                     >
-                        <UserIcon width="48" height="48" />
+                        {
+                            userProfilePictureUrl ?
+                                <Image src={ userProfilePictureUrl } width={ USER_PROFILE_PICTURE_WIDTH } height={ USER_PROFILE_PICTURE_HEIGHT } roundedCircle /> :
+                                <UserIcon width={ USER_PROFILE_PICTURE_WIDTH } height={ USER_PROFILE_PICTURE_HEIGHT } />
+                        }
                     </a>
                 </OverlayTrigger>
             );
@@ -177,6 +185,7 @@ ContactsHeader.defaultProps = {
     searchButtonUrl: '/',
     searchPlaceholderText: '',
     searchSuggestions: [],
+    userProfilePictureUrl: null,
     onSearchTextChanged: (searchText) => {},
     onSearchFocus: () => {},
     onSearchBlur: () => {}
@@ -192,6 +201,7 @@ ContactsHeader.propTypes = {
             suggestionUrl: PropTypes.string.isRequired
         })
     ),
+    userProfilePictureUrl: PropTypes.string,
     onSearchTextChanged: PropTypes.func,
     onSearchFocus: PropTypes.func,
     onSearchBlur: PropTypes.func

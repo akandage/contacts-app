@@ -384,7 +384,8 @@ function connectConfirmFavoriteContactsDialog()
 function ContactsHeaderView(props)
 {
     let {
-        currentSearchTerms
+        currentSearchTerms,
+        userProfilePictureUrl
     } = props;
 
     const [ searchText, setSearchText ] = useState();
@@ -479,6 +480,7 @@ function ContactsHeaderView(props)
             searchButtonUrl={ getSearchButtonUrl() }
             searchSuggestions={ searchSuggestions }
             searchPlaceholderText="Search Contacts"
+            userProfilePictureUrl={ userProfilePictureUrl }
             onSearchTextChanged={ onSearchTextChanged }
             onSearchFocus={ onSearchFocus }
             onSearchBlur={ onSearchBlur }
@@ -487,13 +489,15 @@ function ContactsHeaderView(props)
 }
 
 ContactsHeaderView.defaultProps = {
-    currentSearchTerms: []
+    currentSearchTerms: [],
+    userProfilePictureUrl: null,
 };
 
 ContactsHeaderView.propTypes = {
     currentSearchTerms: PropTypes.arrayOf(
         PropTypes.string
-    )
+    ),
+    userProfilePictureUrl: PropTypes.string
 };
 
 function connectContactsHeaderView()
@@ -501,7 +505,8 @@ function connectContactsHeaderView()
     return connect(
         state => {
             return {
-                currentSearchTerms: state.searchContactsSearchTerms
+                currentSearchTerms: state.searchContactsSearchTerms,
+                userProfilePictureUrl: state.user ? state.user.profilePictureUrl : null
             };
         }
     )(ContactsHeaderView);
@@ -527,6 +532,22 @@ function connectSearchContactList()
             return getContactListDispatchActions(dispatch);
         }
     )(ContactList);
+}
+
+function connectUserSettings()
+{
+    return connect(
+        state => {
+            return {
+
+            };
+        },
+        dispatch => {
+            return {
+                onUserSettingsChanged: (user) => dispatch(ContactAppActions.retrievedUser(user))
+            };
+        }
+    )(UserSettings);
 }
 
 function ContactsView(props)
@@ -690,6 +711,8 @@ function renderSearchRoute(props, store)
 
 function renderSettingsRoute(props, store)
 {
+    let UserSettingsView = connectUserSettings();
+
     setTimeout(() => {
         store.dispatch(ContactAppActions.clearSearchContacts());
         store.dispatch(ContactAppActions.deselectAllContacts());
@@ -697,7 +720,7 @@ function renderSettingsRoute(props, store)
 
     return (
         <Provider store={ store }>
-            <UserSettings />
+            <UserSettingsView />
         </Provider>
     );
 }

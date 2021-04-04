@@ -7,6 +7,7 @@ import { STATUS, CONFIRM_ACTION_TYPE, DEFAULT_CONTACTS_ORDERBY, DEFAULT_GROUPS_O
 const INITIAL_STATE = {
     status: STATUS.START,
     error: null,
+    user: null,
     contact: null,
     contacts: [],
     searchContacts: [],
@@ -50,6 +51,7 @@ const REDUCER = combineReducers({
             case ACTION_TYPE.RETRIEVING_CONTACTS:
             case ACTION_TYPE.SEARCHING_CONTACTS:
             case ACTION_TYPE.RETRIEVING_GROUPS:
+            case ACTION_TYPE.RETRIEVING_USER:
                 next = state !== STATUS.START && state !== STATUS.LOADING ? STATUS.REFRESHING : STATUS.LOADING;
                 break;
             default:
@@ -74,7 +76,22 @@ const REDUCER = combineReducers({
             case ACTION_TYPE.ERROR_RETRIEVING_CONTACTS:
             case ACTION_TYPE.ERROR_RETRIEVING_SEARCH_CONTACTS:
             case ACTION_TYPE.ERROR_RETRIEVING_GROUPS:
+            case ACTION_TYPE.ERROR_RETRIEVING_USER:
                 next = action.error;
+                break;
+            default:
+                break;
+        }
+
+        return next;
+    },
+    user: (state = INITIAL_STATE.user, action) => {
+        let next = state;
+
+        switch (action.type)
+        {
+            case ACTION_TYPE.RETRIEVED_USER:
+                next = action.user;
                 break;
             default:
                 break;

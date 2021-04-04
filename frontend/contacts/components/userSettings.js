@@ -27,6 +27,9 @@ const UPLOAD_IMAGE_URL = '/api/user/profile-picture';
 
 export default function UserSettings(props)
 {
+    let {
+        onUserSettingsChanged
+    } = props;
     let { url } = useRouteMatch();
 
     const [ status, setStatus ] = useState(STATUS.START);
@@ -113,10 +116,13 @@ export default function UserSettings(props)
                     // Delete the previous profile picture.
                     await deleteProfilePicture(user.profilePictureUrl);
 
-                    setUser(Object.assign({}, user, {
+                    let u = Object.assign({}, user, {
                         profilePictureUrl: imageUrl
-                    }));
+                    });
+
+                    setUser(u);
                     setStatus(STATUS.IDLE);
+                    onUserSettingsChanged(u);
                 }
                 else
                 {
@@ -146,6 +152,7 @@ export default function UserSettings(props)
     {
         console.log(user);
         setUser(user);
+        onUserSettingsChanged(user);
     }
 
     function onErrorSavingUser(error)
@@ -226,11 +233,11 @@ export default function UserSettings(props)
 }
 
 UserSettings.defaultProps = {
-
+    onUserSettingsChanged: (user) => {}
 };
 
 UserSettings.propTypes = {
-
+    onUserSettingsChanged: PropTypes.func
 };
 
 UserSettings.ChangeEmailAddress = function(props)
