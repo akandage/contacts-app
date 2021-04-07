@@ -9,7 +9,7 @@ const ADD_BUTTON_ICON_HEIGHT = 24;
 const REMOVE_BUTTON_ICON_WIDTH = 24;
 const REMOVE_BUTTON_ICON_HEIGHT = 24;
 
-export default function CustomTextBox(props)
+const CustomTextBox = React.forwardRef((props, ref) =>
 {
     let {
         id,
@@ -56,6 +56,7 @@ export default function CustomTextBox(props)
                         onChange={ onChange }
                         onFocus={ onFocus }
                         onBlur={ onBlur }
+                        ref={ ref }
                     >
                     </Form.Control>
 
@@ -81,7 +82,7 @@ export default function CustomTextBox(props)
 
         </Form.Group>
     );
-}
+});
 
 CustomTextBox.defaultProps = {
     id: '',
@@ -108,6 +109,8 @@ CustomTextBox.propTypes = {
     onFocus: PropTypes.func,
     onBlur: PropTypes.func
 };
+
+export default CustomTextBox;
 
 export function AddButton(props)
 {

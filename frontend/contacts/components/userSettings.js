@@ -9,7 +9,7 @@ import {
   } from "react-router-dom";
 import PropTypes from 'prop-types';
 import queryString from 'query-string';
-import CustomTextBox from './customTextbox';
+import CustomTextBox from '../../common/components/customTextbox';
 import { STATUS } from '../constants';
 import UploadImage from './uploadImage';
 

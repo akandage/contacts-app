@@ -3,7 +3,7 @@ import PropTypes from 'prop-types';
 import { Button, Form, Modal, Tabs, Tab } from 'react-bootstrap';
 import { EMAIL_ADDRESS_TYPES, NAME_REGEX, PHONE_NUMBER_TYPES } from '../constants';
 import CustomSelect from './customSelect';
-import CustomTextBox, { AddButton, RemoveButton } from './customTextbox';
+import CustomTextBox, { AddButton, RemoveButton } from '../../common/components/customTextbox';
 import UploadImage from './uploadImage';
 
 const { EmailAddress } = require('../../../emailAddress');

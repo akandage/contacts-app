@@ -4,7 +4,7 @@ import { Button, Modal } from 'react-bootstrap';
 import { CONTACTS_SEARCH_URL, MAX_CONTACT_SEARCH_RESULTS, GROUP_NAME_REGEX } from '../constants';
 import queryString from 'query-string';
 import AutoCompleteTextbox from './autoCompleteTextbox';
-import CustomTextBox, { RemoveButton } from './customTextbox';
+import CustomTextBox, { RemoveButton } from '../../common/components/customTextbox';
 
 export const GROUP_DIALOG_MODE = {
     ADD_GROUP: 'ADD_GROUP',

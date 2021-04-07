@@ -1,7 +1,7 @@
 import React, { useRef } from 'react';
 import PropTypes from 'prop-types';
 import { Col, Form } from 'react-bootstrap';
-import { AddButton, RemoveButton } from './customTextbox';
+import { AddButton, RemoveButton } from '../../common/components/customTextbox';
 
 const NUM_INPUT_COLS = 10;
 

@@ -3,7 +3,7 @@ import PropTypes from 'prop-types';
 import { Button, Modal } from 'react-bootstrap';
 import { GROUP_NAME_REGEX } from '../constants';
 import ConfirmActionDialog from './confirmActionDialog';
-import CustomTextBox from './customTextbox';
+import CustomTextBox from '../../common/components/customTextbox';
 
 function Dialog(props)
 {

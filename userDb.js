@@ -151,6 +151,40 @@ class UserDb
         return user;
     }
 
+    async getUserByEmailAddress(emailAddress)
+    {
+        if (!EmailAddress.isValid(emailAddress))
+        {
+            throw new Error(INVALID_EMAIL_ADDRESS);
+        }
+
+        let user = await this._model.findOne({ emailAddress }).exec();
+
+        if (!user)
+        {
+            throw new Error(USER_NOT_FOUND);
+        }
+
+        return user;
+    }
+
+    async getUserByPhoneNumber(phoneNumber)
+    {
+        if (!PhoneNumber.isValidUSAOrCanada(phoneNumber))
+        {
+            throw new Error(INVALID_USA_CANADA_PHONE_NUMBER);
+        }
+
+        let user = await this._model.findOne({ phoneNumber }).exec();
+
+        if (!user)
+        {
+            throw new Error(USER_NOT_FOUND);
+        }
+
+        return user;
+    }
+
     async putUser(user)
     {
         await this.validateUser(user);

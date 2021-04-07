@@ -28,6 +28,7 @@ const { UserDb } = require('./userDb');
 const HTML_ROOT = path.resolve(__dirname, 'html');
 const CONTACTS_DEFAULT_PAGE = 'index.html';
 const CONTACTS_APP_PAGE = 'contacts.html';
+const CONTACTS_WELCOME_PAGE = 'contacts_welcome.html';
 const NOT_FOUND_PAGE = 'not_found.html';
 const ERROR_PAGE = 'error.html';
 
@@ -176,6 +177,13 @@ app.use(async (req, res, next) => {
 app.use(/^\/(contacts|favorites|groups|search|settings)?/, (req, res, next) => {
     let session = req.session;
     let page = session ? CONTACTS_APP_PAGE : CONTACTS_DEFAULT_PAGE;
+
+    res.status(200)
+        .sendFile(req.app.pathToHtml(page));
+});
+app.use('/welcome', (req, res, next) => {
+    let session = req.session;
+    let page = session ? CONTACTS_WELCOME_PAGE : CONTACTS_DEFAULT_PAGE;
 
     res.status(200)
         .sendFile(req.app.pathToHtml(page));

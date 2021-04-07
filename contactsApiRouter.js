@@ -939,46 +939,81 @@ contactsApiRouter.delete('/api/groups/:id', async (req, res, next) => {
 
 contactsApiRouter.get('/api/user', async (req, res, next) => {
     let session = req.session;
+    let {
+        username,
+        emailAddress,
+        phoneNumber
+    } = req.query;
 
-    if (session)
+    if (username !== null && username !== undefined && (typeof username !== 'string' || username.length === 0))
     {
-        debug(`Request session ${session.sessionId}`);
+        next(httpError(400, 'Request parameter \'username\' is invalid.'));
+        return;
+    }
 
-        let userDb = req.app.get('user-db');
-        let user = null;
+    if (emailAddress !== null && emailAddress !== undefined && (typeof emailAddress !== 'string' || emailAddress.length === 0))
+    {
+        next(httpError(400, 'Request parameter \'emailAddress\' is invalid.'));
+        return;
+    }
 
-        try
+    if (phoneNumber !== null && phoneNumber !== undefined && (typeof phoneNumber !== 'string' || phoneNumber.length === 0))
+    {
+        next(httpError(400, 'Request parameter \'phoneNumber\' is invalid.'));
+        return;
+    }
+
+    let userDb = req.app.get('user-db');
+    let user = null;
+
+    try
+    {
+        if (username)
         {
-            user = await userDb.getUser(session.username);
-            debug(`Request user ${user.username}`);
-
-            // Remove the password field.
-            delete user.password;
+            user = await userDb.getUser(username);
         }
-        catch (error)
+        else if (emailAddress)
         {
-            console.log(error);
-
-            if (error.message === USER_NOT_FOUND)
-            {
-                next(httpError(404, error.message));
-            }
-            else
-            {
-                next(httpError(500, error.message));
-            }
-
+            user = await userDb.getUserByEmailAddress(emailAddress);
+        }
+        else if (phoneNumber)
+        {
+            user = await userDb.getUserByPhoneNumber(phoneNumber);
+        }
+        else if (session)
+        {
+            debug(`Request session ${session.sessionId}`);
+            user = await userDb.getUser(session.username);
+        }
+        else
+        {
+            debug('Request does not have session.');
+            next(httpError(401));
             return;
         }
 
-        res.status(200)
-            .send(user);
+        debug(`Request user ${user.username}`);
+
+        // Remove the password field.
+        delete user.password;
     }
-    else
+    catch (error)
     {
-        debug('Request does not have session.');
-        next(httpError(401));
+        if (error.message === USER_NOT_FOUND)
+        {
+            next(httpError(404, error.message));
+        }
+        else
+        {
+            console.log(error);
+            next(httpError(500, error.message));
+        }
+
+        return;
     }
+
+    res.status(200)
+        .send(user);
 });
 
 contactsApiRouter.put('/api/user/profile-picture', async (req, res, next) => {
