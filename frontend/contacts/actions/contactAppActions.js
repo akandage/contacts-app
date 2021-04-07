@@ -77,7 +77,9 @@ export const ACTION_TYPE = {
     RETRIEVED_USER: 'RETRIEVED_USER',
     ERROR_RETRIEVING_USER: 'ERROR_RETRIEVING_USER',
     SORT_CONTACTS: 'SORT_CONTACTS',
-    SORT_GROUPS: 'SORT_GROUPS'
+    SORT_GROUPS: 'SORT_GROUPS',
+    SHOW_WELCOME: 'SHOW_WELCOME',
+    HIDE_WELCOME: 'HIDE_WELCOME'
 };
 
 export function initContacts()
@@ -1182,5 +1184,19 @@ export function sortGroups(orderBy = DEFAULT_GROUPS_ORDERBY)
 {
     return async (dispatch) => {
         dispatch(retrieveGroups(null, 0, orderBy));
+    };
+}
+
+export function showWelcome()
+{
+    return {
+        type: ACTION_TYPE.SHOW_WELCOME
+    };
+}
+
+export function hideWelcome()
+{
+    return {
+        type: ACTION_TYPE.HIDE_WELCOME
     };
 }

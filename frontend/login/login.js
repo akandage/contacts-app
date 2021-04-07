@@ -133,7 +133,7 @@ function LoginForm(props)
                             </Button>
                         </Col>
                         <Col>
-                            <Button size="lg" variant="outline-primary" block>
+                            <Button href="/signup" size="lg" variant="outline-primary" block>
                                 Sign Up
                             </Button>
                         </Col>

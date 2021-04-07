@@ -626,6 +626,41 @@ function SearchContactsView()
     );
 }
 
+function WelcomeDialog(props)
+{
+    let {
+        show,
+        username,
+        onAccepted
+    } = props;
+
+    return (
+        <ConfirmActionDialog
+            show={ show && username !== null }
+            bodyText={ username ? `Welcome to Contacts App, ${username}!` : '' }
+            showCancelButton={ false }
+            onAccepted={ onAccepted }
+        />
+    );
+}
+
+function connectWelcomeDialog()
+{
+    return connect(
+        state => {
+            return {
+                show: state.showWelcome,
+                username: state.user !== null ? state.user.username : null
+            };
+        },
+        dispatch => {
+            return {
+                onAccepted: () => dispatch(ContactAppActions.hideWelcome())
+            };
+        }
+    )(WelcomeDialog);
+}
+
 function renderContactsRoute(props, store)
 {
     setTimeout(() => {
@@ -728,15 +763,19 @@ function renderSettingsRoute(props, store)
 function renderContactsApp()
 {
     let authState = document.getElementById('auth-state');
+    let welcome = document.getElementById('welcome');
 
     if (authState && authState.value === 'LOGGED_IN')
     {
         let store = ContactAppStore();
 
         let ContactsHeaderView = connectContactsHeaderView();
+        let WelcomeDialog = connectWelcomeDialog();
+
         ReactDOM.render(
             <Provider store={ store }>
                 <ContactsHeaderView />
+                <WelcomeDialog />
             </Provider>,
             document.getElementById('contacts-header'));
 
@@ -757,6 +796,9 @@ function renderContactsApp()
                                 <Route exact path="/">
                                     <Redirect to="/contacts" />
                                 </Route>
+                                <Route exact path="/welcome">
+                                    <Redirect to="/contacts" />
+                                </Route>
                                 <Route exact path="/contacts" render={ (props) => renderContactsRoute(props, store) } />
                                 <Route exact path="/favorites" render={ (props) => renderFavoritesRoute(props, store) } />
                                 <Route exact path="/groups" render={ (props) => renderGroupsRoute(props, store) } />
@@ -771,6 +813,11 @@ function renderContactsApp()
     
         setTimeout(() => {
             store.dispatch(ContactAppActions.initContacts());
+
+            if (welcome)
+            {
+                store.dispatch(ContactAppActions.showWelcome());
+            }
         }, 0);
     }
     else

@@ -21,6 +21,7 @@ const INITIAL_STATE = {
         type: null,
         subjects: []
     },
+    showWelcome: false
 };
 
 const REDUCER = combineReducers({
@@ -505,6 +506,23 @@ const REDUCER = combineReducers({
                     break;
             default:
                 next = INITIAL_STATE.confirmAction;
+                break;
+        }
+
+        return next;
+    },
+    showWelcome: (state = INITIAL_STATE.showWelcome, action) => {
+        let next = state;
+
+        switch (action.type)
+        {
+            case ACTION_TYPE.SHOW_WELCOME:
+                next = true;
+                break;
+            case ACTION_TYPE.HIDE_WELCOME:
+                next = false;
+                break;
+            default:
                 break;
         }
 

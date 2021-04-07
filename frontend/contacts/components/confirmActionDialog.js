@@ -12,6 +12,7 @@ function Dialog(props)
         acceptText,
         cancelText,
         centered,
+        showCancelButton,
         onAccepted,
         onCancelled
     } = props;
@@ -60,7 +61,11 @@ function Dialog(props)
 
             <Modal.Footer>
                 <Button variant="primary" onClick={ onAcceptClicked }>{ acceptText }</Button>
-                <Button variant="secondary" onClick={ onCancelClicked }>{ cancelText }</Button>
+                {
+                    showCancelButton ?
+                        <Button variant="secondary" onClick={ onCancelClicked }>{ cancelText }</Button> :
+                        <></>
+                }
             </Modal.Footer>
         </Modal> 
     );
@@ -88,6 +93,7 @@ ConfirmActionDialog.defaultProps = {
     acceptText: 'OK',
     cancelText: 'Cancel',
     centered: true,
+    showCancelButton: true,
     onAccepted: (actionType, subjects) => {},
     onCancelled: (actionType, subjects) => {}
 };
@@ -101,6 +107,7 @@ ConfirmActionDialog.propTypes = {
     acceptText: PropTypes.string,
     cancelText: PropTypes.string,
     centered: PropTypes.bool,
+    showCancelButton: PropTypes.bool,
     onAccepted: PropTypes.func,
     onCancelled: PropTypes.func
 };
