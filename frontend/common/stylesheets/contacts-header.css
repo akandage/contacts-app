@@ -51,8 +51,12 @@ div.contacts-header > div.login-signup-buttons {
     display: flex;
     flex-direction: row;
     justify-content: space-evenly;
-    column-gap: 0.5em;
+    column-gap: 0.25em;
     width: 25%;
+}
+
+div.contacts-header > div.login-signup-buttons > span {
+    max-width: 0;
 }
 
 /*

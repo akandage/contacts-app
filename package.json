@@ -4,6 +4,7 @@
   "description": "Contacts app using MERN stack.",
   "main": "index.js",
   "scripts": {
+    "prestart": "npx webpack --config ./frontend/login/webpack.config.js; npx webpack --config ./frontend/contacts/webpack.config.js; npx webpack --config ./frontend/signup/webpack.config.js",
     "start": "node index.js",
     "start-dev": "nodemon index.js",
     "test": "jest"

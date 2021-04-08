@@ -68,6 +68,7 @@ export default function ContactsHeader(props)
             return (
                 <div className="login-signup-buttons">
                     <Button href="/login" size="lg" variant="primary" block>Login</Button>
+                    <span></span>
                     <Button href="/signup" size="lg" variant="outline-primary" block>Sign Up</Button>
                 </div>
             );

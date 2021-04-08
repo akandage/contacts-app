@@ -4,6 +4,7 @@ import AddIconImage from './images/add-icon.svg';
 import ContactIconImage from './images/contact-icon.svg';
 import CrossIconImage from './images/cross-icon.svg';
 import DeleteIconImage from './images/delete-icon.svg';
+import DeleteIconOutlineImage from './images/delete-icon-outline.svg';
 import FavoriteIconImage from './images/favorite-icon.svg';
 import FavoriteIconOutlineImage from './images/favorite-icon-outline.svg';
 import GroupIconImage from './images/group-icon.svg';
@@ -53,10 +54,12 @@ export function CrossIcon(props)
 
 export function DeleteIcon(props)
 {
-    let { width, height } = props;
+    let { width, height, outline } = props;
 
     return (
-        <DeleteIconImage width={ width } height={ height } viewBox="0 0 125 148" />
+        outline ?
+            <DeleteIconOutlineImage width={ width } height={ height } viewBox="0 0 130 152" /> :
+            <DeleteIconImage width={ width } height={ height } viewBox="0 0 125 148" />
     );
 }
 
