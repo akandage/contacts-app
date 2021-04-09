@@ -1,5 +1,6 @@
 import React from 'react';
 import ContactsLogoImage from './images/contacts.svg';
+import ContactsHomeLogoImage from './images/contacts-home-logo.svg';
 import AddIconImage from './images/add-icon.svg';
 import ContactIconImage from './images/contact-icon.svg';
 import CrossIconImage from './images/cross-icon.svg';
@@ -22,6 +23,15 @@ export function ContactsLogo(props)
 
     return (
         <ContactsLogoImage width={ width } height={ height } viewBox="0 0 150 117" />
+    );
+}
+
+export function ContactsHomeLogo(props)
+{
+    let { width, height } = props;
+
+    return (
+        <ContactsHomeLogoImage className="contacts-home-logo" viewBox="0 0 150 117" />
     );
 }
 

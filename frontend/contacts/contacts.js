@@ -1,5 +1,6 @@
 import React, { useEffect, useState } from 'react';
 import PropTypes from 'prop-types';
+import { Button } from 'react-bootstrap';
 import ReactDOM from 'react-dom';
 import { connect, Provider } from 'react-redux';
 import { BrowserRouter as Router, Redirect, Route, Switch } from 'react-router-dom';
@@ -7,7 +8,7 @@ import queryString from 'query-string';
 import { CONTACTS_SEARCH_URL, MAX_CONTACT_SEARCH_RESULTS, STATUS, CONFIRM_ACTION_TYPE } from './constants';
 import * as ContactAppActions from './actions/contactAppActions';
 import ContactsHeader from '../common/contactsHeader';
-import { ContactIcon, FavoriteIcon, GroupIcon, SearchIcon, SettingsIcon } from '../common/contactsImages';
+import { ContactsHomeLogo, ContactIcon, FavoriteIcon, GroupIcon, SearchIcon, SettingsIcon } from '../common/contactsImages';
 import ContactDialog, { CONTACT_DIALOG_MODE } from './components/contactDialog';
 import ConfirmActionDialog from './components/confirmActionDialog';
 import ContactList from './components/contactList';
@@ -550,6 +551,25 @@ function connectUserSettings()
     )(UserSettings);
 }
 
+function HomeView(props)
+{
+    return (
+        <>
+            <div className="contacts-home-left">
+                <ContactsHomeLogo />
+            </div>
+            <div className="contacts-home-right">
+                <h2>Contacts!</h2>
+                <div className="contacts-home-login-signup-buttons">
+                    <Button href="/login" variant="primary" block>Login</Button>
+                    <span></span>
+                    <Button href="/signup" variant="primary" block>Sign Up</Button>
+                </div>
+            </div>
+        </>
+    );
+}
+
 function ContactsView(props)
 {
     let {
@@ -822,7 +842,7 @@ function renderContactsApp()
     }
     else
     {
-        ReactDOM.render(<ContactsHeader /> , document.getElementById('contacts-header'));
+        ReactDOM.render(<HomeView /> , document.getElementById('contacts-home-main'));
     }
 }
 
