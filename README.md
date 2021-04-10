@@ -2,6 +2,8 @@
 
 Contacts app using MERN stack.
 
+![alt text](https://github.com/akandage/contacts-app/blob/b76cde6abc3115911a93a5b26b03f23197d7ea46/demo.gif "Contacts App Demo")
+
 ## Prerequisites
 
 - Node.js
